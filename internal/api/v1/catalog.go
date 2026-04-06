@@ -6,7 +6,7 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 
-	"github.com/arrsenal/configurarr/internal/core/indexer"
+	"github.com/beacon-media/pulse/internal/core/indexer"
 )
 
 type catalogEntry struct {

@@ -95,7 +95,7 @@ func testGenericHTTP(ctx context.Context, client *http.Client, url, apiKey strin
 		return TestResult{Success: false, Message: fmt.Sprintf("Invalid URL: %v", err), Duration: since(start)}
 	}
 	// Many torrent sites block requests without a browser-like user-agent.
-	req.Header.Set("User-Agent", "Mozilla/5.0 (compatible; Configurarr/1.0)")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (compatible; Pulse/1.0)")
 	if apiKey != "" {
 		req.Header.Set("X-Api-Key", apiKey)
 	}

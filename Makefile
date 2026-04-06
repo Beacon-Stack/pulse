@@ -2,11 +2,11 @@
 
 # Build the binary
 build:
-	go build -o bin/configurarr ./cmd/configurarr
+	go build -o bin/pulse ./cmd/pulse
 
 # Run the server
 run: build
-	./bin/configurarr
+	./bin/pulse
 
 # Run with hot reload (requires air: go install github.com/air-verse/air@latest)
 dev:
@@ -26,15 +26,15 @@ clean:
 
 # Build Docker image
 docker:
-	docker build -t configurarr:latest .
+	docker build -t pulse:latest .
 
 # Run in Docker
 docker-run:
 	docker run -d \
-		--name configurarr \
+		--name pulse \
 		-p 9696:9696 \
-		-v configurarr-data:/app/data \
-		configurarr:latest
+		-v pulse-data:/app/data \
+		pulse:latest
 
 # Tidy Go modules
 tidy:

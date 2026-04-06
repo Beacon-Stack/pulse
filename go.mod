@@ -1,4 +1,4 @@
-module github.com/arrsenal/configurarr
+module github.com/beacon-media/pulse
 
 go 1.25.0
 

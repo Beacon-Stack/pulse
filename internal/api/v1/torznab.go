@@ -15,9 +15,9 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	dbsqlite "github.com/arrsenal/configurarr/internal/db/generated/sqlite"
-	"github.com/arrsenal/configurarr/internal/scraper"
-	"github.com/arrsenal/configurarr/internal/torznab"
+	dbsqlite "github.com/beacon-media/pulse/internal/db/generated/sqlite"
+	"github.com/beacon-media/pulse/internal/scraper"
+	"github.com/beacon-media/pulse/internal/torznab"
 )
 
 // TorznabHandler handles Torznab proxy requests.
@@ -162,7 +162,7 @@ func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, ru
 }
 
 // writeResults encodes search results as Torznab XML.
-// Download URLs are rewritten to point at Configurarr's download proxy
+// Download URLs are rewritten to point at Pulse's download proxy
 // so clients don't need CF cookies or tracker sessions.
 func (h *TorznabHandler) writeResults(w http.ResponseWriter, r *http.Request, idx dbsqlite.Indexer, results []scraper.SearchResult) {
 	// Build the proxy download base URL from the request
@@ -216,7 +216,7 @@ func (h *TorznabHandler) xmlError(w http.ResponseWriter, code int, description s
 
 
 // HandleDownload resolves a download URL from a detail page and redirects to it.
-// This proxies downloads through Configurarr so the client doesn't need CF cookies
+// This proxies downloads through Pulse so the client doesn't need CF cookies
 // or tracker sessions. The detail page URL is passed via ?url= query param.
 //
 // GET /api/v1/torznab/{indexer_id}/download?url=https://1337x.to/torrent/12345/...

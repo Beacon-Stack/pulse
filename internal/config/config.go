@@ -2,7 +2,7 @@ package config
 
 // Config holds all application configuration.
 // Values are loaded from config.yaml and can be overridden by
-// CONFIGURARR_* environment variables (e.g. CONFIGURARR_SERVER_PORT=9696).
+// PULSE_* environment variables (e.g. PULSE_SERVER_PORT=9696).
 type Config struct {
 	Server       ServerConfig       `mapstructure:"server"`
 	Database     DatabaseConfig     `mapstructure:"database"`
@@ -15,7 +15,7 @@ type Config struct {
 }
 
 // FlareSolverrConfig holds optional FlareSolverr proxy settings.
-// When URL is set, Configurarr will use FlareSolverr to bypass Cloudflare
+// When URL is set, Pulse will use FlareSolverr to bypass Cloudflare
 // challenges on protected indexer sites.
 type FlareSolverrConfig struct {
 	// URL is the FlareSolverr endpoint (e.g., "http://localhost:8191").
@@ -27,7 +27,7 @@ type FlareSolverrConfig struct {
 type ServerConfig struct {
 	Host        string `mapstructure:"host"`
 	Port        int    `mapstructure:"port"`
-	ExternalURL string `mapstructure:"external_url"` // e.g., "http://configurarr:9696" — for Torznab proxy URLs
+	ExternalURL string `mapstructure:"external_url"` // e.g., "http://pulse:9696" — for Torznab proxy URLs
 }
 
 // DatabaseConfig selects and configures the database driver.
@@ -43,7 +43,7 @@ type LogConfig struct {
 	Format string `mapstructure:"format"`
 }
 
-// AuthConfig holds the Configurarr API key used to authenticate requests.
+// AuthConfig holds the Pulse API key used to authenticate requests.
 type AuthConfig struct {
 	APIKey Secret `mapstructure:"api_key"`
 }

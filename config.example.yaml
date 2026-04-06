@@ -1,11 +1,11 @@
-# Configurarr configuration
+# Beacon Pulse configuration
 server:
   host: "0.0.0.0"
   port: 9696
 
 database:
   driver: sqlite
-  path: data/configurarr.db
+  path: data/pulse.db
 
 log:
   level: info     # debug, info, warn, error

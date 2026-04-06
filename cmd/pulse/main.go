@@ -12,19 +12,19 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/arrsenal/configurarr/internal/api"
-	"github.com/arrsenal/configurarr/internal/api/ws"
-	"github.com/arrsenal/configurarr/internal/config"
-	cfgstore "github.com/arrsenal/configurarr/internal/core/config"
-	"github.com/arrsenal/configurarr/internal/core/health"
-	"github.com/arrsenal/configurarr/internal/core/indexer"
-	"github.com/arrsenal/configurarr/internal/core/registry"
-	"github.com/arrsenal/configurarr/internal/core/tag"
-	"github.com/arrsenal/configurarr/internal/db"
-	"github.com/arrsenal/configurarr/internal/core/downloadclient"
-	dbsqlite "github.com/arrsenal/configurarr/internal/db/generated/sqlite"
-	"github.com/arrsenal/configurarr/internal/events"
-	"github.com/arrsenal/configurarr/internal/scraper"
+	"github.com/beacon-media/pulse/internal/api"
+	"github.com/beacon-media/pulse/internal/api/ws"
+	"github.com/beacon-media/pulse/internal/config"
+	cfgstore "github.com/beacon-media/pulse/internal/core/config"
+	"github.com/beacon-media/pulse/internal/core/health"
+	"github.com/beacon-media/pulse/internal/core/indexer"
+	"github.com/beacon-media/pulse/internal/core/registry"
+	"github.com/beacon-media/pulse/internal/core/tag"
+	"github.com/beacon-media/pulse/internal/db"
+	"github.com/beacon-media/pulse/internal/core/downloadclient"
+	dbsqlite "github.com/beacon-media/pulse/internal/db/generated/sqlite"
+	"github.com/beacon-media/pulse/internal/events"
+	"github.com/beacon-media/pulse/internal/scraper"
 )
 
 func main() {
@@ -34,7 +34,7 @@ func main() {
 	// ── Load configuration ───────────────────────────────────────────────
 	cfg, err := config.Load(*configPath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "configurarr: %v\n", err)
+		fmt.Fprintf(os.Stderr, "pulse: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -60,7 +60,7 @@ func main() {
 	}
 	logger := slog.New(handler)
 
-	logger.Info("starting configurarr",
+	logger.Info("starting pulse",
 		"host", cfg.Server.Host,
 		"port", cfg.Server.Port,
 		"db_driver", cfg.Database.Driver,
@@ -209,7 +209,7 @@ func main() {
 
 	// ── Start server ─────────────────────────────────────────────────────
 	go func() {
-		logger.Info("configurarr listening", "addr", addr)
+		logger.Info("pulse listening", "addr", addr)
 		logger.Info("API docs available", "url", fmt.Sprintf("http://%s/api/docs", addr))
 		logger.Info("API key", "key", cfg.Auth.APIKey.Value())
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -232,5 +232,5 @@ func main() {
 	if err := srv.Shutdown(shutdownCtx); err != nil {
 		logger.Error("server shutdown error", "error", err)
 	}
-	logger.Info("configurarr stopped")
+	logger.Info("pulse stopped")
 }

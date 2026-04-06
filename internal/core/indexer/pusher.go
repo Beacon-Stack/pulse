@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	dbsqlite "github.com/arrsenal/configurarr/internal/db/generated/sqlite"
+	dbsqlite "github.com/beacon-media/pulse/internal/db/generated/sqlite"
 )
 
 // Pusher notifies services when their indexer assignments change.
@@ -27,8 +27,8 @@ func NewPusher(q dbsqlite.Querier, logger *slog.Logger) *Pusher {
 	}
 }
 
-// NotifyService sends a sync trigger to a service's Configurarr webhook.
-// The endpoint is: POST {service.api_url}/api/v1/hooks/configurarr/sync
+// NotifyService sends a sync trigger to a service's Pulse webhook.
+// The endpoint is: POST {service.api_url}/api/v1/hooks/pulse/sync
 func (p *Pusher) NotifyService(ctx context.Context, serviceID string) {
 	svc, err := p.q.GetService(ctx, serviceID)
 	if err != nil {
@@ -40,7 +40,7 @@ func (p *Pusher) NotifyService(ctx context.Context, serviceID string) {
 		return
 	}
 
-	syncURL := svc.ApiUrl + "/api/v1/hooks/configurarr/sync"
+	syncURL := svc.ApiUrl + "/api/v1/hooks/pulse/sync"
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, syncURL, nil)
 	if err != nil {

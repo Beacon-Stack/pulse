@@ -1,20 +1,20 @@
-# Example Docker Compose for the Arr ecosystem with Configurarr.
+# Example Docker Compose for the Arr ecosystem with Pulse.
 # Services auto-discover each other through the central control plane.
 #
 # Usage:
 #   docker compose up -d
-#   Open http://localhost:9696 for the Configurarr UI
+#   Open http://localhost:9696 for the Pulse UI
 #
 version: "3.9"
 
 services:
-  configurarr:
+  pulse:
     build: .
-    container_name: configurarr
+    container_name: pulse
     ports:
       - "9696:9696"
     volumes:
-      - configurarr-data:/app/data
+      - pulse-data:/app/data
     environment:
       - CONFIGURARR_LOG_LEVEL=info
       - CONFIGURARR_LOG_FORMAT=text
@@ -34,8 +34,8 @@ services:
     restart: unless-stopped
 
   # ── Example: qBittorrent download client ────────────────────────────────
-  # After startup, register it with Configurarr:
-  #   curl -X POST http://configurarr:9696/api/v1/services/register \
+  # After startup, register it with Pulse:
+  #   curl -X POST http://pulse:9696/api/v1/services/register \
   #     -H "X-Api-Key: YOUR_KEY" \
   #     -H "Content-Type: application/json" \
   #     -d '{
@@ -61,6 +61,6 @@ services:
     restart: unless-stopped
 
 volumes:
-  configurarr-data:
+  pulse-data:
   qbit-config:
   downloads:

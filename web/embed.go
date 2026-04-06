@@ -1,4 +1,4 @@
-// Package web serves the embedded Configurarr web UI.
+// Package web serves the embedded Pulse web UI.
 package web
 
 import (

@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
-	dbsqlite "github.com/arrsenal/configurarr/internal/db/generated/sqlite"
+	dbsqlite "github.com/beacon-media/pulse/internal/db/generated/sqlite"
 )
 
 // categoryToCapability maps indexer categories to service capability names.

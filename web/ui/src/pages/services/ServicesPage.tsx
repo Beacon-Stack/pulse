@@ -89,7 +89,7 @@ export default function ServicesPage() {
         <div style={{ color: "var(--color-text-muted)", fontSize: 13 }}>Loading...</div>
       ) : !services?.length ? (
         <div style={{ ...card, color: "var(--color-text-muted)", fontSize: 13, textAlign: "center", padding: 40 }}>
-          No services registered. Services will appear here once they connect to Configurarr.
+          No services registered. Services will appear here once they connect to Pulse.
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>

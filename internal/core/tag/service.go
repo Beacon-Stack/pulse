@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
-	dbsqlite "github.com/arrsenal/configurarr/internal/db/generated/sqlite"
+	dbsqlite "github.com/beacon-media/pulse/internal/db/generated/sqlite"
 )
 
 // TagWithCounts is a tag enriched with usage counts.

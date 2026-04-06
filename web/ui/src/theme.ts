@@ -1,6 +1,6 @@
 // ── Theme system ──────────────────────────────────────────────────────────────
 // Copied from Luminarr — same presets, same CSS custom property approach.
-// Storage keys use "configurarr-" prefix to avoid collisions.
+// Storage keys use "pulse-" prefix to avoid collisions.
 
 export type ThemeMode = "dark" | "light" | "system";
 
@@ -32,7 +32,7 @@ export interface ThemePreset {
 
 export const THEME_PRESETS: ThemePreset[] = [
   {
-    id: "configurarr", label: "Configurarr", mode: "dark",
+    id: "pulse", label: "Pulse", mode: "dark",
     preview: { bg: "#0d0d12", surface: "#13131a", accent: "#7c6af7", text: "#f0f0f5" },
     vars: { "bg-base": "#0d0d12", "bg-surface": "#13131a", "bg-elevated": "#1c1c27", "bg-subtle": "#252535", "border-subtle": "rgba(255,255,255,0.078)", "border-default": "rgba(255,255,255,0.133)", "border-strong": "rgba(255,255,255,0.267)", accent: "#7c6af7", "accent-hover": "#9283f9", "accent-muted": "rgba(124,106,247,0.12)", "accent-fg": "#ffffff", "text-primary": "#f0f0f5", "text-secondary": "#9898b0", "text-muted": "#5a5a72", success: "#34d399", warning: "#fbbf24", danger: "#f87171" },
   },
@@ -63,12 +63,12 @@ export const THEME_PRESETS: ThemePreset[] = [
   },
 ];
 
-export const DEFAULT_DARK_PRESET = "configurarr";
+export const DEFAULT_DARK_PRESET = "pulse";
 export const DEFAULT_LIGHT_PRESET = "catppuccin-latte";
 
-const KEY_MODE = "configurarr-theme-mode";
-const KEY_DARK = "configurarr-theme-dark";
-const KEY_LIGHT = "configurarr-theme-light";
+const KEY_MODE = "pulse-theme-mode";
+const KEY_DARK = "pulse-theme-dark";
+const KEY_LIGHT = "pulse-theme-light";
 
 function applyPreset(preset: ThemePreset): void {
   const root = document.documentElement;

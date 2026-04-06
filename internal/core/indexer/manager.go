@@ -8,8 +8,8 @@ import (
 
 	"github.com/google/uuid"
 
-	dbsqlite "github.com/arrsenal/configurarr/internal/db/generated/sqlite"
-	"github.com/arrsenal/configurarr/internal/events"
+	dbsqlite "github.com/beacon-media/pulse/internal/db/generated/sqlite"
+	"github.com/beacon-media/pulse/internal/events"
 )
 
 // Input is the data required to create or update an indexer.

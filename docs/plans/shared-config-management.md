@@ -2,7 +2,7 @@
 
 ## Context
 
-Configurarr is the central control plane for the Arr ecosystem. Currently it manages indexers — now we're extending it to manage all shared configuration that multiple services need. Instead of configuring quality profiles, download clients, naming rules, and media management settings in each service separately, users configure them once in Configurarr and they're pushed to all connected services.
+Pulse is the central control plane for the Arr ecosystem. Currently it manages indexers — now we're extending it to manage all shared configuration that multiple services need. Instead of configuring quality profiles, download clients, naming rules, and media management settings in each service separately, users configure them once in Pulse and they're pushed to all connected services.
 
 ## Scope
 
@@ -18,9 +18,9 @@ Four config domains, in build order:
 Each config domain follows the same pattern:
 
 ```
-User configures in Configurarr UI
+User configures in Pulse UI
   ↓
-Stored in Configurarr's DB
+Stored in Pulse's DB
   ↓
 When a service registers (or config changes):
   Push to all subscribed services via webhook
@@ -110,8 +110,8 @@ func (c *Client) MyDownloadClients(ctx context.Context) ([]DownloadClient, error
 
 ### Luminarr Integration
 
-Add download client sync to `internal/configurarr/sync.go`:
-- Pull download clients from Configurarr on startup
+Add download client sync to `internal/pulse/sync.go`:
+- Pull download clients from Pulse on startup
 - Create/update/delete in Luminarr's local DB (same pattern as indexer sync)
 - Match by name to detect existing vs new
 
@@ -199,7 +199,7 @@ Store as config entries with namespace `media`:
 | File | Change |
 |------|--------|
 | `internal/api/router.go` | Register download client routes |
-| `cmd/configurarr/main.go` | Wire download client service |
+| `cmd/pulse/main.go` | Wire download client service |
 | `web/ui/src/App.tsx` | Add routes |
 | `web/ui/src/layouts/Shell.tsx` | Add sidebar nav item |
 | `pkg/sdk/client.go` | Add MyDownloadClients() |
@@ -207,9 +207,9 @@ Store as config entries with namespace `media`:
 
 ## Verification (Phase 1)
 
-1. Add qBittorrent in Configurarr UI with host/port/credentials
+1. Add qBittorrent in Pulse UI with host/port/credentials
 2. Click Test — verify connectivity
 3. Start Luminarr — download client auto-synced
-4. Check Luminarr Settings → Download Clients — qBittorrent appears with Configurarr badge
-5. Update credentials in Configurarr — Luminarr updates within 30s
-6. Delete in Configurarr — removed from Luminarr
+4. Check Luminarr Settings → Download Clients — qBittorrent appears with Pulse badge
+5. Update credentials in Pulse — Luminarr updates within 30s
+6. Delete in Pulse — removed from Luminarr

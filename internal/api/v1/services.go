@@ -6,7 +6,7 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 
-	"github.com/arrsenal/configurarr/internal/core/registry"
+	"github.com/beacon-media/pulse/internal/core/registry"
 )
 
 // ── Request / Response types ─────────────────────────────────────────────────

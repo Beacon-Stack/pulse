@@ -8,8 +8,8 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 
-	dbsqlite "github.com/arrsenal/configurarr/internal/db/generated/sqlite"
-	"github.com/arrsenal/configurarr/internal/core/indexer"
+	dbsqlite "github.com/beacon-media/pulse/internal/db/generated/sqlite"
+	"github.com/beacon-media/pulse/internal/core/indexer"
 )
 
 // ── Request / Response types ─────────────────────────────────────────────────
@@ -87,8 +87,8 @@ func toIndexerBody(row dbsqlite.Indexer) indexerBody {
 }
 
 // RegisterIndexerRoutes registers indexer management endpoints.
-// proxyBaseURL is the Configurarr external URL used for Torznab proxy URL rewriting
-// (e.g., "http://configurarr:9696"). If empty, URLs are not rewritten.
+// proxyBaseURL is the Pulse external URL used for Torznab proxy URL rewriting
+// (e.g., "http://pulse:9696"). If empty, URLs are not rewritten.
 func RegisterIndexerRoutes(api huma.API, mgr *indexer.Manager, proxyBaseURL ...string) {
 	baseURL := ""
 	if len(proxyBaseURL) > 0 {
@@ -291,9 +291,9 @@ func RegisterIndexerRoutes(api huma.API, mgr *indexer.Manager, proxyBaseURL ...s
 		items := make([]indexerBody, len(rows))
 		for i, r := range rows {
 			body := toIndexerBody(r)
-			// Rewrite URL to point at Configurarr's Torznab proxy for scraped indexers.
+			// Rewrite URL to point at Pulse's Torznab proxy for scraped indexers.
 			// If the URL isn't already a Torznab/Newznab API endpoint, replace it
-			// with the proxy URL so Luminarr queries through Configurarr.
+			// with the proxy URL so Luminarr queries through Pulse.
 			if baseURL != "" && !isNativeTorznabURL(r.Url) {
 				body.URL = fmt.Sprintf("%s/api/v1/torznab/%s", baseURL, r.ID)
 			}

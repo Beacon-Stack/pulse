@@ -1,10 +1,10 @@
 // Package sdk provides a Go client for ecosystem services to register with
-// Configurarr, send heartbeats, discover peers, and subscribe to config.
+// Pulse, send heartbeats, discover peers, and subscribe to config.
 //
 // Usage:
 //
 //	client, err := sdk.New(sdk.Config{
-//	    ConfigurarURL: "http://configurarr:9696",
+//	    PulseURL: "http://pulse:9696",
 //	    APIKey:         "your-api-key",
 //	    ServiceName:    "luminarr",
 //	    ServiceType:    "media-manager",
@@ -32,12 +32,12 @@ import (
 	"time"
 )
 
-// Config holds the settings for connecting to Configurarr.
+// Config holds the settings for connecting to Pulse.
 type Config struct {
-	// ConfigurarURL is the base URL of the Configurarr instance (e.g. "http://configurarr:9696").
-	ConfigurarURL string
+	// PulseURL is the base URL of the Pulse instance (e.g. "http://pulse:9696").
+	PulseURL string
 
-	// APIKey is the Configurarr API key for authentication.
+	// APIKey is the Pulse API key for authentication.
 	APIKey string
 
 	// ServiceName is the name this service registers under (e.g. "luminarr").
@@ -68,7 +68,7 @@ type Config struct {
 	HTTPClient *http.Client
 }
 
-// Client is the Configurarr SDK client. Create one with New().
+// Client is the Pulse SDK client. Create one with New().
 type Client struct {
 	cfg       Config
 	serviceID string
@@ -79,12 +79,12 @@ type Client struct {
 	wg     sync.WaitGroup
 }
 
-// New creates a new SDK client, registers the service with Configurarr,
+// New creates a new SDK client, registers the service with Pulse,
 // and starts the heartbeat loop. Call Close() to stop the heartbeat and
 // deregister (optional).
 func New(cfg Config) (*Client, error) {
-	if cfg.ConfigurarURL == "" {
-		return nil, fmt.Errorf("sdk: ConfigurarURL is required")
+	if cfg.PulseURL == "" {
+		return nil, fmt.Errorf("sdk: PulseURL is required")
 	}
 	if cfg.APIKey == "" {
 		return nil, fmt.Errorf("sdk: APIKey is required")
@@ -121,7 +121,7 @@ func New(cfg Config) (*Client, error) {
 		return nil, fmt.Errorf("sdk: registration failed: %w", err)
 	}
 	c.serviceID = svc.ID
-	c.logger.Info("sdk: registered with configurarr",
+	c.logger.Info("sdk: registered with pulse",
 		"service_id", svc.ID,
 		"name", svc.Name,
 		"type", svc.Type,
@@ -136,19 +136,19 @@ func New(cfg Config) (*Client, error) {
 	return c, nil
 }
 
-// ServiceID returns the ID assigned by Configurarr during registration.
+// ServiceID returns the ID assigned by Pulse during registration.
 func (c *Client) ServiceID() string {
 	return c.serviceID
 }
 
 // Close stops the heartbeat loop. It does NOT deregister — the service
-// remains registered so Configurarr can track it went offline via health checks.
+// remains registered so Pulse can track it went offline via health checks.
 func (c *Client) Close() {
 	c.cancel()
 	c.wg.Wait()
 }
 
-// Deregister stops the heartbeat and removes this service from Configurarr.
+// Deregister stops the heartbeat and removes this service from Pulse.
 func (c *Client) Deregister(ctx context.Context) error {
 	c.Close()
 	return c.doRequest(ctx, "DELETE", fmt.Sprintf("/api/v1/services/%s", c.serviceID), nil, nil)
@@ -251,7 +251,7 @@ type Indexer struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-// MyIndexers returns the indexers assigned to this service by Configurarr.
+// MyIndexers returns the indexers assigned to this service by Pulse.
 func (c *Client) MyIndexers(ctx context.Context) ([]Indexer, error) {
 	var out []Indexer
 	err := c.doRequest(ctx, "GET", fmt.Sprintf("/api/v1/services/%s/indexers", c.serviceID), nil, &out)
@@ -333,7 +333,7 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body any, r
 		bodyReader = bytes.NewReader(b)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, method, c.cfg.ConfigurarURL+path, bodyReader)
+	req, err := http.NewRequestWithContext(ctx, method, c.cfg.PulseURL+path, bodyReader)
 	if err != nil {
 		return fmt.Errorf("creating request: %w", err)
 	}

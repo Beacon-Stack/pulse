@@ -11,18 +11,18 @@ import (
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 
-	"github.com/arrsenal/configurarr/internal/api/middleware"
-	v1 "github.com/arrsenal/configurarr/internal/api/v1"
-	"github.com/arrsenal/configurarr/internal/api/ws"
-	appconfig "github.com/arrsenal/configurarr/internal/config"
-	cfgstore "github.com/arrsenal/configurarr/internal/core/config"
-	"github.com/arrsenal/configurarr/internal/core/downloadclient"
-	"github.com/arrsenal/configurarr/internal/core/indexer"
-	"github.com/arrsenal/configurarr/internal/core/registry"
-	"github.com/arrsenal/configurarr/internal/core/tag"
-	dbsqlite "github.com/arrsenal/configurarr/internal/db/generated/sqlite"
-	"github.com/arrsenal/configurarr/internal/scraper"
-	"github.com/arrsenal/configurarr/web"
+	"github.com/beacon-media/pulse/internal/api/middleware"
+	v1 "github.com/beacon-media/pulse/internal/api/v1"
+	"github.com/beacon-media/pulse/internal/api/ws"
+	appconfig "github.com/beacon-media/pulse/internal/config"
+	cfgstore "github.com/beacon-media/pulse/internal/core/config"
+	"github.com/beacon-media/pulse/internal/core/downloadclient"
+	"github.com/beacon-media/pulse/internal/core/indexer"
+	"github.com/beacon-media/pulse/internal/core/registry"
+	"github.com/beacon-media/pulse/internal/core/tag"
+	dbsqlite "github.com/beacon-media/pulse/internal/db/generated/sqlite"
+	"github.com/beacon-media/pulse/internal/scraper"
+	"github.com/beacon-media/pulse/web"
 )
 
 // RouterConfig holds everything the router needs to function.
@@ -38,7 +38,7 @@ type RouterConfig struct {
 	DownloadClientService *downloadclient.Service
 	ScraperEngine        *scraper.Engine
 	Queries              dbsqlite.Querier
-	ExternalURL          string // e.g., "http://configurarr:9696" — used for Torznab proxy URL rewriting
+	ExternalURL          string // e.g., "http://pulse:9696" — used for Torznab proxy URL rewriting
 }
 
 // NewRouter builds and returns the application HTTP handler.
@@ -70,11 +70,11 @@ func NewRouter(cfg RouterConfig) http.Handler {
 		_, _ = w.Write([]byte(`{"status":"ok"}`))
 	})
 
-	humaConfig := huma.DefaultConfig("Configurarr API", "0.1.0")
+	humaConfig := huma.DefaultConfig("Pulse API", "0.1.0")
 	humaConfig.DocsPath = "/api/docs"
 	humaConfig.OpenAPIPath = "/api/openapi"
 	humaConfig.SchemasPath = "/api/schemas"
-	humaConfig.Info.Description = "Configurarr — centralized control plane for the Arr ecosystem. " +
+	humaConfig.Info.Description = "Pulse — centralized control plane for the Arr ecosystem. " +
 		"Manages service registration, discovery, shared configuration, and indexer assignment."
 
 	humaAPI := humachi.New(r, humaConfig)

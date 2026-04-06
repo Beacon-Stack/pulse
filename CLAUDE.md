@@ -1,11 +1,11 @@
-# Configurarr
+# Beacon Pulse
 
 Centralized control plane for the Arr ecosystem — service registry, discovery, shared config, and indexer management.
 
 ## Build & Run
 
 ```bash
-make build          # compile binary to bin/configurarr
+make build          # compile binary to bin/pulse
 make run            # build + run
 make dev            # hot-reload with air
 make sqlc           # regenerate SQLC code from SQL queries
@@ -25,7 +25,7 @@ npm run build       # production build → web/static/
 ## Project Structure
 
 ```
-cmd/configurarr/        main entry point
+cmd/pulse/        main entry point
 pkg/sdk/                Go client SDK for ecosystem services
 internal/
   api/                  HTTP layer (Huma v2 + Chi v5)
@@ -55,7 +55,7 @@ web/
 - **Go 1.25** with Huma v2 (OpenAPI-first) + Chi v5 router
 - **SQLite** (WAL mode) via SQLC for type-safe queries
 - **Goose** for database migrations
-- **Viper** for config (YAML + env vars `CONFIGURARR_*`)
+- **Viper** for config (YAML + env vars `PULSE_*`)
 - **WebSocket** (coder/websocket) for real-time event streaming
 - **React 19** + TypeScript + Vite + TailwindCSS v4 frontend
 - **React Query** for server state, **Sonner** for toasts
@@ -68,17 +68,17 @@ web/
 - Same-origin browser requests trusted via Sec-Fetch-Site
 - Event bus is non-blocking, handlers run in goroutines
 - SQLC generated code lives in `internal/db/generated/sqlite/` — never edit directly
-- Config supports env var overrides: `CONFIGURARR_SERVER_PORT=8080`
+- Config supports env var overrides: `PULSE_SERVER_PORT=8080`
 - Frontend uses inline CSS with CSS custom properties for theming (same as Luminarr)
 - Catalog entries live in `internal/core/indexer/catalog_data.go` — add new indexers there
 
 ## Client SDK
 
-The `pkg/sdk` package lets any Go service integrate with Configurarr:
+The `pkg/sdk` package lets any Go service integrate with Pulse:
 
 ```go
 client, err := sdk.New(sdk.Config{
-    ConfigurarURL: "http://configurarr:9696",
+    ConfigurarURL: "http://pulse:9696",
     APIKey:        "your-api-key",
     ServiceName:   "luminarr",
     ServiceType:   "media-manager",
@@ -159,4 +159,4 @@ All endpoints are under `/api/v1/`. Interactive docs at `/api/docs`.
 
 ## Default Port
 
-9696 (configurable via `CONFIGURARR_SERVER_PORT` or `config.yaml`)
+9696 (configurable via `PULSE_SERVER_PORT` or `config.yaml`)

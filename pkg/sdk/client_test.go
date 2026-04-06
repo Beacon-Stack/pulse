@@ -11,16 +11,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/arrsenal/configurarr/internal/api"
-	"github.com/arrsenal/configurarr/internal/api/ws"
-	appconfig "github.com/arrsenal/configurarr/internal/config"
-	cfgstore "github.com/arrsenal/configurarr/internal/core/config"
-	"github.com/arrsenal/configurarr/internal/core/indexer"
-	"github.com/arrsenal/configurarr/internal/core/registry"
-	"github.com/arrsenal/configurarr/internal/core/tag"
-	"github.com/arrsenal/configurarr/internal/db"
-	dbsqlite "github.com/arrsenal/configurarr/internal/db/generated/sqlite"
-	"github.com/arrsenal/configurarr/internal/events"
+	"github.com/beacon-media/pulse/internal/api"
+	"github.com/beacon-media/pulse/internal/api/ws"
+	appconfig "github.com/beacon-media/pulse/internal/config"
+	cfgstore "github.com/beacon-media/pulse/internal/core/config"
+	"github.com/beacon-media/pulse/internal/core/indexer"
+	"github.com/beacon-media/pulse/internal/core/registry"
+	"github.com/beacon-media/pulse/internal/core/tag"
+	"github.com/beacon-media/pulse/internal/db"
+	dbsqlite "github.com/beacon-media/pulse/internal/db/generated/sqlite"
+	"github.com/beacon-media/pulse/internal/events"
 
 	_ "modernc.org/sqlite"
 )
@@ -69,7 +69,7 @@ func TestSDKRegisterAndDiscover(t *testing.T) {
 
 	// Register service A
 	clientA, err := New(Config{
-		ConfigurarURL:     ts.URL,
+		PulseURL:     ts.URL,
 		APIKey:            testAPIKey,
 		ServiceName:       "test-downloader",
 		ServiceType:       "download-client",
@@ -91,7 +91,7 @@ func TestSDKRegisterAndDiscover(t *testing.T) {
 
 	// Register service B
 	clientB, err := New(Config{
-		ConfigurarURL:     ts.URL,
+		PulseURL:     ts.URL,
 		APIKey:            testAPIKey,
 		ServiceName:       "test-luminarr",
 		ServiceType:       "media-manager",
@@ -143,7 +143,7 @@ func TestSDKConfigOperations(t *testing.T) {
 	ts := setupTestServer(t)
 
 	client, err := New(Config{
-		ConfigurarURL:     ts.URL,
+		PulseURL:     ts.URL,
 		APIKey:            testAPIKey,
 		ServiceName:       "config-test",
 		ServiceType:       "automation",
@@ -194,7 +194,7 @@ func TestSDKDeregister(t *testing.T) {
 	ts := setupTestServer(t)
 
 	client, err := New(Config{
-		ConfigurarURL:     ts.URL,
+		PulseURL:     ts.URL,
 		APIKey:            testAPIKey,
 		ServiceName:       "ephemeral",
 		ServiceType:       "automation",

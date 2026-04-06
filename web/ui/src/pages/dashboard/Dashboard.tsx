@@ -65,7 +65,7 @@ export default function Dashboard() {
       </h2>
       {!services?.length ? (
         <div style={{ ...card, color: "var(--color-text-muted)", fontSize: 13, textAlign: "center", padding: 40 }}>
-          No services registered yet. Services will appear here once they register with Configurarr.
+          No services registered yet. Services will appear here once they register with Pulse.
         </div>
       ) : (
         <div style={{ ...card, padding: 0, overflow: "hidden" }}>

@@ -188,7 +188,7 @@ function Sidebar({
                 flex: 1,
               }}
             >
-              Configurarr
+              Pulse
             </span>
           )}
         </Link>
@@ -430,7 +430,7 @@ export function Shell() {
                   letterSpacing: "-0.01em",
                 }}
               >
-                Configurarr
+                Pulse
               </span>
             </Link>
           </div>

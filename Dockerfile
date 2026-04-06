@@ -8,21 +8,21 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN CGO_ENABLED=1 go build -o /configurarr ./cmd/configurarr
+RUN CGO_ENABLED=1 go build -o /pulse ./cmd/pulse
 
 # ── Runtime stage ──────────────────────────────────────────────────────��─────
 FROM alpine:3.21
 
 RUN apk add --no-cache ca-certificates tzdata
-RUN adduser -D -h /app configurarr
+RUN adduser -D -h /app pulse
 
 WORKDIR /app
-COPY --from=build /configurarr .
+COPY --from=build /pulse .
 
-USER configurarr
+USER pulse
 
 EXPOSE 9696
 
 VOLUME ["/app/data"]
 
-ENTRYPOINT ["./configurarr"]
+ENTRYPOINT ["./pulse"]

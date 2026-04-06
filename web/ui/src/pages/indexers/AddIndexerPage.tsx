@@ -633,7 +633,7 @@ function ConfigDrawer({
       setTestMessage(data.message + (data.duration ? ` (${data.duration})` : ""));
     } catch {
       setTestStatus("error");
-      setTestMessage("Request failed — is Configurarr running?");
+      setTestMessage("Request failed — is Pulse running?");
     }
   };
 

@@ -11,13 +11,13 @@ import (
 	"github.com/spf13/viper"
 )
 
-// dataDir returns the default data directory: ~/.config/configurarr/
+// dataDir returns the default data directory: ~/.config/pulse/
 func dataDir() string {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return "data" // fallback to relative
 	}
-	return filepath.Join(home, ".config", "configurarr")
+	return filepath.Join(home, ".config", "pulse")
 }
 
 // Load reads configuration from file, env, and flags, then returns a Config.
@@ -30,18 +30,18 @@ func Load(configPath string) (*Config, error) {
 	v.SetDefault("server.host", "0.0.0.0")
 	v.SetDefault("server.port", 9696)
 	v.SetDefault("database.driver", "sqlite")
-	v.SetDefault("database.path", filepath.Join(dir, "configurarr.db"))
+	v.SetDefault("database.path", filepath.Join(dir, "pulse.db"))
 	v.SetDefault("log.level", "info")
 	v.SetDefault("log.format", "json")
 
-	// Env vars: CONFIGURARR_SERVER_PORT, etc.
-	v.SetEnvPrefix("CONFIGURARR")
+	// Env vars: PULSE_SERVER_PORT, etc.
+	v.SetEnvPrefix("PULSE")
 	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	v.AutomaticEnv()
 
 	// Config file search order:
 	//   1. Explicit path via --config flag
-	//   2. ~/.config/configurarr/config.yaml
+	//   2. ~/.config/pulse/config.yaml
 	//   3. /config/config.yaml (Docker volume mount)
 	//   4. ./config.yaml (CWD fallback)
 	if configPath != "" {
@@ -106,7 +106,7 @@ func WriteDefault(path string) error {
 
 	dir := dataDir()
 	key, _ := generateAPIKey()
-	content := fmt.Sprintf(`# Configurarr configuration
+	content := fmt.Sprintf(`# Pulse configuration
 server:
   host: "0.0.0.0"
   port: 9696
@@ -121,7 +121,7 @@ log:
 
 auth:
   api_key: "%s"
-`, filepath.Join(dir, "configurarr.db"), key)
+`, filepath.Join(dir, "pulse.db"), key)
 
 	return os.WriteFile(path, []byte(content), 0o600)
 }

@@ -1,8 +1,8 @@
-# Plan: FlareSolverr Integration for Configurarr
+# Plan: FlareSolverr Integration for Pulse
 
 ## Context
 
-53 of 548 Prowlarr indexer definitions reference FlareSolverr (including popular ones like 1337x). When Configurarr's scraper engine fetches these sites, Cloudflare returns a 403 challenge page instead of results. The scraper currently detects this (`CloudflareError`) and reports "Blocked by Cloudflare — requires FlareSolverr" but can't bypass it.
+53 of 548 Prowlarr indexer definitions reference FlareSolverr (including popular ones like 1337x). When Pulse's scraper engine fetches these sites, Cloudflare returns a 403 challenge page instead of results. The scraper currently detects this (`CloudflareError`) and reports "Blocked by Cloudflare — requires FlareSolverr" but can't bypass it.
 
 FlareSolverr is a proxy server that runs a headless browser (Selenium/Chrome) to solve Cloudflare challenges, then returns the HTML and session cookies. Once we have the cookies, subsequent direct HTTP requests work without the browser.
 
@@ -120,7 +120,7 @@ This is a **transparent fallback** — the runner tries the direct request first
 - Accept `*FlareSolverr` in constructor, pass to runners
 - `NewEngine(logger, flaresolverr *FlareSolverr)`
 
-**Modify:** `cmd/configurarr/main.go`
+**Modify:** `cmd/pulse/main.go`
 - Read FlareSolverr config
 - Create `FlareSolverr` client if URL is configured
 - Pass to engine
@@ -164,7 +164,7 @@ This is a **transparent fallback** — the runner tries the direct request first
 | Modify | `internal/scraper/engine.go` | Pass FlareSolverr to runners |
 | Modify | `internal/config/config.go` | Add FlareSolverrConfig |
 | Modify | `internal/config/load.go` | Wire FlareSolverr config |
-| Modify | `cmd/configurarr/main.go` | Create FlareSolverr client, pass to engine |
+| Modify | `cmd/pulse/main.go` | Create FlareSolverr client, pass to engine |
 | Modify | `config.example.yaml` | Add flaresolverr section |
 | Modify | `docker-compose.yml` | Add flaresolverr service |
 
@@ -176,13 +176,13 @@ flaresolverr:
   url: "http://localhost:8191"  # empty = disabled
 ```
 
-Environment variable: `CONFIGURARR_FLARESOLVERR_URL=http://flaresolverr:8191`
+Environment variable: `PULSE_FLARESOLVERR_URL=http://flaresolverr:8191`
 
 ## Verification
 
 1. Start FlareSolverr: `docker run -d -p 8191:8191 ghcr.io/flaresolverr/flaresolverr:latest`
-2. Configure: set `flaresolverr.url` in Configurarr config
-3. Add 1337x indexer in Configurarr
+2. Configure: set `flaresolverr.url` in Pulse config
+3. Add 1337x indexer in Pulse
 4. Test it — should succeed instead of returning "Cloudflare blocked"
 5. Check logs: should see "flaresolverr: solved challenge for 1337x.to" + "using cached CF session"
 6. Second search should use cached cookies (no FlareSolverr call)
