@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -34,6 +36,7 @@ func NewTorznabHandler(engine *scraper.Engine, q dbsqlite.Querier, logger *slog.
 // This is registered directly on chi (not Huma) because Torznab uses XML, not JSON.
 func RegisterTorznabRoutes(r chi.Router, h *TorznabHandler) {
 	r.Get("/api/v1/torznab/{indexer_id}/api", h.Handle)
+	r.Get("/api/v1/torznab/{indexer_id}/download", h.HandleDownload)
 	r.Post("/api/v1/indexers/{indexer_id}/test-search", h.HandleTestSearch)
 }
 
@@ -136,7 +139,7 @@ func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, ru
 	// Check cache
 	cacheKey := fmt.Sprintf("%s:%s:%v", idx.ID, query, cats)
 	if cached, ok := h.engine.Cache().Get(cacheKey); ok {
-		h.writeResults(w, idx.Name, cached)
+		h.writeResults(w, r, idx, cached)
 		return
 	}
 
@@ -155,32 +158,47 @@ func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, ru
 	h.logger.Info("torznab: search complete",
 		"indexer", idx.Name, "query", query, "results", len(results))
 
-	h.writeResults(w, idx.Name, results)
+	h.writeResults(w, r, idx, results)
 }
 
 // writeResults encodes search results as Torznab XML.
-func (h *TorznabHandler) writeResults(w http.ResponseWriter, indexerName string, results []scraper.SearchResult) {
+// Download URLs are rewritten to point at Configurarr's download proxy
+// so clients don't need CF cookies or tracker sessions.
+func (h *TorznabHandler) writeResults(w http.ResponseWriter, r *http.Request, idx dbsqlite.Indexer, results []scraper.SearchResult) {
+	// Build the proxy download base URL from the request
+	scheme := "http"
+	if r.TLS != nil {
+		scheme = "https"
+	}
+	proxyBase := fmt.Sprintf("%s://%s/api/v1/torznab/%s/download", scheme, r.Host, idx.ID)
+
 	var items []torznab.Item
-	for _, r := range results {
-		downloadURL := r.Download
+	for _, res := range results {
+		downloadURL := res.Download
 		if downloadURL == "" {
-			downloadURL = r.MagnetURI
+			downloadURL = res.MagnetURI
 		}
 
-		guid := r.Details
+		// Rewrite download URL through the proxy unless it's already a magnet
+		enclosureURL := downloadURL
+		if downloadURL != "" && !strings.HasPrefix(downloadURL, "magnet:") {
+			enclosureURL = proxyBase + "?url=" + url.QueryEscape(downloadURL)
+		}
+
+		guid := res.Details
 		if guid == "" {
 			guid = downloadURL
 		}
 
 		items = append(items, torznab.SearchResultToItem(
-			r.Title, guid, r.Details, r.Date, r.Size,
-			downloadURL, r.Seeders, r.Leechers,
-			r.DownloadVolumeFactor, r.UploadVolumeFactor,
-			r.Category,
+			res.Title, guid, res.Details, res.Date, res.Size,
+			enclosureURL, res.Seeders, res.Leechers,
+			res.DownloadVolumeFactor, res.UploadVolumeFactor,
+			res.Category,
 		))
 	}
 
-	feed := torznab.NewFeed(indexerName, items)
+	feed := torznab.NewFeed(idx.Name, items)
 
 	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
@@ -196,6 +214,89 @@ func (h *TorznabHandler) xmlError(w http.ResponseWriter, code int, description s
 <error code="%d" description="%s"/>`, code, description)
 }
 
+
+// HandleDownload resolves a download URL from a detail page and redirects to it.
+// This proxies downloads through Configurarr so the client doesn't need CF cookies
+// or tracker sessions. The detail page URL is passed via ?url= query param.
+//
+// GET /api/v1/torznab/{indexer_id}/download?url=https://1337x.to/torrent/12345/...
+func (h *TorznabHandler) HandleDownload(w http.ResponseWriter, r *http.Request) {
+	indexerID := chi.URLParam(r, "indexer_id")
+	detailURL := r.URL.Query().Get("url")
+
+	if detailURL == "" {
+		http.Error(w, "missing url parameter", http.StatusBadRequest)
+		return
+	}
+
+	// If the URL is already a magnet link, redirect directly
+	if strings.HasPrefix(detailURL, "magnet:") {
+		http.Redirect(w, r, detailURL, http.StatusFound)
+		return
+	}
+
+	idx, err := h.q.GetIndexer(r.Context(), indexerID)
+	if err != nil {
+		http.Error(w, "indexer not found", http.StatusNotFound)
+		return
+	}
+
+	catalogID := h.engine.ResolveCatalogID(idx.Name, idx.Url)
+	if catalogID == "" {
+		http.Error(w, "no catalog definition for indexer", http.StatusNotFound)
+		return
+	}
+
+	runner, err := h.engine.GetRunner(catalogID, idx.Settings)
+	if err != nil {
+		http.Error(w, "failed to load indexer definition", http.StatusInternalServerError)
+		return
+	}
+
+	downloadURL, err := runner.ResolveDownload(r.Context(), detailURL)
+	if err != nil {
+		h.logger.Warn("download: failed to resolve",
+			"indexer", idx.Name, "detail_url", detailURL, "error", err)
+		http.Error(w, "failed to resolve download: "+err.Error(), http.StatusBadGateway)
+		return
+	}
+
+	h.logger.Info("download: resolved",
+		"indexer", idx.Name,
+		"detail_url", detailURL,
+		"download_url", downloadURL[:min(80, len(downloadURL))],
+	)
+
+	// For magnet links, redirect
+	if strings.HasPrefix(downloadURL, "magnet:") {
+		http.Redirect(w, r, downloadURL, http.StatusFound)
+		return
+	}
+
+	// For .torrent URLs, proxy the download so the client gets the file
+	// with our CF cookies / sessions intact
+	proxyReq, err := http.NewRequestWithContext(r.Context(), http.MethodGet, downloadURL, nil)
+	if err != nil {
+		http.Error(w, "invalid download URL", http.StatusBadGateway)
+		return
+	}
+	proxyReq.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+
+	proxyResp, err := http.DefaultClient.Do(proxyReq)
+	if err != nil {
+		http.Error(w, "download failed", http.StatusBadGateway)
+		return
+	}
+	defer proxyResp.Body.Close()
+
+	// Pass through content type and body
+	w.Header().Set("Content-Type", proxyResp.Header.Get("Content-Type"))
+	if cd := proxyResp.Header.Get("Content-Disposition"); cd != "" {
+		w.Header().Set("Content-Disposition", cd)
+	}
+	w.WriteHeader(proxyResp.StatusCode)
+	io.Copy(w, proxyResp.Body)
+}
 
 // TestSearchResult is the JSON response from the test-search endpoint.
 type TestSearchResult struct {
