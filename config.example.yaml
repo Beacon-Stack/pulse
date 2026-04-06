@@ -13,3 +13,9 @@ log:
 
 auth:
   api_key: ""     # auto-generated on first run if empty
+
+# FlareSolverr — optional Cloudflare bypass proxy.
+# Required for indexers behind Cloudflare (1337x, etc.).
+# Run: docker run -d -p 8191:8191 ghcr.io/flaresolverr/flaresolverr:latest
+flaresolverr:
+  # url: "http://localhost:8191"

@@ -107,8 +107,14 @@ func main() {
 	prowlarrCatalog := indexer.NewProwlarrCatalog(logger)
 	indexer.SetCatalogSource(prowlarrCatalog.Entries)
 
+	// ── FlareSolverr (optional) ───────────────────────────────────────────
+	flaresolverr := scraper.NewFlareSolverr(cfg.FlareSolverr.URL, logger)
+	if flaresolverr != nil {
+		logger.Info("FlareSolverr configured", "url", cfg.FlareSolverr.URL)
+	}
+
 	// ── Scraper engine ───────────────────────────────────────────────────
-	scraperEngine := scraper.NewEngine(logger)
+	scraperEngine := scraper.NewEngine(logger, flaresolverr)
 
 	// ── WebSocket hub ────────────────────────────────────────────────────
 	wsHub := ws.NewHub(logger, []byte(cfg.Auth.APIKey.Value()))
@@ -145,8 +151,8 @@ func main() {
 		Addr:         addr,
 		Handler:      router,
 		ReadTimeout:  15 * time.Second,
-		WriteTimeout: 30 * time.Second,
-		IdleTimeout:  60 * time.Second,
+		WriteTimeout: 5 * time.Minute, // FlareSolverr can take 60-120s per challenge solve
+		IdleTimeout:  120 * time.Second,
 	}
 
 	// ── Background services ─────────────────────────────────────────────

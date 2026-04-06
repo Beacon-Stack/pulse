@@ -18,6 +18,19 @@ services:
     environment:
       - CONFIGURARR_LOG_LEVEL=info
       - CONFIGURARR_LOG_FORMAT=text
+      - CONFIGURARR_FLARESOLVERR_URL=http://flaresolverr:8191
+    depends_on:
+      - flaresolverr
+    restart: unless-stopped
+
+  # ── FlareSolverr — Cloudflare bypass proxy ──────────────────────────────
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    ports:
+      - "8191:8191"
+    environment:
+      - LOG_LEVEL=info
     restart: unless-stopped
 
   # ── Example: qBittorrent download client ────────────────────────────────

@@ -32,15 +32,16 @@ func IsCloudflareError(err error) bool {
 
 // Runner executes searches against a single indexer using its YAML definition.
 type Runner struct {
-	def      *Definition
-	client   *RateLimitedClient
-	settings map[string]string // user-provided config values
-	baseURL  string            // primary site URL
-	logger   *slog.Logger
+	def          *Definition
+	client       *RateLimitedClient
+	flaresolverr *FlareSolverr
+	settings     map[string]string // user-provided config values
+	baseURL      string            // primary site URL
+	logger       *slog.Logger
 }
 
 // NewRunner creates a runner for the given definition.
-func NewRunner(def *Definition, settings map[string]string, logger *slog.Logger) *Runner {
+func NewRunner(def *Definition, settings map[string]string, flaresolverr *FlareSolverr, logger *slog.Logger) *Runner {
 	delay := time.Duration(def.RequestDelay) * time.Millisecond
 	baseURL := ""
 	if len(def.Links) > 0 {
@@ -61,11 +62,12 @@ func NewRunner(def *Definition, settings map[string]string, logger *slog.Logger)
 	merged["sitelink"] = baseURL + "/"
 
 	return &Runner{
-		def:      def,
-		client:   NewRateLimitedClient(delay),
-		settings: merged,
-		baseURL:  baseURL,
-		logger:   logger,
+		def:          def,
+		client:       NewRateLimitedClient(delay),
+		flaresolverr: flaresolverr,
+		settings:     merged,
+		baseURL:      baseURL,
+		logger:       logger,
 	}
 }
 
@@ -128,6 +130,14 @@ func (r *Runner) executePath(ctx context.Context, path SearchPath, tmplCtx *Temp
 		"url", fullURL,
 	)
 
+	// Check for a cached FlareSolverr session for this domain and apply it.
+	domain := extractDomainFromURL(fullURL)
+	if r.flaresolverr != nil && domain != "" {
+		if sess, ok := r.flaresolverr.GetSession(domain); ok {
+			r.client.ApplyCFSession(fullURL, sess.ToHTTPCookies(), sess.userAgent)
+		}
+	}
+
 	// Build request
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fullURL, nil)
 	if err != nil {
@@ -145,6 +155,11 @@ func (r *Runner) executePath(ctx context.Context, path SearchPath, tmplCtx *Temp
 		cfHeader := resp.Header.Get("Cf-Mitigated")
 		server := resp.Header.Get("Server")
 		if cfHeader == "challenge" || strings.Contains(strings.ToLower(server), "cloudflare") {
+			// Try FlareSolverr if available
+			if r.flaresolverr != nil {
+				resp.Body.Close()
+				return r.solveWithFlareSolverr(ctx, fullURL, path, tmplCtx)
+			}
 			return nil, &CloudflareError{StatusCode: resp.StatusCode}
 		}
 		return nil, fmt.Errorf("HTTP %d", resp.StatusCode)
@@ -170,6 +185,29 @@ func (r *Runner) executePath(ctx context.Context, path SearchPath, tmplCtx *Temp
 		return r.parseJSON(string(body), tmplCtx)
 	default:
 		return r.parseHTML(string(body), tmplCtx)
+	}
+}
+
+// solveWithFlareSolverr uses FlareSolverr to bypass Cloudflare and returns
+// parsed results from the solved page. The HTML from FlareSolverr is used
+// directly — no need to re-fetch with cookies.
+func (r *Runner) solveWithFlareSolverr(ctx context.Context, fullURL string, path SearchPath, tmplCtx *TemplateContext) ([]SearchResult, error) {
+	html, _, _, err := r.flaresolverr.Solve(ctx, fullURL)
+	if err != nil {
+		return nil, fmt.Errorf("FlareSolverr failed: %w", err)
+	}
+
+	// Use the HTML directly from FlareSolverr's response.
+	respType := "html"
+	if path.Response != nil && path.Response.Type != "" {
+		respType = path.Response.Type
+	}
+
+	switch respType {
+	case "json":
+		return r.parseJSON(html, tmplCtx)
+	default:
+		return r.parseHTML(html, tmplCtx)
 	}
 }
 

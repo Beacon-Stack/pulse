@@ -11,23 +11,26 @@ import (
 // Engine is the top-level scraping coordinator. It manages definitions,
 // runners, and the result cache.
 type Engine struct {
-	rawStore   map[string][]byte  // catalog_id → raw YAML bytes
-	nameToID   map[string]string  // normalized name → catalog_id
-	urlToID    map[string]string  // domain → catalog_id
-	mu         sync.RWMutex
-	runners    sync.Map           // catalog_id → *Runner
-	cache      *ResultCache
-	logger     *slog.Logger
+	rawStore     map[string][]byte  // catalog_id → raw YAML bytes
+	nameToID     map[string]string  // normalized name → catalog_id
+	urlToID      map[string]string  // domain → catalog_id
+	mu           sync.RWMutex
+	runners      sync.Map           // catalog_id → *Runner
+	cache        *ResultCache
+	flaresolverr *FlareSolverr
+	logger       *slog.Logger
 }
 
 // NewEngine creates a new scraping engine.
-func NewEngine(logger *slog.Logger) *Engine {
+// flaresolverr can be nil if not configured.
+func NewEngine(logger *slog.Logger, flaresolverr *FlareSolverr) *Engine {
 	return &Engine{
-		rawStore: make(map[string][]byte),
-		nameToID: make(map[string]string),
-		urlToID:  make(map[string]string),
-		cache:    NewResultCache(0),
-		logger:   logger,
+		rawStore:     make(map[string][]byte),
+		nameToID:     make(map[string]string),
+		urlToID:      make(map[string]string),
+		cache:        NewResultCache(0),
+		flaresolverr: flaresolverr,
+		logger:       logger,
 	}
 }
 
@@ -110,7 +113,7 @@ func (e *Engine) GetRunner(catalogID string, settingsJSON string) (*Runner, erro
 		}
 	}
 
-	runner := NewRunner(def, settings, e.logger)
+	runner := NewRunner(def, settings, e.flaresolverr, e.logger)
 
 	// Cache it
 	e.runners.Store(catalogID, runner)

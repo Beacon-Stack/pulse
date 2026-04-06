@@ -3,6 +3,7 @@ package scraper
 import (
 	"net/http"
 	"net/http/cookiejar"
+	"net/url"
 	"sync"
 	"time"
 )
@@ -46,4 +47,20 @@ func (c *RateLimitedClient) Do(req *http.Request) (*http.Response, error) {
 	req.Header.Set("Accept-Language", "en-US,en;q=0.5")
 
 	return c.client.Do(req)
+}
+
+// ApplyCFSession sets Cloudflare bypass cookies and user agent from a
+// FlareSolverr session onto this client's cookie jar.
+func (c *RateLimitedClient) ApplyCFSession(rawURL string, cookies []*http.Cookie, userAgent string) {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return
+	}
+	if c.client.Jar != nil {
+		c.client.Jar.SetCookies(u, cookies)
+	}
+	// Store user agent for use in subsequent requests — we override it in Do()
+	// but the CF user agent matters for cookie validation.
+	_ = userAgent // Currently we set a fixed UA in Do(); for CF bypass we'd need
+	// to use the FlareSolverr UA. For now the cookie alone is usually sufficient.
 }

@@ -4,13 +4,23 @@ package config
 // Values are loaded from config.yaml and can be overridden by
 // CONFIGURARR_* environment variables (e.g. CONFIGURARR_SERVER_PORT=9696).
 type Config struct {
-	Server   ServerConfig   `mapstructure:"server"`
-	Database DatabaseConfig `mapstructure:"database"`
-	Log      LogConfig      `mapstructure:"log"`
-	Auth     AuthConfig     `mapstructure:"auth"`
+	Server       ServerConfig       `mapstructure:"server"`
+	Database     DatabaseConfig     `mapstructure:"database"`
+	Log          LogConfig          `mapstructure:"log"`
+	Auth         AuthConfig         `mapstructure:"auth"`
+	FlareSolverr FlareSolverrConfig `mapstructure:"flaresolverr"`
 
 	// ConfigFile is the path of the config file that was loaded, if any.
 	ConfigFile string `mapstructure:"-"`
+}
+
+// FlareSolverrConfig holds optional FlareSolverr proxy settings.
+// When URL is set, Configurarr will use FlareSolverr to bypass Cloudflare
+// challenges on protected indexer sites.
+type FlareSolverrConfig struct {
+	// URL is the FlareSolverr endpoint (e.g., "http://localhost:8191").
+	// Empty means disabled.
+	URL string `mapstructure:"url"`
 }
 
 // ServerConfig controls the HTTP server.
