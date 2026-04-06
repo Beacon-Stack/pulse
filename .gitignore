@@ -1,0 +1,10 @@
+bin/
+data/
+*.db
+*.db-shm
+*.db-wal
+config.yaml
+.air.toml
+tmp/
+web/ui/node_modules/
+web/static/

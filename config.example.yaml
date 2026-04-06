@@ -1,0 +1,15 @@
+# Configurarr configuration
+server:
+  host: "0.0.0.0"
+  port: 9696
+
+database:
+  driver: sqlite
+  path: data/configurarr.db
+
+log:
+  level: info     # debug, info, warn, error
+  format: json    # json, text
+
+auth:
+  api_key: ""     # auto-generated on first run if empty

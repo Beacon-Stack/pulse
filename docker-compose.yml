@@ -1,0 +1,53 @@
+# Example Docker Compose for the Arr ecosystem with Configurarr.
+# Services auto-discover each other through the central control plane.
+#
+# Usage:
+#   docker compose up -d
+#   Open http://localhost:9696 for the Configurarr UI
+#
+version: "3.9"
+
+services:
+  configurarr:
+    build: .
+    container_name: configurarr
+    ports:
+      - "9696:9696"
+    volumes:
+      - configurarr-data:/app/data
+    environment:
+      - CONFIGURARR_LOG_LEVEL=info
+      - CONFIGURARR_LOG_FORMAT=text
+    restart: unless-stopped
+
+  # ── Example: qBittorrent download client ────────────────────────────────
+  # After startup, register it with Configurarr:
+  #   curl -X POST http://configurarr:9696/api/v1/services/register \
+  #     -H "X-Api-Key: YOUR_KEY" \
+  #     -H "Content-Type: application/json" \
+  #     -d '{
+  #       "name": "qbittorrent",
+  #       "type": "download-client",
+  #       "api_url": "http://qbittorrent:8080",
+  #       "health_url": "http://qbittorrent:8080/api/v2/app/version",
+  #       "capabilities": ["supports_torrent", "supports_categories", "supports_tags"]
+  #     }'
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - WEBUI_PORT=8080
+    volumes:
+      - qbit-config:/config
+      - downloads:/downloads
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  configurarr-data:
+  qbit-config:
+  downloads:

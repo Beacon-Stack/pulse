@@ -1,0 +1,213 @@
+package main
+
+import (
+	"context"
+	"errors"
+	"flag"
+	"fmt"
+	"log/slog"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"github.com/arrsenal/configurarr/internal/api"
+	"github.com/arrsenal/configurarr/internal/api/ws"
+	"github.com/arrsenal/configurarr/internal/config"
+	cfgstore "github.com/arrsenal/configurarr/internal/core/config"
+	"github.com/arrsenal/configurarr/internal/core/health"
+	"github.com/arrsenal/configurarr/internal/core/indexer"
+	"github.com/arrsenal/configurarr/internal/core/registry"
+	"github.com/arrsenal/configurarr/internal/core/tag"
+	"github.com/arrsenal/configurarr/internal/db"
+	dbsqlite "github.com/arrsenal/configurarr/internal/db/generated/sqlite"
+	"github.com/arrsenal/configurarr/internal/events"
+	"github.com/arrsenal/configurarr/internal/scraper"
+)
+
+func main() {
+	configPath := flag.String("config", "", "path to config.yaml")
+	flag.Parse()
+
+	// ── Load configuration ───────────────────────────────────────────────
+	cfg, err := config.Load(*configPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "configurarr: %v\n", err)
+		os.Exit(1)
+	}
+
+	// ── Logger ───────────────────────────────────────────────────────────
+	var logLevel slog.Level
+	switch cfg.Log.Level {
+	case "debug":
+		logLevel = slog.LevelDebug
+	case "warn":
+		logLevel = slog.LevelWarn
+	case "error":
+		logLevel = slog.LevelError
+	default:
+		logLevel = slog.LevelInfo
+	}
+
+	var handler slog.Handler
+	opts := &slog.HandlerOptions{Level: logLevel}
+	if cfg.Log.Format == "text" {
+		handler = slog.NewTextHandler(os.Stdout, opts)
+	} else {
+		handler = slog.NewJSONHandler(os.Stdout, opts)
+	}
+	logger := slog.New(handler)
+
+	logger.Info("starting configurarr",
+		"host", cfg.Server.Host,
+		"port", cfg.Server.Port,
+		"db_driver", cfg.Database.Driver,
+		"db_path", cfg.Database.Path,
+	)
+
+	if cfg.ConfigFile != "" {
+		logger.Info("loaded config file", "path", cfg.ConfigFile)
+	}
+
+	// ── Database ─────────────────────────────────────────────────────────
+	database, err := db.Open(cfg.Database)
+	if err != nil {
+		logger.Error("failed to open database", "error", err)
+		os.Exit(1)
+	}
+	defer database.Close()
+
+	if err := db.Migrate(database.SQL); err != nil {
+		logger.Error("failed to run migrations", "error", err)
+		os.Exit(1)
+	}
+	logger.Info("database migrations complete")
+
+	// ── Event bus ────────────────────────────────────────────────────────
+	bus := events.New(logger)
+
+	// ── SQLC queries ─────────────────────────────────────────────────────
+	queries := dbsqlite.New(database.SQL)
+
+	// ── Core services ────────────────────────────────────────────────────
+	registrySvc := registry.NewService(queries, bus, logger)
+	configStore := cfgstore.NewStore(queries, bus, logger)
+	indexerMgr := indexer.NewManager(queries, bus, logger)
+	tagSvc := tag.NewService(queries)
+	healthChecker := health.NewChecker(queries, bus, logger)
+
+	// When a new service registers, auto-assign existing indexers based on
+	// category↔capability matching (e.g., Movies indexers → content:movies services).
+	registrySvc.SetOnRegister(func(ctx context.Context, serviceID string) {
+		indexerMgr.AutoAssigner().AssignExistingIndexersToService(ctx, serviceID)
+	})
+
+	// ── Prowlarr-sourced indexer catalog ──────────────────────────────────
+	prowlarrCatalog := indexer.NewProwlarrCatalog(logger)
+	indexer.SetCatalogSource(prowlarrCatalog.Entries)
+
+	// ── Scraper engine ───────────────────────────────────────────────────
+	scraperEngine := scraper.NewEngine(logger)
+
+	// ── WebSocket hub ────────────────────────────────────────────────────
+	wsHub := ws.NewHub(logger, []byte(cfg.Auth.APIKey.Value()))
+	bus.Subscribe(wsHub.HandleEvent)
+
+	// ── HTTP router ──────────────────────────────────────────────────────
+	// Compute external URL for Torznab proxy URL rewriting.
+	externalURL := cfg.Server.ExternalURL
+	if externalURL == "" {
+		host := cfg.Server.Host
+		if host == "0.0.0.0" || host == "" {
+			host = "localhost"
+		}
+		externalURL = fmt.Sprintf("http://%s:%d", host, cfg.Server.Port)
+	}
+
+	startTime := time.Now()
+	router := api.NewRouter(api.RouterConfig{
+		Auth:            cfg.Auth.APIKey,
+		Logger:          logger,
+		StartTime:       startTime,
+		RegistryService: registrySvc,
+		ConfigStore:     configStore,
+		IndexerManager:  indexerMgr,
+		TagService:      tagSvc,
+		WSHub:           wsHub,
+		ScraperEngine:   scraperEngine,
+		Queries:         queries,
+		ExternalURL:     externalURL,
+	})
+
+	addr := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
+	srv := &http.Server{
+		Addr:         addr,
+		Handler:      router,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 30 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+
+	// ── Background services ─────────────────────────────────────────────
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// Prowlarr catalog refresh — fetch live definitions on startup, then daily.
+	// After each refresh, load the raw YAML into the scraper engine.
+	go func() {
+		prowlarrCatalog.StartRefreshLoop(ctx, 24*time.Hour)
+	}()
+	// Wait a moment for the initial fetch, then load definitions into the engine.
+	go func() {
+		// Poll until the catalog has raw YAML data (initial fetch takes a few seconds).
+		for i := 0; i < 30; i++ {
+			time.Sleep(1 * time.Second)
+			raw := prowlarrCatalog.AllRawYAML()
+			if len(raw) > 0 {
+				scraperEngine.LoadDefinitions(raw)
+				return
+			}
+		}
+		logger.Warn("scraper: timed out waiting for Prowlarr definitions")
+	}()
+
+	healthTicker := time.NewTicker(30 * time.Second)
+	go func() {
+		for {
+			select {
+			case <-healthTicker.C:
+				healthChecker.CheckAll(ctx)
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+
+	// ── Start server ─────────────────────────────────────────────────────
+	go func() {
+		logger.Info("configurarr listening", "addr", addr)
+		logger.Info("API docs available", "url", fmt.Sprintf("http://%s/api/docs", addr))
+		logger.Info("API key", "key", cfg.Auth.APIKey.Value())
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			logger.Error("server error", "error", err)
+			os.Exit(1)
+		}
+	}()
+
+	// ── Graceful shutdown ────────────────────────────────────────────────
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	logger.Info("shutting down...")
+	healthTicker.Stop()
+	cancel()
+
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer shutdownCancel()
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		logger.Error("server shutdown error", "error", err)
+	}
+	logger.Info("configurarr stopped")
+}
