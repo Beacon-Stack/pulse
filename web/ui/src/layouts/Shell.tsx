@@ -5,6 +5,7 @@ import {
   Server,
   Search,
   Settings2,
+  Download,
   Cog,
   ChevronLeft,
   ChevronRight,
@@ -27,8 +28,9 @@ interface NavItem {
 const mainNav: NavItem[] = [
   { to: "/",         icon: LayoutDashboard, label: "Dashboard" },
   { to: "/services", icon: Server,          label: "Services" },
-  { to: "/indexers",  icon: Search,          label: "Indexers" },
-  { to: "/config",    icon: Settings2,       label: "Config" },
+  { to: "/indexers",          icon: Search,   label: "Indexers" },
+  { to: "/download-clients", icon: Download, label: "Download Clients" },
+  { to: "/config",           icon: Settings2, label: "Config" },
 ];
 
 const settingsNav: NavItem[] = [

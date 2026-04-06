@@ -11,6 +11,8 @@ import ConfigPage from "@/pages/config/ConfigPage";
 import IndexersPage from "@/pages/indexers/IndexersPage";
 import AddIndexerPage from "@/pages/indexers/AddIndexerPage";
 import IndexerDetailPage from "@/pages/indexers/IndexerDetailPage";
+import DownloadClientsPage from "@/pages/download-clients/DownloadClientsPage";
+import DownloadClientDetailPage from "@/pages/download-clients/DownloadClientDetailPage";
 import SystemPage from "@/pages/settings/system/SystemPage";
 import AppSettingsPage from "@/pages/settings/app/AppSettingsPage";
 
@@ -42,6 +44,8 @@ export default function App() {
               <Route path="indexers" element={<RouteEB><IndexersPage /></RouteEB>} />
               <Route path="indexers/add" element={<RouteEB><AddIndexerPage /></RouteEB>} />
               <Route path="indexers/:id" element={<RouteEB><IndexerDetailPage /></RouteEB>} />
+              <Route path="download-clients" element={<RouteEB><DownloadClientsPage /></RouteEB>} />
+              <Route path="download-clients/:id" element={<RouteEB><DownloadClientDetailPage /></RouteEB>} />
               <Route path="settings">
                 <Route path="system" element={<RouteEB><SystemPage /></RouteEB>} />
                 <Route path="app" element={<RouteEB><AppSettingsPage /></RouteEB>} />

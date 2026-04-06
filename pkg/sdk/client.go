@@ -258,6 +258,32 @@ func (c *Client) MyIndexers(ctx context.Context) ([]Indexer, error) {
 	return out, err
 }
 
+// ── Download Clients ─────────────────────────────────────────────────────────
+
+// DownloadClient represents a centrally managed download client.
+type DownloadClient struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	Kind      string `json:"kind"`      // qbittorrent, deluge, transmission, sabnzbd, nzbget
+	Protocol  string `json:"protocol"`  // torrent, usenet
+	Enabled   bool   `json:"enabled"`
+	Priority  int    `json:"priority"`
+	Host      string `json:"host"`
+	Port      int    `json:"port"`
+	UseSSL    bool   `json:"use_ssl"`
+	Username  string `json:"username"`
+	Category  string `json:"category"`
+	Directory string `json:"directory"`
+	Settings  string `json:"settings"`
+}
+
+// MyDownloadClients returns download clients available to this service.
+func (c *Client) MyDownloadClients(ctx context.Context) ([]DownloadClient, error) {
+	var out []DownloadClient
+	err := c.doRequest(ctx, "GET", "/api/v1/download-clients", nil, &out)
+	return out, err
+}
+
 // ── Internal ─────────────────────────────────────────────────────────────────
 
 func (c *Client) register(ctx context.Context) (*Service, error) {

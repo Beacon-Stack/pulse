@@ -20,6 +20,16 @@ import {
   useUnassignIndexer,
 } from "@/api/indexers";
 import { useServices } from "@/api/services";
+import { useCatalog } from "@/api/catalog";
+
+const categoryColors: Record<string, string> = {
+  Movies: "#3b9eff",
+  TV: "#34d399",
+  Audio: "#f59e0b",
+  Books: "#a78bfa",
+  XXX: "#f87171",
+  Other: "#6b7280",
+};
 
 export default function IndexerDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -30,6 +40,12 @@ export default function IndexerDetailPage() {
   const updateIndexer = useUpdateIndexer();
   const deleteIndexer = useDeleteIndexer();
   const unassign = useUnassignIndexer();
+  const { data: catalogData } = useCatalog();
+
+  // Look up catalog entry to get categories, description, language, privacy
+  const catalogEntry = catalogData?.entries.find(
+    (e) => e.name.toLowerCase() === indexer?.name.toLowerCase()
+  );
 
   const [testStatus, setTestStatus] = useState<"idle" | "testing" | "success" | "error">("idle");
   const [testMessage, setTestMessage] = useState("");
@@ -195,6 +211,55 @@ export default function IndexerDetailPage() {
           </button>
         </div>
       </div>
+
+      {/* Catalog info */}
+      {catalogEntry && (
+        <div style={{ ...card, marginBottom: 16 }}>
+          {catalogEntry.description && (
+            <p style={{ margin: "0 0 12px", fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.5 }}>
+              {catalogEntry.description}
+            </p>
+          )}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
+            {catalogEntry.categories.map((cat) => (
+              <span
+                key={cat}
+                style={{
+                  fontSize: 12,
+                  fontWeight: 500,
+                  padding: "3px 10px",
+                  borderRadius: 4,
+                  color: categoryColors[cat] ?? "#6b7280",
+                  background: `color-mix(in srgb, ${categoryColors[cat] ?? "#6b7280"} 12%, transparent)`,
+                }}
+              >
+                {cat}
+              </span>
+            ))}
+            {catalogEntry.privacy && (
+              <span style={{
+                fontSize: 11,
+                fontWeight: 500,
+                padding: "3px 8px",
+                borderRadius: 4,
+                color: catalogEntry.privacy === "public" ? "var(--color-success)" : catalogEntry.privacy === "private" ? "var(--color-danger)" : "var(--color-warning)",
+                background: catalogEntry.privacy === "public"
+                  ? "color-mix(in srgb, var(--color-success) 10%, transparent)"
+                  : catalogEntry.privacy === "private"
+                  ? "color-mix(in srgb, var(--color-danger) 10%, transparent)"
+                  : "color-mix(in srgb, var(--color-warning) 10%, transparent)",
+              }}>
+                {catalogEntry.privacy}
+              </span>
+            )}
+            {catalogEntry.language && catalogEntry.language !== "en-US" && (
+              <span style={{ fontSize: 11, padding: "3px 8px", borderRadius: 4, background: "var(--color-bg-subtle)", color: "var(--color-text-muted)" }}>
+                {catalogEntry.language}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Details card */}
       <div style={{ ...card, marginBottom: 16 }}>

@@ -21,6 +21,7 @@ import (
 	"github.com/arrsenal/configurarr/internal/core/registry"
 	"github.com/arrsenal/configurarr/internal/core/tag"
 	"github.com/arrsenal/configurarr/internal/db"
+	"github.com/arrsenal/configurarr/internal/core/downloadclient"
 	dbsqlite "github.com/arrsenal/configurarr/internal/db/generated/sqlite"
 	"github.com/arrsenal/configurarr/internal/events"
 	"github.com/arrsenal/configurarr/internal/scraper"
@@ -95,7 +96,22 @@ func main() {
 	configStore := cfgstore.NewStore(queries, bus, logger)
 	indexerMgr := indexer.NewManager(queries, bus, logger)
 	tagSvc := tag.NewService(queries)
+	dlClientSvc := downloadclient.NewService(queries, bus, logger)
 	healthChecker := health.NewChecker(queries, bus, logger)
+
+	// When a download client changes, notify all services that support its protocol.
+	dlClientPusher := indexer.NewPusher(queries, logger) // reuse the indexer pusher for notifications
+	dlClientSvc.SetNotifier(func(ctx context.Context, protocol string) {
+		capability := "supports_" + protocol // supports_torrent or supports_usenet
+		services, err := queries.ListServicesByCapability(ctx, capability)
+		if err != nil {
+			logger.Warn("download-client: failed to list services for push", "error", err)
+			return
+		}
+		for _, svc := range services {
+			dlClientPusher.NotifyServiceAsync(svc.ID)
+		}
+	})
 
 	// When a new service registers, auto-assign existing indexers based on
 	// category↔capability matching (e.g., Movies indexers → content:movies services).
@@ -139,7 +155,8 @@ func main() {
 		RegistryService: registrySvc,
 		ConfigStore:     configStore,
 		IndexerManager:  indexerMgr,
-		TagService:      tagSvc,
+		TagService:              tagSvc,
+		DownloadClientService:   dlClientSvc,
 		WSHub:           wsHub,
 		ScraperEngine:   scraperEngine,
 		Queries:         queries,

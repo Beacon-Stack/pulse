@@ -4,8 +4,18 @@ import { Plus, ChevronRight, FlaskConical, Check, AlertCircle, Loader2, Trash2, 
 import PageHeader from "@/components/PageHeader";
 import Pill from "@/components/Pill";
 import { useIndexers, useDeleteIndexer } from "@/api/indexers";
+import { useCatalog } from "@/api/catalog";
 import { card } from "@/lib/styles";
 import type { Indexer } from "@/types";
+
+const categoryColors: Record<string, string> = {
+  Movies: "#3b9eff",
+  TV: "#34d399",
+  Audio: "#f59e0b",
+  Books: "#a78bfa",
+  XXX: "#f87171",
+  Other: "#6b7280",
+};
 
 type TestStatus = "idle" | "testing" | "pass" | "fail" | "cloudflare";
 
@@ -18,6 +28,15 @@ export default function IndexersPage() {
   const navigate = useNavigate();
   const { data: indexers, isLoading } = useIndexers();
   const deleteIndexer = useDeleteIndexer();
+  const { data: catalogData } = useCatalog();
+
+  // Build a name→categories lookup from the catalog
+  const catsByName = new Map<string, string[]>();
+  if (catalogData?.entries) {
+    for (const e of catalogData.entries) {
+      catsByName.set(e.name.toLowerCase(), e.categories);
+    }
+  }
   const [testStates, setTestStates] = useState<Record<string, TestState>>({});
   const [testingAll, setTestingAll] = useState(false);
   const [selectMode, setSelectMode] = useState(false);
@@ -297,6 +316,15 @@ export default function IndexersPage() {
                       {idx.kind}
                     </span>
                     <Pill ok={idx.enabled} labelTrue="Enabled" labelFalse="Disabled" />
+                    {(catsByName.get(idx.name.toLowerCase()) ?? []).map((cat) => (
+                      <span key={cat} style={{
+                        fontSize: 10, fontWeight: 500, padding: "1px 6px", borderRadius: 3,
+                        color: categoryColors[cat] ?? "#6b7280",
+                        background: `color-mix(in srgb, ${categoryColors[cat] ?? "#6b7280"} 10%, transparent)`,
+                      }}>
+                        {cat}
+                      </span>
+                    ))}
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
                     <span style={{ fontSize: 12, color: "var(--color-text-muted)", fontFamily: "var(--font-family-mono)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>

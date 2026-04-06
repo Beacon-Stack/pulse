@@ -16,6 +16,7 @@ import (
 	"github.com/arrsenal/configurarr/internal/api/ws"
 	appconfig "github.com/arrsenal/configurarr/internal/config"
 	cfgstore "github.com/arrsenal/configurarr/internal/core/config"
+	"github.com/arrsenal/configurarr/internal/core/downloadclient"
 	"github.com/arrsenal/configurarr/internal/core/indexer"
 	"github.com/arrsenal/configurarr/internal/core/registry"
 	"github.com/arrsenal/configurarr/internal/core/tag"
@@ -34,9 +35,10 @@ type RouterConfig struct {
 	IndexerManager  *indexer.Manager
 	TagService      *tag.Service
 	WSHub           *ws.Hub
-	ScraperEngine   *scraper.Engine
-	Queries         dbsqlite.Querier
-	ExternalURL     string // e.g., "http://configurarr:9696" — used for Torznab proxy URL rewriting
+	DownloadClientService *downloadclient.Service
+	ScraperEngine        *scraper.Engine
+	Queries              dbsqlite.Querier
+	ExternalURL          string // e.g., "http://configurarr:9696" — used for Torznab proxy URL rewriting
 }
 
 // NewRouter builds and returns the application HTTP handler.
@@ -127,6 +129,10 @@ func NewRouter(cfg RouterConfig) http.Handler {
 
 	if cfg.Queries != nil {
 		v1.RegisterPresetRoutes(humaAPI, cfg.Queries)
+	}
+
+	if cfg.DownloadClientService != nil {
+		v1.RegisterDownloadClientRoutes(humaAPI, cfg.DownloadClientService)
 	}
 
 	v1.RegisterCatalogRoutes(humaAPI)

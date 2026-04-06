@@ -18,6 +18,25 @@ type ConfigSubscription struct {
 	Namespace string `json:"namespace"`
 }
 
+type DownloadClient struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	Kind      string `json:"kind"`
+	Protocol  string `json:"protocol"`
+	Enabled   int64  `json:"enabled"`
+	Priority  int64  `json:"priority"`
+	Host      string `json:"host"`
+	Port      int64  `json:"port"`
+	UseSsl    int64  `json:"useSsl"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	Category  string `json:"category"`
+	Directory string `json:"directory"`
+	Settings  string `json:"settings"`
+	CreatedAt string `json:"createdAt"`
+	UpdatedAt string `json:"updatedAt"`
+}
+
 type FilterPreset struct {
 	ID        string `json:"id"`
 	Name      string `json:"name"`

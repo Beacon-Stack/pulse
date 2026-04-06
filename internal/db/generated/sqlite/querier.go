@@ -19,6 +19,7 @@ type Querier interface {
 	CountServicesForTag(ctx context.Context, tagID string) (int64, error)
 	// Assignments
 	CreateAssignment(ctx context.Context, arg CreateAssignmentParams) (IndexerAssignment, error)
+	CreateDownloadClient(ctx context.Context, arg CreateDownloadClientParams) (DownloadClient, error)
 	CreateFilterPreset(ctx context.Context, arg CreateFilterPresetParams) (FilterPreset, error)
 	CreateIndexer(ctx context.Context, arg CreateIndexerParams) (Indexer, error)
 	CreateService(ctx context.Context, arg CreateServiceParams) (Service, error)
@@ -29,6 +30,7 @@ type Querier interface {
 	DeleteCapabilities(ctx context.Context, serviceID string) error
 	DeleteConfigEntry(ctx context.Context, arg DeleteConfigEntryParams) error
 	DeleteConfigNamespace(ctx context.Context, namespace string) error
+	DeleteDownloadClient(ctx context.Context, id string) error
 	DeleteFilterPreset(ctx context.Context, id string) error
 	DeleteFilterPresetByName(ctx context.Context, name string) error
 	DeleteIndexer(ctx context.Context, id string) error
@@ -37,6 +39,7 @@ type Querier interface {
 	DeleteTag(ctx context.Context, id string) error
 	GetAssignmentOverrides(ctx context.Context, arg GetAssignmentOverridesParams) (string, error)
 	GetConfigEntry(ctx context.Context, arg GetConfigEntryParams) (ConfigEntry, error)
+	GetDownloadClient(ctx context.Context, id string) (DownloadClient, error)
 	GetFilterPreset(ctx context.Context, id string) (FilterPreset, error)
 	GetFilterPresetByName(ctx context.Context, name string) (FilterPreset, error)
 	GetIndexer(ctx context.Context, id string) (Indexer, error)
@@ -50,6 +53,9 @@ type Querier interface {
 	ListCapabilities(ctx context.Context, serviceID string) ([]string, error)
 	ListConfigByNamespace(ctx context.Context, namespace string) ([]ConfigEntry, error)
 	ListConfigNamespaces(ctx context.Context) ([]string, error)
+	ListDownloadClients(ctx context.Context) ([]DownloadClient, error)
+	ListDownloadClientsByProtocol(ctx context.Context, protocol string) ([]DownloadClient, error)
+	ListEnabledDownloadClients(ctx context.Context) ([]DownloadClient, error)
 	ListEnabledIndexers(ctx context.Context) ([]Indexer, error)
 	ListFilterPresets(ctx context.Context) ([]FilterPreset, error)
 	ListIndexerTagIDs(ctx context.Context, indexerID string) ([]string, error)
@@ -71,6 +77,7 @@ type Querier interface {
 	// Subscriptions
 	Subscribe(ctx context.Context, arg SubscribeParams) error
 	Unsubscribe(ctx context.Context, arg UnsubscribeParams) error
+	UpdateDownloadClient(ctx context.Context, arg UpdateDownloadClientParams) (DownloadClient, error)
 	UpdateFilterPreset(ctx context.Context, arg UpdateFilterPresetParams) (FilterPreset, error)
 	UpdateIndexer(ctx context.Context, arg UpdateIndexerParams) (Indexer, error)
 	UpdateService(ctx context.Context, arg UpdateServiceParams) (Service, error)
