@@ -8,7 +8,7 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 
-	dbsqlite "github.com/beacon-media/pulse/internal/db/generated/sqlite"
+	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
 )
 
 type presetBody struct {

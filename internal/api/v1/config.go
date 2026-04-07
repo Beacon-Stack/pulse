@@ -6,7 +6,7 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 
-	cfgstore "github.com/beacon-media/pulse/internal/core/config"
+	cfgstore "github.com/beacon-stack/pulse/internal/core/config"
 )
 
 // ── Request / Response types ───────────────���─────────────────────────────────

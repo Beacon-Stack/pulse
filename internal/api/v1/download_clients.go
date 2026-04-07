@@ -6,8 +6,8 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 
-	"github.com/beacon-media/pulse/internal/core/downloadclient"
-	dbsqlite "github.com/beacon-media/pulse/internal/db/generated/sqlite"
+	"github.com/beacon-stack/pulse/internal/core/downloadclient"
+	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
 )
 
 type dlClientBody struct {

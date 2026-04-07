@@ -1,4 +1,4 @@
-module github.com/beacon-media/pulse
+module github.com/beacon-stack/pulse
 
 go 1.25.0
 

@@ -8,8 +8,8 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 
-	dbsqlite "github.com/beacon-media/pulse/internal/db/generated/sqlite"
-	"github.com/beacon-media/pulse/internal/core/indexer"
+	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
+	"github.com/beacon-stack/pulse/internal/core/indexer"
 )
 
 // ── Request / Response types ─────────────────────────────────────────────────

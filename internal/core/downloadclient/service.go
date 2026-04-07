@@ -10,8 +10,8 @@ import (
 
 	"github.com/google/uuid"
 
-	dbsqlite "github.com/beacon-media/pulse/internal/db/generated/sqlite"
-	"github.com/beacon-media/pulse/internal/events"
+	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
+	"github.com/beacon-stack/pulse/internal/events"
 )
 
 // Input is the data needed to create or update a download client.

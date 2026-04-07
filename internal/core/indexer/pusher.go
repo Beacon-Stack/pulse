@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	dbsqlite "github.com/beacon-media/pulse/internal/db/generated/sqlite"
+	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
 )
 
 // Pusher notifies services when their indexer assignments change.

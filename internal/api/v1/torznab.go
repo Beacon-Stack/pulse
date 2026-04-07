@@ -15,9 +15,9 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	dbsqlite "github.com/beacon-media/pulse/internal/db/generated/sqlite"
-	"github.com/beacon-media/pulse/internal/scraper"
-	"github.com/beacon-media/pulse/internal/torznab"
+	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
+	"github.com/beacon-stack/pulse/internal/scraper"
+	"github.com/beacon-stack/pulse/internal/torznab"
 )
 
 // TorznabHandler handles Torznab proxy requests.

@@ -8,7 +8,7 @@ import (
 
 	_ "modernc.org/sqlite"
 
-	"github.com/beacon-media/pulse/internal/config"
+	"github.com/beacon-stack/pulse/internal/config"
 )
 
 // DB wraps the underlying sql.DB and tracks which driver is in use.

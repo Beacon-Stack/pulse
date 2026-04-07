@@ -8,3 +8,4 @@ config.yaml
 tmp/
 web/ui/node_modules/
 web/static/
+pulse
