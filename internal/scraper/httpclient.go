@@ -14,6 +14,7 @@ type RateLimitedClient struct {
 	delay     time.Duration
 	mu        sync.Mutex
 	lastReq   time.Time
+	cfUA      map[string]string // domain → FlareSolverr user-agent
 }
 
 // NewRateLimitedClient creates an HTTP client with rate limiting.
@@ -29,6 +30,7 @@ func NewRateLimitedClient(delay time.Duration) *RateLimitedClient {
 			Jar:     jar,
 		},
 		delay: delay,
+		cfUA:  make(map[string]string),
 	}
 }
 
@@ -40,9 +42,16 @@ func (c *RateLimitedClient) Do(req *http.Request) (*http.Response, error) {
 		time.Sleep(c.delay - since)
 	}
 	c.lastReq = time.Now()
+	// Use the FlareSolverr user-agent for this domain if we have one.
+	ua := "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+	if req.URL != nil {
+		if cfUA, ok := c.cfUA[req.URL.Hostname()]; ok {
+			ua = cfUA
+		}
+	}
 	c.mu.Unlock()
 
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+	req.Header.Set("User-Agent", ua)
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	req.Header.Set("Accept-Language", "en-US,en;q=0.5")
 
@@ -59,8 +68,9 @@ func (c *RateLimitedClient) ApplyCFSession(rawURL string, cookies []*http.Cookie
 	if c.client.Jar != nil {
 		c.client.Jar.SetCookies(u, cookies)
 	}
-	// Store user agent for use in subsequent requests — we override it in Do()
-	// but the CF user agent matters for cookie validation.
-	_ = userAgent // Currently we set a fixed UA in Do(); for CF bypass we'd need
-	// to use the FlareSolverr UA. For now the cookie alone is usually sufficient.
+	if userAgent != "" {
+		c.mu.Lock()
+		c.cfUA[u.Hostname()] = userAgent
+		c.mu.Unlock()
+	}
 }

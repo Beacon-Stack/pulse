@@ -189,6 +189,26 @@ func main() {
 			raw := prowlarrCatalog.AllRawYAML()
 			if len(raw) > 0 {
 				scraperEngine.LoadDefinitions(raw)
+
+				// Pre-warm FlareSolverr sessions for configured indexers.
+				if flaresolverr != nil {
+					go func() {
+						idxRows, err := queries.ListEnabledIndexers(ctx)
+						if err != nil {
+							logger.Warn("pre-warm: failed to list indexers", "error", err)
+							return
+						}
+						var urls []string
+						for _, row := range idxRows {
+							if row.Url != "" {
+								urls = append(urls, row.Url)
+							}
+						}
+						if len(urls) > 0 {
+							flaresolverr.PreWarm(ctx, urls)
+						}
+					}()
+				}
 				return
 			}
 		}

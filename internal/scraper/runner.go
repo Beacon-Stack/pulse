@@ -7,6 +7,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -442,6 +443,9 @@ func (r *Runner) buildResult(fields map[string]string) SearchResult {
 	}
 
 	size := parseSize(fields["size"])
+	if fields["size"] != "" && size == 0 {
+		r.logger.Debug("scraper: size parse failed", "raw_size", fields["size"], "indexer", r.def.Name)
+	}
 	seeders, _ := strconv.Atoi(strings.TrimSpace(fields["seeders"]))
 	leechers, _ := strconv.Atoi(strings.TrimSpace(fields["leechers"]))
 	grabs, _ := strconv.Atoi(strings.TrimSpace(fields["grabs"]))
@@ -531,8 +535,14 @@ func newznabBase(name string) string {
 	}
 }
 
+// sizeRe matches patterns like "1.5 GB", "797.7MB", "320 KiB" anywhere in a string.
+var sizeRe = regexp.MustCompile(`(?i)([\d,.]+)[\s\x{00a0}]*(TIB|GIB|MIB|KIB|TB|GB|MB|KB|B)(?:[^A-Z]|$)`)
+
 // parseSize converts human-readable size strings to bytes.
+// Handles messy input like "797.7 MB3470" (size + seed count concatenated)
+// and non-breaking spaces (U+00A0) used by some sites.
 func parseSize(s string) int64 {
+	s = strings.ReplaceAll(s, "\u00a0", " ") // normalize nbsp
 	s = strings.TrimSpace(s)
 	if s == "" {
 		return 0
@@ -543,10 +553,11 @@ func parseSize(s string) int64 {
 		"KIB": 1024, "MIB": 1024 * 1024, "GIB": 1024 * 1024 * 1024, "TIB": 1024 * 1024 * 1024 * 1024,
 	}
 
-	s = strings.ToUpper(strings.ReplaceAll(s, ",", ""))
-	for suffix, mult := range multipliers {
-		if strings.HasSuffix(s, suffix) {
-			numStr := strings.TrimSpace(strings.TrimSuffix(s, suffix))
+	m := sizeRe.FindStringSubmatch(s)
+	if len(m) == 3 {
+		numStr := strings.ReplaceAll(m[1], ",", "")
+		unit := strings.ToUpper(m[2])
+		if mult, ok := multipliers[unit]; ok {
 			f, err := strconv.ParseFloat(numStr, 64)
 			if err == nil {
 				return int64(f * float64(mult))
@@ -555,7 +566,7 @@ func parseSize(s string) int64 {
 	}
 
 	// Try parsing as raw number (bytes)
-	n, _ := strconv.ParseInt(s, 10, 64)
+	n, _ := strconv.ParseInt(strings.ReplaceAll(s, ",", ""), 10, 64)
 	return n
 }
 

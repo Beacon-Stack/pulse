@@ -4,7 +4,9 @@ package torznab
 import (
 	"encoding/xml"
 	"fmt"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -189,13 +191,73 @@ func joinParams(params []string) string {
 }
 
 // FormatPubDate formats a time string for Torznab pubDate field (RFC1123Z).
+// Handles RFC3339 dates, relative dates ("3 days", "1 week, 2 days"), and "now".
 func FormatPubDate(dateStr string) string {
-	t, err := time.Parse(time.RFC3339, dateStr)
-	if err != nil {
-		// Try as-is
-		return dateStr
+	dateStr = strings.ReplaceAll(dateStr, "\u00a0", " ") // normalize nbsp
+	dateStr = strings.TrimSpace(dateStr)
+	if dateStr == "" {
+		return ""
 	}
-	return t.Format(time.RFC1123Z)
+
+	// RFC3339 (absolute)
+	if t, err := time.Parse(time.RFC3339, dateStr); err == nil {
+		return t.Format(time.RFC1123Z)
+	}
+
+	// Already RFC1123Z
+	if t, err := time.Parse(time.RFC1123Z, dateStr); err == nil {
+		return t.Format(time.RFC1123Z)
+	}
+
+	// "now" or "today"
+	lower := strings.ToLower(dateStr)
+	if lower == "now" || lower == "today" {
+		return time.Now().UTC().Format(time.RFC1123Z)
+	}
+
+	// Relative date: "3 days", "1 week, 2 days", "1 month", etc.
+	if t, ok := parseRelativeDate(lower); ok {
+		return t.Format(time.RFC1123Z)
+	}
+
+	// Return as-is if nothing matched
+	return dateStr
+}
+
+// parseRelativeDate converts strings like "3 days", "1 week, 2 days",
+// "1 month" into an absolute time by subtracting from now.
+func parseRelativeDate(s string) (time.Time, bool) {
+	now := time.Now().UTC()
+	total := time.Duration(0)
+	matched := false
+
+	re := regexp.MustCompile(`(\d+)\s*(year|month|week|day|hour|min(?:ute)?)s?`)
+	for _, m := range re.FindAllStringSubmatch(s, -1) {
+		n, err := strconv.Atoi(m[1])
+		if err != nil {
+			continue
+		}
+		matched = true
+		switch m[2] {
+		case "year":
+			now = now.AddDate(-n, 0, 0)
+		case "month":
+			now = now.AddDate(0, -n, 0)
+		case "week":
+			total += time.Duration(n) * 7 * 24 * time.Hour
+		case "day":
+			total += time.Duration(n) * 24 * time.Hour
+		case "hour":
+			total += time.Duration(n) * time.Hour
+		case "min", "minute":
+			total += time.Duration(n) * time.Minute
+		}
+	}
+
+	if !matched {
+		return time.Time{}, false
+	}
+	return now.Add(-total), true
 }
 
 // ResultToItem converts a scraper SearchResult to a Torznab Item.

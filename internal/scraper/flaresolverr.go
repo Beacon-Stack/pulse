@@ -171,6 +171,26 @@ func (sess *cfSession) ToHTTPCookies() []*http.Cookie {
 	return out
 }
 
+// PreWarm proactively solves Cloudflare challenges for a list of URLs.
+// This is called at startup so that user searches hit cached sessions.
+func (f *FlareSolverr) PreWarm(ctx context.Context, urls []string) {
+	for _, u := range urls {
+		domain := extractDomainFromURL(u)
+		if domain == "" {
+			continue
+		}
+		// Skip if already cached.
+		if _, ok := f.GetSession(domain); ok {
+			continue
+		}
+		f.logger.Info("flaresolverr: pre-warming session", "url", u)
+		_, _, _, err := f.Solve(ctx, u)
+		if err != nil {
+			f.logger.Warn("flaresolverr: pre-warm failed", "url", u, "error", err)
+		}
+	}
+}
+
 func extractDomainFromURL(rawURL string) string {
 	u, err := url.Parse(rawURL)
 	if err != nil {

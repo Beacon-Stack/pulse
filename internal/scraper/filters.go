@@ -185,27 +185,31 @@ func filterFuzzytime(value string) string {
 		return now.Add(-24 * time.Hour).Truncate(24 * time.Hour).Format(time.RFC3339)
 	}
 
-	// Try "N unit(s) ago" pattern
-	re := regexp.MustCompile(`(\d+)\s*(second|minute|min|hour|day|week|month|year)s?\s*ago`)
-	m := re.FindStringSubmatch(v)
-	if len(m) == 3 {
-		n, _ := strconv.Atoi(m[1])
-		switch m[2] {
-		case "second":
-			return now.Add(-time.Duration(n) * time.Second).Format(time.RFC3339)
-		case "minute", "min":
-			return now.Add(-time.Duration(n) * time.Minute).Format(time.RFC3339)
-		case "hour":
-			return now.Add(-time.Duration(n) * time.Hour).Format(time.RFC3339)
-		case "day":
-			return now.Add(-time.Duration(n) * 24 * time.Hour).Format(time.RFC3339)
-		case "week":
-			return now.Add(-time.Duration(n) * 7 * 24 * time.Hour).Format(time.RFC3339)
-		case "month":
-			return now.AddDate(0, -n, 0).Format(time.RFC3339)
-		case "year":
-			return now.AddDate(-n, 0, 0).Format(time.RFC3339)
+	// Try relative time patterns: "N units ago" or "N units, N units" (no "ago")
+	re := regexp.MustCompile(`(\d+)\s*(second|minute|min|hour|day|week|month|year)s?`)
+	matches := re.FindAllStringSubmatch(v, -1)
+	if len(matches) > 0 {
+		t := now
+		for _, m := range matches {
+			n, _ := strconv.Atoi(m[1])
+			switch m[2] {
+			case "second":
+				t = t.Add(-time.Duration(n) * time.Second)
+			case "minute", "min":
+				t = t.Add(-time.Duration(n) * time.Minute)
+			case "hour":
+				t = t.Add(-time.Duration(n) * time.Hour)
+			case "day":
+				t = t.Add(-time.Duration(n) * 24 * time.Hour)
+			case "week":
+				t = t.Add(-time.Duration(n) * 7 * 24 * time.Hour)
+			case "month":
+				t = t.AddDate(0, -n, 0)
+			case "year":
+				t = t.AddDate(-n, 0, 0)
+			}
 		}
+		return t.Format(time.RFC3339)
 	}
 
 	// Try parsing as a time today (e.g., "12:25am")
