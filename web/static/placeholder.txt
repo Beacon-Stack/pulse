@@ -1,0 +1,11 @@
+This file exists so `//go:embed static` in web/embed.go compiles when
+web/static/ is otherwise empty (e.g. during `go test` / `go vet` /
+golangci-lint runs on a fresh checkout, before the frontend has been
+built).
+
+The real frontend assets are produced by `cd web/ui && npm ci && npm run build`,
+which writes the compiled SPA into this directory. CI builds them in
+the release path; local development does the same via the Makefile or
+docker compose.
+
+Do not delete this file.
