@@ -8,7 +8,7 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 
-	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
+	db "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/core/indexer"
 )
 
@@ -72,12 +72,12 @@ type indexerForServiceInput struct {
 	ServiceID string `path:"service_id"`
 }
 
-func toIndexerBody(row dbsqlite.Indexer) indexerBody {
+func toIndexerBody(row db.Indexer) indexerBody {
 	return indexerBody{
 		ID:        row.ID,
 		Name:      row.Name,
 		Kind:      row.Kind,
-		Enabled:   row.Enabled == 1,
+		Enabled:   row.Enabled,
 		Priority:  int(row.Priority),
 		URL:       row.Url,
 		Settings:  row.Settings,
@@ -216,7 +216,7 @@ func RegisterIndexerRoutes(api huma.API, mgr *indexer.Manager, proxyBaseURL ...s
 		Summary:       "Assign an indexer to a service",
 		Tags:          []string{"Indexers"},
 		DefaultStatus: http.StatusCreated,
-	}, func(ctx context.Context, input *assignInput) (*struct{ Body dbsqlite.IndexerAssignment }, error) {
+	}, func(ctx context.Context, input *assignInput) (*struct{ Body db.IndexerAssignment }, error) {
 		row, err := mgr.Assign(ctx, indexer.AssignmentInput{
 			IndexerID: input.ID,
 			ServiceID: input.Body.ServiceID,
@@ -225,7 +225,7 @@ func RegisterIndexerRoutes(api huma.API, mgr *indexer.Manager, proxyBaseURL ...s
 		if err != nil {
 			return nil, huma.NewError(http.StatusConflict, "assignment failed", err)
 		}
-		return &struct{ Body dbsqlite.IndexerAssignment }{Body: *row}, nil
+		return &struct{ Body db.IndexerAssignment }{Body: *row}, nil
 	})
 
 	// DELETE /api/v1/indexers/{id}/assign/{service_id} — unassign
@@ -250,12 +250,12 @@ func RegisterIndexerRoutes(api huma.API, mgr *indexer.Manager, proxyBaseURL ...s
 		Path:        "/api/v1/indexers/{id}/assignments",
 		Summary:     "List services assigned to an indexer",
 		Tags:        []string{"Indexers"},
-	}, func(ctx context.Context, input *indexerIDInput) (*struct{ Body []dbsqlite.IndexerAssignment }, error) {
+	}, func(ctx context.Context, input *indexerIDInput) (*struct{ Body []db.IndexerAssignment }, error) {
 		rows, err := mgr.ListAssignments(ctx, input.ID)
 		if err != nil {
 			return nil, huma.NewError(http.StatusInternalServerError, "failed to list assignments", err)
 		}
-		return &struct{ Body []dbsqlite.IndexerAssignment }{Body: rows}, nil
+		return &struct{ Body []db.IndexerAssignment }{Body: rows}, nil
 	})
 
 	// POST /api/v1/indexers/test — test indexer connectivity

@@ -7,7 +7,7 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 
 	"github.com/beacon-stack/pulse/internal/core/downloadclient"
-	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
+	db "github.com/beacon-stack/pulse/internal/db/generated"
 )
 
 type dlClientBody struct {
@@ -224,17 +224,17 @@ func RegisterDownloadClientRoutes(api huma.API, svc *downloadclient.Service) {
 	})
 }
 
-func rowToBody(row *dbsqlite.DownloadClient) dlClientBody {
+func rowToBody(row *db.DownloadClient) dlClientBody {
 	return dlClientBody{
 		ID:        row.ID,
 		Name:      row.Name,
 		Kind:      row.Kind,
 		Protocol:  row.Protocol,
-		Enabled:   row.Enabled == 1,
+		Enabled:   row.Enabled,
 		Priority:  int(row.Priority),
 		Host:      row.Host,
 		Port:      int(row.Port),
-		UseSSL:    row.UseSsl == 1,
+		UseSSL:    row.UseSsl,
 		Username:  row.Username,
 		Category:  row.Category,
 		Directory: row.Directory,

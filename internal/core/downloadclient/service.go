@@ -10,7 +10,7 @@ import (
 
 	"github.com/google/uuid"
 
-	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
+	db "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/events"
 )
 
@@ -43,14 +43,14 @@ type ServiceNotifier func(ctx context.Context, protocol string)
 
 // Service manages download client configurations.
 type Service struct {
-	q        dbsqlite.Querier
+	q        db.Querier
 	bus      *events.Bus
 	logger   *slog.Logger
 	notifier ServiceNotifier
 }
 
 // NewService creates a new download client service.
-func NewService(q dbsqlite.Querier, bus *events.Bus, logger *slog.Logger) *Service {
+func NewService(q db.Querier, bus *events.Bus, logger *slog.Logger) *Service {
 	return &Service{q: q, bus: bus, logger: logger}
 }
 
@@ -60,7 +60,7 @@ func (s *Service) SetNotifier(fn ServiceNotifier) {
 }
 
 // Create adds a new download client.
-func (s *Service) Create(ctx context.Context, input Input) (*dbsqlite.DownloadClient, error) {
+func (s *Service) Create(ctx context.Context, input Input) (*db.DownloadClient, error) {
 	now := time.Now().UTC().Format(time.RFC3339)
 	if input.Settings == "" {
 		input.Settings = "{}"
@@ -69,25 +69,16 @@ func (s *Service) Create(ctx context.Context, input Input) (*dbsqlite.DownloadCl
 		input.Protocol = inferProtocol(input.Kind)
 	}
 
-	var enabled int64
-	if input.Enabled {
-		enabled = 1
-	}
-	var useSSL int64
-	if input.UseSSL {
-		useSSL = 1
-	}
-
-	row, err := s.q.CreateDownloadClient(ctx, dbsqlite.CreateDownloadClientParams{
+	row, err := s.q.CreateDownloadClient(ctx, db.CreateDownloadClientParams{
 		ID:        uuid.New().String(),
 		Name:      input.Name,
 		Kind:      input.Kind,
 		Protocol:  input.Protocol,
-		Enabled:   enabled,
-		Priority:  int64(input.Priority),
+		Enabled:   input.Enabled,
+		Priority:  int32(input.Priority),
 		Host:      input.Host,
-		Port:      int64(input.Port),
-		UseSsl:    useSSL,
+		Port:      int32(input.Port),
+		UseSsl:    input.UseSSL,
 		Username:  input.Username,
 		Password:  input.Password,
 		Category:  input.Category,
@@ -114,7 +105,7 @@ func (s *Service) Create(ctx context.Context, input Input) (*dbsqlite.DownloadCl
 }
 
 // Get returns a single download client.
-func (s *Service) Get(ctx context.Context, id string) (*dbsqlite.DownloadClient, error) {
+func (s *Service) Get(ctx context.Context, id string) (*db.DownloadClient, error) {
 	row, err := s.q.GetDownloadClient(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("download client not found: %w", err)
@@ -123,12 +114,12 @@ func (s *Service) Get(ctx context.Context, id string) (*dbsqlite.DownloadClient,
 }
 
 // List returns all download clients.
-func (s *Service) List(ctx context.Context) ([]dbsqlite.DownloadClient, error) {
+func (s *Service) List(ctx context.Context) ([]db.DownloadClient, error) {
 	return s.q.ListDownloadClients(ctx)
 }
 
 // Update modifies a download client.
-func (s *Service) Update(ctx context.Context, id string, input Input) (*dbsqlite.DownloadClient, error) {
+func (s *Service) Update(ctx context.Context, id string, input Input) (*db.DownloadClient, error) {
 	now := time.Now().UTC().Format(time.RFC3339)
 	if input.Settings == "" {
 		input.Settings = "{}"
@@ -137,24 +128,15 @@ func (s *Service) Update(ctx context.Context, id string, input Input) (*dbsqlite
 		input.Protocol = inferProtocol(input.Kind)
 	}
 
-	var enabled int64
-	if input.Enabled {
-		enabled = 1
-	}
-	var useSSL int64
-	if input.UseSSL {
-		useSSL = 1
-	}
-
-	row, err := s.q.UpdateDownloadClient(ctx, dbsqlite.UpdateDownloadClientParams{
+	row, err := s.q.UpdateDownloadClient(ctx, db.UpdateDownloadClientParams{
 		Name:      input.Name,
 		Kind:      input.Kind,
 		Protocol:  input.Protocol,
-		Enabled:   enabled,
-		Priority:  int64(input.Priority),
+		Enabled:   input.Enabled,
+		Priority:  int32(input.Priority),
 		Host:      input.Host,
-		Port:      int64(input.Port),
-		UseSsl:    useSSL,
+		Port:      int32(input.Port),
+		UseSsl:    input.UseSSL,
 		Username:  input.Username,
 		Password:  input.Password,
 		Category:  input.Category,

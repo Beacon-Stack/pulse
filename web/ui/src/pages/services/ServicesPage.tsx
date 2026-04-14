@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Plus, ChevronRight } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import StatusBadge from "@/components/StatusBadge";
-import Modal from "@/components/Modal";
+import Modal from "@beacon-shared/Modal";
 import { useServices, useRegisterService } from "@/api/services";
 import { card } from "@/lib/styles";
 import { timeAgo } from "@/lib/utils";

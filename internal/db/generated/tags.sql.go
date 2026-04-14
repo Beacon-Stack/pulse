@@ -3,14 +3,15 @@
 //   sqlc v1.30.0
 // source: tags.sql
 
-package dbsqlite
+package db
 
 import (
 	"context"
 )
 
 const addIndexerTag = `-- name: AddIndexerTag :exec
-INSERT OR IGNORE INTO indexer_tags (indexer_id, tag_id) VALUES (?, ?)
+INSERT INTO indexer_tags (indexer_id, tag_id) VALUES ($1, $2)
+ON CONFLICT DO NOTHING
 `
 
 type AddIndexerTagParams struct {
@@ -24,7 +25,8 @@ func (q *Queries) AddIndexerTag(ctx context.Context, arg AddIndexerTagParams) er
 }
 
 const addServiceTag = `-- name: AddServiceTag :exec
-INSERT OR IGNORE INTO service_tags (service_id, tag_id) VALUES (?, ?)
+INSERT INTO service_tags (service_id, tag_id) VALUES ($1, $2)
+ON CONFLICT DO NOTHING
 `
 
 type AddServiceTagParams struct {
@@ -38,7 +40,7 @@ func (q *Queries) AddServiceTag(ctx context.Context, arg AddServiceTagParams) er
 }
 
 const countIndexersForTag = `-- name: CountIndexersForTag :one
-SELECT COUNT(*) FROM indexer_tags WHERE tag_id = ?
+SELECT COUNT(*) FROM indexer_tags WHERE tag_id = $1
 `
 
 func (q *Queries) CountIndexersForTag(ctx context.Context, tagID string) (int64, error) {
@@ -50,7 +52,7 @@ func (q *Queries) CountIndexersForTag(ctx context.Context, tagID string) (int64,
 
 const countServicesForTag = `-- name: CountServicesForTag :one
 
-SELECT COUNT(*) FROM service_tags WHERE tag_id = ?
+SELECT COUNT(*) FROM service_tags WHERE tag_id = $1
 `
 
 // Counts
@@ -62,7 +64,7 @@ func (q *Queries) CountServicesForTag(ctx context.Context, tagID string) (int64,
 }
 
 const createTag = `-- name: CreateTag :one
-INSERT INTO tags (id, name) VALUES (?, ?) RETURNING id, name
+INSERT INTO tags (id, name) VALUES ($1, $2) RETURNING id, name
 `
 
 type CreateTagParams struct {
@@ -78,7 +80,7 @@ func (q *Queries) CreateTag(ctx context.Context, arg CreateTagParams) (Tag, erro
 }
 
 const deleteTag = `-- name: DeleteTag :exec
-DELETE FROM tags WHERE id = ?
+DELETE FROM tags WHERE id = $1
 `
 
 func (q *Queries) DeleteTag(ctx context.Context, id string) error {
@@ -87,7 +89,7 @@ func (q *Queries) DeleteTag(ctx context.Context, id string) error {
 }
 
 const getTag = `-- name: GetTag :one
-SELECT id, name FROM tags WHERE id = ?
+SELECT id, name FROM tags WHERE id = $1
 `
 
 func (q *Queries) GetTag(ctx context.Context, id string) (Tag, error) {
@@ -98,7 +100,7 @@ func (q *Queries) GetTag(ctx context.Context, id string) (Tag, error) {
 }
 
 const getTagByName = `-- name: GetTagByName :one
-SELECT id, name FROM tags WHERE name = ?
+SELECT id, name FROM tags WHERE name = $1
 `
 
 func (q *Queries) GetTagByName(ctx context.Context, name string) (Tag, error) {
@@ -109,7 +111,7 @@ func (q *Queries) GetTagByName(ctx context.Context, name string) (Tag, error) {
 }
 
 const listIndexerTagIDs = `-- name: ListIndexerTagIDs :many
-SELECT tag_id FROM indexer_tags WHERE indexer_id = ?
+SELECT tag_id FROM indexer_tags WHERE indexer_id = $1
 `
 
 func (q *Queries) ListIndexerTagIDs(ctx context.Context, indexerID string) ([]string, error) {
@@ -136,7 +138,7 @@ func (q *Queries) ListIndexerTagIDs(ctx context.Context, indexerID string) ([]st
 }
 
 const listServiceTagIDs = `-- name: ListServiceTagIDs :many
-SELECT tag_id FROM service_tags WHERE service_id = ?
+SELECT tag_id FROM service_tags WHERE service_id = $1
 `
 
 func (q *Queries) ListServiceTagIDs(ctx context.Context, serviceID string) ([]string, error) {
@@ -191,7 +193,7 @@ func (q *Queries) ListTags(ctx context.Context) ([]Tag, error) {
 
 const setIndexerTags = `-- name: SetIndexerTags :exec
 
-DELETE FROM indexer_tags WHERE indexer_id = ?
+DELETE FROM indexer_tags WHERE indexer_id = $1
 `
 
 // Indexer tags
@@ -202,7 +204,7 @@ func (q *Queries) SetIndexerTags(ctx context.Context, indexerID string) error {
 
 const setServiceTags = `-- name: SetServiceTags :exec
 
-DELETE FROM service_tags WHERE service_id = ?
+DELETE FROM service_tags WHERE service_id = $1
 `
 
 // Service tags
@@ -212,7 +214,7 @@ func (q *Queries) SetServiceTags(ctx context.Context, serviceID string) error {
 }
 
 const updateTag = `-- name: UpdateTag :one
-UPDATE tags SET name = ? WHERE id = ? RETURNING id, name
+UPDATE tags SET name = $1 WHERE id = $2 RETURNING id, name
 `
 
 type UpdateTagParams struct {

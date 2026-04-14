@@ -1,7 +1,7 @@
-import { Server, Search, Settings2, Activity } from "lucide-react";
+import { Server, Search, Gauge, Activity } from "lucide-react";
 import { useServices } from "@/api/services";
 import { useIndexers } from "@/api/indexers";
-import { useConfigEntries } from "@/api/config";
+import { useQualityProfiles } from "@/api/quality-profiles";
 import { useSystemStatus } from "@/api/system";
 import { card } from "@/lib/styles";
 import StatusBadge from "@/components/StatusBadge";
@@ -35,7 +35,7 @@ function StatCard({ icon: Icon, label, value, color }: { icon: React.ElementType
 export default function Dashboard() {
   const { data: services } = useServices();
   const { data: indexers } = useIndexers();
-  const { data: configEntries } = useConfigEntries();
+  const { data: qualityProfiles } = useQualityProfiles();
   const { data: status } = useSystemStatus();
 
   const onlineCount = services?.filter((s) => s.status === "online").length ?? 0;
@@ -56,7 +56,7 @@ export default function Dashboard() {
         <StatCard icon={Server} label="Services" value={services?.length ?? 0} color="var(--color-accent)" />
         <StatCard icon={Activity} label="Online" value={onlineCount} color="var(--color-success)" />
         <StatCard icon={Search} label="Indexers" value={enabledIndexers} color="var(--color-info)" />
-        <StatCard icon={Settings2} label="Config entries" value={configEntries?.length ?? 0} color="var(--color-warning)" />
+        <StatCard icon={Gauge} label="Quality profiles" value={qualityProfiles?.length ?? 0} color="var(--color-warning)" />
       </div>
 
       {/* Recent services */}

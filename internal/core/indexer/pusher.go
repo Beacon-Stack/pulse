@@ -7,19 +7,19 @@ import (
 	"net/http"
 	"time"
 
-	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
+	db "github.com/beacon-stack/pulse/internal/db/generated"
 )
 
 // Pusher notifies services when their indexer assignments change.
 // It POSTs to each affected service's sync webhook endpoint.
 type Pusher struct {
-	q      dbsqlite.Querier
+	q      db.Querier
 	client *http.Client
 	logger *slog.Logger
 }
 
 // NewPusher creates a new Pusher.
-func NewPusher(q dbsqlite.Querier, logger *slog.Logger) *Pusher {
+func NewPusher(q db.Querier, logger *slog.Logger) *Pusher {
 	return &Pusher{
 		q:      q,
 		client: &http.Client{Timeout: 5 * time.Second},

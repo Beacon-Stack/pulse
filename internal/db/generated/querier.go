@@ -2,7 +2,7 @@
 // versions:
 //   sqlc v1.30.0
 
-package dbsqlite
+package db
 
 import (
 	"context"
@@ -22,6 +22,7 @@ type Querier interface {
 	CreateDownloadClient(ctx context.Context, arg CreateDownloadClientParams) (DownloadClient, error)
 	CreateFilterPreset(ctx context.Context, arg CreateFilterPresetParams) (FilterPreset, error)
 	CreateIndexer(ctx context.Context, arg CreateIndexerParams) (Indexer, error)
+	CreateQualityProfile(ctx context.Context, arg CreateQualityProfileParams) (QualityProfile, error)
 	CreateService(ctx context.Context, arg CreateServiceParams) (Service, error)
 	CreateTag(ctx context.Context, arg CreateTagParams) (Tag, error)
 	DeleteAssignment(ctx context.Context, arg DeleteAssignmentParams) error
@@ -34,6 +35,7 @@ type Querier interface {
 	DeleteFilterPreset(ctx context.Context, id string) error
 	DeleteFilterPresetByName(ctx context.Context, name string) error
 	DeleteIndexer(ctx context.Context, id string) error
+	DeleteQualityProfile(ctx context.Context, id string) error
 	DeleteService(ctx context.Context, id string) error
 	DeleteSubscriptionsByService(ctx context.Context, serviceID string) error
 	DeleteTag(ctx context.Context, id string) error
@@ -43,8 +45,10 @@ type Querier interface {
 	GetFilterPreset(ctx context.Context, id string) (FilterPreset, error)
 	GetFilterPresetByName(ctx context.Context, name string) (FilterPreset, error)
 	GetIndexer(ctx context.Context, id string) (Indexer, error)
+	GetQualityProfile(ctx context.Context, id string) (QualityProfile, error)
 	GetService(ctx context.Context, id string) (Service, error)
 	GetServiceByNameAndType(ctx context.Context, arg GetServiceByNameAndTypeParams) (Service, error)
+	GetSharedMediaHandling(ctx context.Context) (SharedMediaHandling, error)
 	GetTag(ctx context.Context, id string) (Tag, error)
 	GetTagByName(ctx context.Context, name string) (Tag, error)
 	ListAllConfig(ctx context.Context) ([]ConfigEntry, error)
@@ -62,6 +66,7 @@ type Querier interface {
 	ListIndexers(ctx context.Context) ([]Indexer, error)
 	ListIndexersForService(ctx context.Context, serviceID string) ([]Indexer, error)
 	ListOnlineServices(ctx context.Context) ([]Service, error)
+	ListQualityProfiles(ctx context.Context) ([]QualityProfile, error)
 	ListServiceTagIDs(ctx context.Context, serviceID string) ([]string, error)
 	ListServices(ctx context.Context) ([]Service, error)
 	ListServicesByCapability(ctx context.Context, capability string) ([]Service, error)
@@ -80,9 +85,11 @@ type Querier interface {
 	UpdateDownloadClient(ctx context.Context, arg UpdateDownloadClientParams) (DownloadClient, error)
 	UpdateFilterPreset(ctx context.Context, arg UpdateFilterPresetParams) (FilterPreset, error)
 	UpdateIndexer(ctx context.Context, arg UpdateIndexerParams) (Indexer, error)
+	UpdateQualityProfile(ctx context.Context, arg UpdateQualityProfileParams) (QualityProfile, error)
 	UpdateService(ctx context.Context, arg UpdateServiceParams) (Service, error)
 	UpdateServiceHeartbeat(ctx context.Context, arg UpdateServiceHeartbeatParams) error
 	UpdateServiceStatus(ctx context.Context, arg UpdateServiceStatusParams) error
+	UpdateSharedMediaHandling(ctx context.Context, arg UpdateSharedMediaHandlingParams) (SharedMediaHandling, error)
 	UpdateTag(ctx context.Context, arg UpdateTagParams) (Tag, error)
 	UpsertFilterPreset(ctx context.Context, arg UpsertFilterPresetParams) (FilterPreset, error)
 }

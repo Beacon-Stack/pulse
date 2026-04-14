@@ -9,6 +9,7 @@ import {
   Server,
   X,
 } from "lucide-react";
+import { useConfirm } from "@beacon-shared/ConfirmDialog";
 import Pill from "@/components/Pill";
 import { card, sectionHeader } from "@/lib/styles";
 import { formatDate } from "@/lib/utils";
@@ -40,6 +41,7 @@ export default function IndexerDetailPage() {
   const updateIndexer = useUpdateIndexer();
   const deleteIndexer = useDeleteIndexer();
   const unassign = useUnassignIndexer();
+  const confirm = useConfirm();
   const { data: catalogData } = useCatalog();
 
   // Look up catalog entry to get categories, description, language, privacy
@@ -98,9 +100,16 @@ export default function IndexerDetailPage() {
     );
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!indexer) return;
-    if (!confirm(`Delete indexer "${indexer.name}"? This cannot be undone.`)) return;
+    if (
+      !(await confirm({
+        title: "Delete indexer",
+        message: `Delete "${indexer.name}"? All services using it will stop receiving results from this source.`,
+        confirmLabel: "Delete",
+      }))
+    )
+      return;
     deleteIndexer.mutate(indexer.id, { onSuccess: () => navigate("/indexers") });
   };
 

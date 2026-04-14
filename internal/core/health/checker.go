@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
+	db "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/events"
 )
 
@@ -20,14 +20,14 @@ const (
 
 // Checker polls registered services for health status.
 type Checker struct {
-	q      dbsqlite.Querier
+	q      db.Querier
 	bus    *events.Bus
 	client *http.Client
 	logger *slog.Logger
 }
 
 // NewChecker creates a health checker.
-func NewChecker(q dbsqlite.Querier, bus *events.Bus, logger *slog.Logger) *Checker {
+func NewChecker(q db.Querier, bus *events.Bus, logger *slog.Logger) *Checker {
 	return &Checker{
 		q:   q,
 		bus: bus,
@@ -49,7 +49,7 @@ func (c *Checker) CheckAll(ctx context.Context) {
 	var wg sync.WaitGroup
 	for _, svc := range services {
 		wg.Add(1)
-		go func(s dbsqlite.Service) {
+		go func(s db.Service) {
 			defer wg.Done()
 			c.checkOne(ctx, s)
 		}(svc)
@@ -57,7 +57,7 @@ func (c *Checker) CheckAll(ctx context.Context) {
 	wg.Wait()
 }
 
-func (c *Checker) checkOne(ctx context.Context, svc dbsqlite.Service) {
+func (c *Checker) checkOne(ctx context.Context, svc db.Service) {
 	now := time.Now().UTC()
 
 	// If no health URL, check staleness via last_seen.
@@ -96,7 +96,7 @@ func (c *Checker) checkOne(ctx context.Context, svc dbsqlite.Service) {
 	}
 }
 
-func (c *Checker) checkStaleness(ctx context.Context, svc dbsqlite.Service, now time.Time) {
+func (c *Checker) checkStaleness(ctx context.Context, svc db.Service, now time.Time) {
 	if svc.LastSeen == "" {
 		return
 	}
@@ -109,13 +109,13 @@ func (c *Checker) checkStaleness(ctx context.Context, svc dbsqlite.Service, now 
 	}
 }
 
-func (c *Checker) markStatus(ctx context.Context, svc dbsqlite.Service, status string, now time.Time) {
+func (c *Checker) markStatus(ctx context.Context, svc db.Service, status string, now time.Time) {
 	oldStatus := svc.Status
 	if oldStatus == status {
 		return
 	}
 
-	if err := c.q.UpdateServiceStatus(ctx, dbsqlite.UpdateServiceStatusParams{
+	if err := c.q.UpdateServiceStatus(ctx, db.UpdateServiceStatusParams{
 		Status:   status,
 		LastSeen: now.Format(time.RFC3339),
 		ID:       svc.ID,

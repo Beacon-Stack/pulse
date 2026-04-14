@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   Server,
   Search,
-  Settings2,
   Download,
   Cog,
   ChevronLeft,
@@ -14,6 +13,8 @@ import {
   Activity,
   Network,
   Paintbrush,
+  Gauge,
+  FolderCog,
 } from "lucide-react";
 import { useWebSocket } from "@/api/websocket";
 import { useSystemStatus } from "@/api/system";
@@ -30,7 +31,8 @@ const mainNav: NavItem[] = [
   { to: "/services", icon: Server,          label: "Services" },
   { to: "/indexers",          icon: Search,   label: "Indexers" },
   { to: "/download-clients", icon: Download, label: "Download Clients" },
-  { to: "/config",           icon: Settings2, label: "Config" },
+  { to: "/quality-profiles", icon: Gauge,    label: "Quality Profiles" },
+  { to: "/shared-settings",  icon: FolderCog, label: "Shared Settings" },
 ];
 
 const settingsNav: NavItem[] = [

@@ -2,7 +2,11 @@
 // versions:
 //   sqlc v1.30.0
 
-package dbsqlite
+package db
+
+import (
+	"database/sql"
+)
 
 type ConfigEntry struct {
 	ID        string `json:"id"`
@@ -23,11 +27,11 @@ type DownloadClient struct {
 	Name      string `json:"name"`
 	Kind      string `json:"kind"`
 	Protocol  string `json:"protocol"`
-	Enabled   int64  `json:"enabled"`
-	Priority  int64  `json:"priority"`
+	Enabled   bool   `json:"enabled"`
+	Priority  int32  `json:"priority"`
 	Host      string `json:"host"`
-	Port      int64  `json:"port"`
-	UseSsl    int64  `json:"useSsl"`
+	Port      int32  `json:"port"`
+	UseSsl    bool   `json:"useSsl"`
 	Username  string `json:"username"`
 	Password  string `json:"password"`
 	Category  string `json:"category"`
@@ -49,8 +53,8 @@ type Indexer struct {
 	ID        string `json:"id"`
 	Name      string `json:"name"`
 	Kind      string `json:"kind"`
-	Enabled   int64  `json:"enabled"`
-	Priority  int64  `json:"priority"`
+	Enabled   bool   `json:"enabled"`
+	Priority  int32  `json:"priority"`
 	Url       string `json:"url"`
 	ApiKey    string `json:"apiKey"`
 	Settings  string `json:"settings"`
@@ -68,6 +72,19 @@ type IndexerAssignment struct {
 type IndexerTag struct {
 	IndexerID string `json:"indexerId"`
 	TagID     string `json:"tagId"`
+}
+
+type QualityProfile struct {
+	ID                   string         `json:"id"`
+	Name                 string         `json:"name"`
+	CutoffJson           string         `json:"cutoffJson"`
+	QualitiesJson        string         `json:"qualitiesJson"`
+	UpgradeAllowed       bool           `json:"upgradeAllowed"`
+	UpgradeUntilJson     sql.NullString `json:"upgradeUntilJson"`
+	MinCustomFormatScore int32          `json:"minCustomFormatScore"`
+	UpgradeUntilCfScore  int32          `json:"upgradeUntilCfScore"`
+	CreatedAt            string         `json:"createdAt"`
+	UpdatedAt            string         `json:"updatedAt"`
 }
 
 type Service struct {
@@ -93,6 +110,15 @@ type ServiceCapability struct {
 type ServiceTag struct {
 	ServiceID string `json:"serviceId"`
 	TagID     string `json:"tagId"`
+}
+
+type SharedMediaHandling struct {
+	ID                  int32  `json:"id"`
+	ColonReplacement    string `json:"colonReplacement"`
+	ImportExtraFiles    bool   `json:"importExtraFiles"`
+	ExtraFileExtensions string `json:"extraFileExtensions"`
+	RenameFiles         bool   `json:"renameFiles"`
+	UpdatedAt           string `json:"updatedAt"`
 }
 
 type Tag struct {

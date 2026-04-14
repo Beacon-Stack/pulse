@@ -11,6 +11,7 @@ import {
   Heart,
   X,
 } from "lucide-react";
+import { useConfirm } from "@beacon-shared/ConfirmDialog";
 import StatusBadge from "@/components/StatusBadge";
 import { card, sectionHeader } from "@/lib/styles";
 import { formatDate, timeAgo } from "@/lib/utils";
@@ -25,6 +26,7 @@ export default function ServiceDetailPage() {
   const { data: indexers } = useIndexersForService(id!);
   const deregister = useDeregisterService();
   const unassign = useUnassignIndexer();
+  const confirm = useConfirm();
 
   const [healthStatus, setHealthStatus] = useState<"idle" | "checking" | "ok" | "fail">("idle");
   const [healthMessage, setHealthMessage] = useState("");
@@ -48,9 +50,16 @@ export default function ServiceDetailPage() {
     }
   };
 
-  const handleDeregister = () => {
+  const handleDeregister = async () => {
     if (!service) return;
-    if (!confirm(`Deregister "${service.name}"? It can re-register on next startup.`)) return;
+    if (
+      !(await confirm({
+        title: "Deregister service",
+        message: `Deregister "${service.name}"? It can re-register on next startup.`,
+        confirmLabel: "Deregister",
+      }))
+    )
+      return;
     deregister.mutate(service.id, { onSuccess: () => navigate("/services") });
   };
 

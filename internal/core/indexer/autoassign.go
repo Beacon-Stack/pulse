@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
-	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
+	db "github.com/beacon-stack/pulse/internal/db/generated"
 )
 
 // categoryToCapability maps indexer categories to service capability names.
@@ -24,13 +24,13 @@ var categoryToCapability = map[string]string{
 // AutoAssigner handles automatic indexer-to-service assignment based on
 // category↔capability matching.
 type AutoAssigner struct {
-	q      dbsqlite.Querier
+	q      db.Querier
 	pusher *Pusher
 	logger *slog.Logger
 }
 
 // NewAutoAssigner creates a new AutoAssigner.
-func NewAutoAssigner(q dbsqlite.Querier, pusher *Pusher, logger *slog.Logger) *AutoAssigner {
+func NewAutoAssigner(q db.Querier, pusher *Pusher, logger *slog.Logger) *AutoAssigner {
 	return &AutoAssigner{q: q, pusher: pusher, logger: logger}
 }
 
@@ -73,7 +73,7 @@ func (a *AutoAssigner) AssignIndexerToMatchingServices(ctx context.Context, inde
 			continue
 		}
 
-		if _, err := a.q.CreateAssignment(ctx, dbsqlite.CreateAssignmentParams{
+		if _, err := a.q.CreateAssignment(ctx, db.CreateAssignmentParams{
 			ID:        uuid.New().String(),
 			IndexerID: indexerID,
 			ServiceID: serviceID,
@@ -156,7 +156,7 @@ func (a *AutoAssigner) AssignExistingIndexersToService(ctx context.Context, serv
 			continue
 		}
 
-		if _, err := a.q.CreateAssignment(ctx, dbsqlite.CreateAssignmentParams{
+		if _, err := a.q.CreateAssignment(ctx, db.CreateAssignmentParams{
 			ID:        uuid.New().String(),
 			IndexerID: idx.ID,
 			ServiceID: serviceID,
@@ -191,9 +191,10 @@ func categoriesToCapabilities(categories []string) []string {
 }
 
 // catalogCategoriesForIndexer looks up the categories for an indexer by name
-// from the built-in catalog. Returns nil if not found (e.g., generic indexers).
+// from the active catalog (Prowlarr if loaded, otherwise the static built-in).
+// Returns nil if not found, e.g., for generic/user-named indexers.
 func catalogCategoriesForIndexer(name string) []string {
-	for _, e := range builtinCatalog {
+	for _, e := range Catalog() {
 		if strings.EqualFold(e.Name, name) {
 			return e.Categories
 		}

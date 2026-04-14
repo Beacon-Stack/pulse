@@ -1,5 +1,6 @@
 // Package sdk provides a Go client for ecosystem services to register with
-// Pulse, send heartbeats, discover peers, and subscribe to config.
+// Pulse, send heartbeats, discover peers, and pull managed resources
+// (indexers, download clients, quality profiles, shared settings).
 //
 // Usage:
 //
@@ -191,51 +192,6 @@ func (c *Client) DiscoverAll(ctx context.Context) ([]Service, error) {
 	return out, err
 }
 
-// ── Shared Config ────────────────────────────────────────────────────────────
-
-// ConfigEntry represents a shared config key-value pair.
-type ConfigEntry struct {
-	Namespace string `json:"namespace"`
-	Key       string `json:"key"`
-	Value     string `json:"value"`
-	UpdatedAt string `json:"updated_at"`
-}
-
-// GetConfig retrieves a single config entry.
-func (c *Client) GetConfig(ctx context.Context, namespace, key string) (*ConfigEntry, error) {
-	var entry ConfigEntry
-	err := c.doRequest(ctx, "GET", fmt.Sprintf("/api/v1/config/%s/%s", namespace, key), nil, &entry)
-	if err != nil {
-		return nil, err
-	}
-	return &entry, nil
-}
-
-// GetConfigNamespace retrieves all entries in a namespace.
-func (c *Client) GetConfigNamespace(ctx context.Context, namespace string) ([]ConfigEntry, error) {
-	var entries []ConfigEntry
-	err := c.doRequest(ctx, "GET", "/api/v1/config/"+namespace, nil, &entries)
-	return entries, err
-}
-
-// Subscribe registers this service to receive updates for a config namespace.
-func (c *Client) Subscribe(ctx context.Context, namespace string) error {
-	body := map[string]string{
-		"service_id": c.serviceID,
-		"namespace":  namespace,
-	}
-	return c.doRequest(ctx, "POST", "/api/v1/config/subscribe", body, nil)
-}
-
-// Unsubscribe removes this service's subscription to a config namespace.
-func (c *Client) Unsubscribe(ctx context.Context, namespace string) error {
-	body := map[string]string{
-		"service_id": c.serviceID,
-		"namespace":  namespace,
-	}
-	return c.doRequest(ctx, "POST", "/api/v1/config/unsubscribe", body, nil)
-}
-
 // ── Indexers ─────────────────────────────────────────────────────────────────
 
 // Indexer represents an indexer assigned to this service.
@@ -282,6 +238,54 @@ func (c *Client) MyDownloadClients(ctx context.Context) ([]DownloadClient, error
 	var out []DownloadClient
 	err := c.doRequest(ctx, "GET", "/api/v1/download-clients", nil, &out)
 	return out, err
+}
+
+// ── Quality Profiles ─────────────────────────────────────────────────────────
+
+// QualityProfile represents a centrally managed quality profile pushed from Pulse.
+// The JSON blob fields (CutoffJSON, QualitiesJSON, UpgradeUntilJSON) are opaque
+// to Pulse — consumers parse them into their own domain types.
+type QualityProfile struct {
+	ID                   string  `json:"id"`
+	Name                 string  `json:"name"`
+	CutoffJSON           string  `json:"cutoff_json"`
+	QualitiesJSON        string  `json:"qualities_json"`
+	UpgradeAllowed       bool    `json:"upgrade_allowed"`
+	UpgradeUntilJSON     *string `json:"upgrade_until_json,omitempty"`
+	MinCustomFormatScore int     `json:"min_custom_format_score"`
+	UpgradeUntilCFScore  int     `json:"upgrade_until_cf_score"`
+	CreatedAt            string  `json:"created_at"`
+	UpdatedAt            string  `json:"updated_at"`
+}
+
+// MyQualityProfiles returns quality profiles available to this service.
+// Services call this on their sync loop to receive centrally managed profiles.
+func (c *Client) MyQualityProfiles(ctx context.Context) ([]QualityProfile, error) {
+	var out []QualityProfile
+	err := c.doRequest(ctx, "GET", "/api/v1/quality-profiles", nil, &out)
+	return out, err
+}
+
+// ── Shared Media Handling Settings ───────────────────────────────────────────
+
+// SharedSettings is the filesystem/handling settings that apply uniformly
+// across all media-manager services. Services overlay these onto their local
+// media_management row on every sync tick.
+type SharedSettings struct {
+	ColonReplacement    string `json:"colon_replacement"`
+	ImportExtraFiles    bool   `json:"import_extra_files"`
+	ExtraFileExtensions string `json:"extra_file_extensions"`
+	RenameFiles         bool   `json:"rename_files"`
+	UpdatedAt           string `json:"updated_at"`
+}
+
+// MySharedSettings returns the shared media handling settings from Pulse.
+func (c *Client) MySharedSettings(ctx context.Context) (*SharedSettings, error) {
+	var out SharedSettings
+	if err := c.doRequest(ctx, "GET", "/api/v1/shared-settings", nil, &out); err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 // ── Internal ─────────────────────────────────────────────────────────────────

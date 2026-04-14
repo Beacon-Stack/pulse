@@ -33,7 +33,6 @@ type ServerConfig struct {
 // DatabaseConfig selects and configures the database driver.
 type DatabaseConfig struct {
 	Driver string `mapstructure:"driver"`
-	Path   string `mapstructure:"path"`
 	DSN    Secret `mapstructure:"dsn"`
 }
 

@@ -1,10 +1,9 @@
 package sdk
 
 import (
-	"bytes"
 	"context"
 	"database/sql"
-	"fmt"
+	"os"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
@@ -14,15 +13,14 @@ import (
 	"github.com/beacon-stack/pulse/internal/api"
 	"github.com/beacon-stack/pulse/internal/api/ws"
 	appconfig "github.com/beacon-stack/pulse/internal/config"
-	cfgstore "github.com/beacon-stack/pulse/internal/core/config"
 	"github.com/beacon-stack/pulse/internal/core/indexer"
 	"github.com/beacon-stack/pulse/internal/core/registry"
 	"github.com/beacon-stack/pulse/internal/core/tag"
 	"github.com/beacon-stack/pulse/internal/db"
-	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
+	dbgen "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/events"
 
-	_ "modernc.org/sqlite"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 const testAPIKey = "test-api-key-12345"
@@ -30,8 +28,12 @@ const testAPIKey = "test-api-key-12345"
 func setupTestServer(t *testing.T) *httptest.Server {
 	t.Helper()
 
-	// In-memory SQLite
-	sqlDB, err := sql.Open("sqlite", ":memory:?_foreign_keys=ON")
+	dsn := os.Getenv("TEST_DATABASE_DSN")
+	if dsn == "" {
+		t.Skip("TEST_DATABASE_DSN not set — skipping integration test")
+	}
+
+	sqlDB, err := sql.Open("pgx", dsn)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -41,9 +43,14 @@ func setupTestServer(t *testing.T) *httptest.Server {
 		t.Fatal(err)
 	}
 
+	// Clean all tables for test isolation.
+	for _, table := range []string{"indexer_tags", "service_tags", "tags", "config_subscriptions", "config_entries", "indexer_assignments", "indexers", "service_capabilities", "services", "filter_presets", "download_clients"} {
+		sqlDB.Exec("DELETE FROM " + table)
+	}
+
 	logger := slog.Default()
 	bus := events.New(logger)
-	queries := dbsqlite.New(sqlDB)
+	queries := dbgen.New(sqlDB)
 
 	wsHub := ws.NewHub(logger, []byte(testAPIKey))
 	bus.Subscribe(wsHub.HandleEvent)
@@ -53,7 +60,6 @@ func setupTestServer(t *testing.T) *httptest.Server {
 		Logger:          logger,
 		StartTime:       time.Now(),
 		RegistryService: registry.NewService(queries, bus, logger),
-		ConfigStore:     cfgstore.NewStore(queries, bus, logger),
 		IndexerManager:  indexer.NewManager(queries, bus, logger),
 		TagService:      tag.NewService(queries),
 		WSHub:           wsHub,
@@ -139,57 +145,6 @@ func TestSDKRegisterAndDiscover(t *testing.T) {
 	}
 }
 
-func TestSDKConfigOperations(t *testing.T) {
-	ts := setupTestServer(t)
-
-	client, err := New(Config{
-		PulseURL:     ts.URL,
-		APIKey:            testAPIKey,
-		ServiceName:       "config-test",
-		ServiceType:       "automation",
-		APIURL:            "http://test:1234",
-		HeartbeatInterval: time.Hour,
-		Logger:            slog.Default(),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer client.Close()
-
-	ctx := context.Background()
-
-	// Set config via direct API call (SDK is consumer, not producer — use raw HTTP)
-	setConfig(t, ts.URL, "quality", "preferred_codec", "x265")
-	setConfig(t, ts.URL, "quality", "min_resolution", "1080p")
-
-	// Read config
-	entries, err := client.GetConfigNamespace(ctx, "quality")
-	if err != nil {
-		t.Fatalf("get namespace: %v", err)
-	}
-	if len(entries) != 2 {
-		t.Fatalf("expected 2 entries in quality namespace, got %d", len(entries))
-	}
-
-	entry, err := client.GetConfig(ctx, "quality", "preferred_codec")
-	if err != nil {
-		t.Fatalf("get entry: %v", err)
-	}
-	if entry.Value != "x265" {
-		t.Errorf("expected value x265, got %s", entry.Value)
-	}
-
-	// Subscribe
-	if err := client.Subscribe(ctx, "quality"); err != nil {
-		t.Fatalf("subscribe: %v", err)
-	}
-
-	// Unsubscribe
-	if err := client.Unsubscribe(ctx, "quality"); err != nil {
-		t.Fatalf("unsubscribe: %v", err)
-	}
-}
-
 func TestSDKDeregister(t *testing.T) {
 	ts := setupTestServer(t)
 
@@ -231,22 +186,3 @@ func TestSDKDeregister(t *testing.T) {
 	}
 }
 
-// Helper: set config via direct HTTP
-func setConfig(t *testing.T, baseURL, namespace, key, value string) {
-	t.Helper()
-	body := fmt.Sprintf(`{"namespace":"%s","key":"%s","value":"%s"}`, namespace, key, value)
-	req, err := http.NewRequest("PUT", baseURL+"/api/v1/config", bytes.NewBufferString(body))
-	if err != nil {
-		t.Fatal(err)
-	}
-	req.Header.Set("X-Api-Key", testAPIKey)
-	req.Header.Set("Content-Type", "application/json")
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		t.Fatalf("set config: %v", err)
-	}
-	resp.Body.Close()
-	if resp.StatusCode >= 400 {
-		t.Fatalf("set config returned %d", resp.StatusCode)
-	}
-}

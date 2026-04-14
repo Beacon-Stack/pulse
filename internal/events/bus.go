@@ -24,6 +24,10 @@ const (
 	TypeIndexerAssigned     Type = "indexer_assigned"
 	TypeIndexerUnassigned   Type = "indexer_unassigned"
 	TypeHealthCheck         Type = "health_check"
+	TypeQualityProfileCreated Type = "quality_profile_created"
+	TypeQualityProfileUpdated Type = "quality_profile_updated"
+	TypeQualityProfileDeleted Type = "quality_profile_deleted"
+	TypeSharedSettingsUpdated Type = "shared_settings_updated"
 )
 
 // Event carries the context of something that happened.

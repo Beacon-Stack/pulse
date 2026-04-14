@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/uuid"
 
-	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
+	db "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/events"
 )
 
@@ -26,7 +26,7 @@ type ServiceInput struct {
 
 // ServiceInfo is the enriched view returned from queries.
 type ServiceInfo struct {
-	dbsqlite.Service
+	db.Service
 	Capabilities []string `json:"capabilities"`
 }
 
@@ -36,14 +36,14 @@ type OnRegisterFunc func(ctx context.Context, serviceID string)
 
 // Service manages the service registry.
 type Service struct {
-	q          dbsqlite.Querier
+	q          db.Querier
 	bus        *events.Bus
 	logger     *slog.Logger
 	onRegister OnRegisterFunc
 }
 
 // NewService creates a new registry service.
-func NewService(q dbsqlite.Querier, bus *events.Bus, logger *slog.Logger) *Service {
+func NewService(q db.Querier, bus *events.Bus, logger *slog.Logger) *Service {
 	return &Service{q: q, bus: bus, logger: logger}
 }
 
@@ -62,13 +62,13 @@ func (s *Service) Register(ctx context.Context, input ServiceInput) (*ServiceInf
 	}
 
 	// Check if already registered.
-	existing, err := s.q.GetServiceByNameAndType(ctx, dbsqlite.GetServiceByNameAndTypeParams{
+	existing, err := s.q.GetServiceByNameAndType(ctx, db.GetServiceByNameAndTypeParams{
 		Name: input.Name,
 		Type: input.Type,
 	})
 	if err == nil {
 		// Update existing registration.
-		row, err := s.q.UpdateService(ctx, dbsqlite.UpdateServiceParams{
+		row, err := s.q.UpdateService(ctx, db.UpdateServiceParams{
 			Name:     input.Name,
 			ApiUrl:   input.APIURL,
 			ApiKey:   input.APIKey,
@@ -93,12 +93,18 @@ func (s *Service) Register(ctx context.Context, input ServiceInput) (*ServiceInf
 			Data:      map[string]any{"name": row.Name, "type": row.Type, "action": "updated"},
 		})
 
+		// Fire onRegister for updates too — the callback is idempotent and
+		// handles cases like download-client auto-registration on re-connect.
+		if s.onRegister != nil {
+			go s.onRegister(context.WithoutCancel(ctx), row.ID)
+		}
+
 		return &ServiceInfo{Service: row, Capabilities: caps}, nil
 	}
 
 	// Create new registration.
 	id := uuid.New().String()
-	row, err := s.q.CreateService(ctx, dbsqlite.CreateServiceParams{
+	row, err := s.q.CreateService(ctx, db.CreateServiceParams{
 		ID:         id,
 		Name:       input.Name,
 		Type:       input.Type,
@@ -200,7 +206,7 @@ func (s *Service) ListByCapability(ctx context.Context, capability string) ([]Se
 // Heartbeat updates the last_seen timestamp and sets status to online.
 func (s *Service) Heartbeat(ctx context.Context, id string) error {
 	now := time.Now().UTC().Format(time.RFC3339)
-	return s.q.UpdateServiceHeartbeat(ctx, dbsqlite.UpdateServiceHeartbeatParams{
+	return s.q.UpdateServiceHeartbeat(ctx, db.UpdateServiceHeartbeatParams{
 		LastSeen: now,
 		ID:       id,
 	})
@@ -209,7 +215,7 @@ func (s *Service) Heartbeat(ctx context.Context, id string) error {
 // UpdateStatus sets the status for a service.
 func (s *Service) UpdateStatus(ctx context.Context, id, status string) error {
 	now := time.Now().UTC().Format(time.RFC3339)
-	return s.q.UpdateServiceStatus(ctx, dbsqlite.UpdateServiceStatusParams{
+	return s.q.UpdateServiceStatus(ctx, db.UpdateServiceStatusParams{
 		Status:   status,
 		LastSeen: now,
 		ID:       id,
@@ -221,7 +227,7 @@ func (s *Service) syncCapabilities(ctx context.Context, serviceID string, capabi
 		return nil, fmt.Errorf("clearing capabilities: %w", err)
 	}
 	for _, cap := range capabilities {
-		if err := s.q.AddCapability(ctx, dbsqlite.AddCapabilityParams{
+		if err := s.q.AddCapability(ctx, db.AddCapabilityParams{
 			ID:         uuid.New().String(),
 			ServiceID:  serviceID,
 			Capability: cap,
@@ -232,7 +238,7 @@ func (s *Service) syncCapabilities(ctx context.Context, serviceID string, capabi
 	return capabilities, nil
 }
 
-func (s *Service) enrichServices(ctx context.Context, rows []dbsqlite.Service) ([]ServiceInfo, error) {
+func (s *Service) enrichServices(ctx context.Context, rows []db.Service) ([]ServiceInfo, error) {
 	out := make([]ServiceInfo, len(rows))
 	for i, row := range rows {
 		caps, err := s.q.ListCapabilities(ctx, row.ID)

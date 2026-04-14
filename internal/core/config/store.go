@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/uuid"
 
-	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
+	db "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/events"
 )
 
@@ -22,13 +22,13 @@ type Entry struct {
 
 // Store manages the shared configuration key-value store.
 type Store struct {
-	q      dbsqlite.Querier
+	q      db.Querier
 	bus    *events.Bus
 	logger *slog.Logger
 }
 
 // NewStore creates a new config store.
-func NewStore(q dbsqlite.Querier, bus *events.Bus, logger *slog.Logger) *Store {
+func NewStore(q db.Querier, bus *events.Bus, logger *slog.Logger) *Store {
 	return &Store{q: q, bus: bus, logger: logger}
 }
 
@@ -36,7 +36,7 @@ func NewStore(q dbsqlite.Querier, bus *events.Bus, logger *slog.Logger) *Store {
 // so subscribers are notified.
 func (s *Store) Set(ctx context.Context, namespace, key, value string) (*Entry, error) {
 	now := time.Now().UTC().Format(time.RFC3339)
-	row, err := s.q.SetConfigEntry(ctx, dbsqlite.SetConfigEntryParams{
+	row, err := s.q.SetConfigEntry(ctx, db.SetConfigEntryParams{
 		ID:        uuid.New().String(),
 		Namespace: namespace,
 		Key:       key,
@@ -65,7 +65,7 @@ func (s *Store) Set(ctx context.Context, namespace, key, value string) (*Entry, 
 
 // Get retrieves a single config entry.
 func (s *Store) Get(ctx context.Context, namespace, key string) (*Entry, error) {
-	row, err := s.q.GetConfigEntry(ctx, dbsqlite.GetConfigEntryParams{
+	row, err := s.q.GetConfigEntry(ctx, db.GetConfigEntryParams{
 		Namespace: namespace,
 		Key:       key,
 	})
@@ -113,7 +113,7 @@ func (s *Store) ListNamespaces(ctx context.Context) ([]string, error) {
 
 // Delete removes a config entry.
 func (s *Store) Delete(ctx context.Context, namespace, key string) error {
-	if err := s.q.DeleteConfigEntry(ctx, dbsqlite.DeleteConfigEntryParams{
+	if err := s.q.DeleteConfigEntry(ctx, db.DeleteConfigEntryParams{
 		Namespace: namespace,
 		Key:       key,
 	}); err != nil {
@@ -133,7 +133,7 @@ func (s *Store) DeleteNamespace(ctx context.Context, namespace string) error {
 
 // Subscribe registers a service as interested in a config namespace.
 func (s *Store) Subscribe(ctx context.Context, serviceID, namespace string) error {
-	return s.q.Subscribe(ctx, dbsqlite.SubscribeParams{
+	return s.q.Subscribe(ctx, db.SubscribeParams{
 		ID:        uuid.New().String(),
 		ServiceID: serviceID,
 		Namespace: namespace,
@@ -142,7 +142,7 @@ func (s *Store) Subscribe(ctx context.Context, serviceID, namespace string) erro
 
 // Unsubscribe removes a service's subscription to a namespace.
 func (s *Store) Unsubscribe(ctx context.Context, serviceID, namespace string) error {
-	return s.q.Unsubscribe(ctx, dbsqlite.UnsubscribeParams{
+	return s.q.Unsubscribe(ctx, db.UnsubscribeParams{
 		ServiceID: serviceID,
 		Namespace: namespace,
 	})
@@ -154,6 +154,6 @@ func (s *Store) ListSubscriptions(ctx context.Context, serviceID string) ([]stri
 }
 
 // ListSubscribers returns the services subscribed to a namespace.
-func (s *Store) ListSubscribers(ctx context.Context, namespace string) ([]dbsqlite.Service, error) {
+func (s *Store) ListSubscribers(ctx context.Context, namespace string) ([]db.Service, error) {
 	return s.q.ListSubscribersByNamespace(ctx, namespace)
 }

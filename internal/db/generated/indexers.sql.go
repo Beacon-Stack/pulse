@@ -3,7 +3,7 @@
 //   sqlc v1.30.0
 // source: indexers.sql
 
-package dbsqlite
+package db
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 const createAssignment = `-- name: CreateAssignment :one
 
 INSERT INTO indexer_assignments (id, indexer_id, service_id, overrides)
-VALUES (?, ?, ?, ?)
+VALUES ($1, $2, $3, $4)
 RETURNING id, indexer_id, service_id, overrides
 `
 
@@ -43,7 +43,7 @@ func (q *Queries) CreateAssignment(ctx context.Context, arg CreateAssignmentPara
 
 const createIndexer = `-- name: CreateIndexer :one
 INSERT INTO indexers (id, name, kind, enabled, priority, url, api_key, settings, created_at, updated_at)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 RETURNING id, name, kind, enabled, priority, url, api_key, settings, created_at, updated_at
 `
 
@@ -51,8 +51,8 @@ type CreateIndexerParams struct {
 	ID        string `json:"id"`
 	Name      string `json:"name"`
 	Kind      string `json:"kind"`
-	Enabled   int64  `json:"enabled"`
-	Priority  int64  `json:"priority"`
+	Enabled   bool   `json:"enabled"`
+	Priority  int32  `json:"priority"`
 	Url       string `json:"url"`
 	ApiKey    string `json:"apiKey"`
 	Settings  string `json:"settings"`
@@ -90,7 +90,7 @@ func (q *Queries) CreateIndexer(ctx context.Context, arg CreateIndexerParams) (I
 }
 
 const deleteAssignment = `-- name: DeleteAssignment :exec
-DELETE FROM indexer_assignments WHERE indexer_id = ? AND service_id = ?
+DELETE FROM indexer_assignments WHERE indexer_id = $1 AND service_id = $2
 `
 
 type DeleteAssignmentParams struct {
@@ -104,7 +104,7 @@ func (q *Queries) DeleteAssignment(ctx context.Context, arg DeleteAssignmentPara
 }
 
 const deleteAssignmentsByIndexer = `-- name: DeleteAssignmentsByIndexer :exec
-DELETE FROM indexer_assignments WHERE indexer_id = ?
+DELETE FROM indexer_assignments WHERE indexer_id = $1
 `
 
 func (q *Queries) DeleteAssignmentsByIndexer(ctx context.Context, indexerID string) error {
@@ -113,7 +113,7 @@ func (q *Queries) DeleteAssignmentsByIndexer(ctx context.Context, indexerID stri
 }
 
 const deleteAssignmentsByService = `-- name: DeleteAssignmentsByService :exec
-DELETE FROM indexer_assignments WHERE service_id = ?
+DELETE FROM indexer_assignments WHERE service_id = $1
 `
 
 func (q *Queries) DeleteAssignmentsByService(ctx context.Context, serviceID string) error {
@@ -122,7 +122,7 @@ func (q *Queries) DeleteAssignmentsByService(ctx context.Context, serviceID stri
 }
 
 const deleteIndexer = `-- name: DeleteIndexer :exec
-DELETE FROM indexers WHERE id = ?
+DELETE FROM indexers WHERE id = $1
 `
 
 func (q *Queries) DeleteIndexer(ctx context.Context, id string) error {
@@ -131,7 +131,7 @@ func (q *Queries) DeleteIndexer(ctx context.Context, id string) error {
 }
 
 const getAssignmentOverrides = `-- name: GetAssignmentOverrides :one
-SELECT overrides FROM indexer_assignments WHERE indexer_id = ? AND service_id = ?
+SELECT overrides FROM indexer_assignments WHERE indexer_id = $1 AND service_id = $2
 `
 
 type GetAssignmentOverridesParams struct {
@@ -147,7 +147,7 @@ func (q *Queries) GetAssignmentOverrides(ctx context.Context, arg GetAssignmentO
 }
 
 const getIndexer = `-- name: GetIndexer :one
-SELECT id, name, kind, enabled, priority, url, api_key, settings, created_at, updated_at FROM indexers WHERE id = ?
+SELECT id, name, kind, enabled, priority, url, api_key, settings, created_at, updated_at FROM indexers WHERE id = $1
 `
 
 func (q *Queries) GetIndexer(ctx context.Context, id string) (Indexer, error) {
@@ -169,7 +169,7 @@ func (q *Queries) GetIndexer(ctx context.Context, id string) (Indexer, error) {
 }
 
 const listAssignmentsByIndexer = `-- name: ListAssignmentsByIndexer :many
-SELECT id, indexer_id, service_id, overrides FROM indexer_assignments WHERE indexer_id = ?
+SELECT id, indexer_id, service_id, overrides FROM indexer_assignments WHERE indexer_id = $1
 `
 
 func (q *Queries) ListAssignmentsByIndexer(ctx context.Context, indexerID string) ([]IndexerAssignment, error) {
@@ -201,7 +201,7 @@ func (q *Queries) ListAssignmentsByIndexer(ctx context.Context, indexerID string
 }
 
 const listAssignmentsByService = `-- name: ListAssignmentsByService :many
-SELECT id, indexer_id, service_id, overrides FROM indexer_assignments WHERE service_id = ?
+SELECT id, indexer_id, service_id, overrides FROM indexer_assignments WHERE service_id = $1
 `
 
 func (q *Queries) ListAssignmentsByService(ctx context.Context, serviceID string) ([]IndexerAssignment, error) {
@@ -233,7 +233,7 @@ func (q *Queries) ListAssignmentsByService(ctx context.Context, serviceID string
 }
 
 const listEnabledIndexers = `-- name: ListEnabledIndexers :many
-SELECT id, name, kind, enabled, priority, url, api_key, settings, created_at, updated_at FROM indexers WHERE enabled = 1 ORDER BY priority ASC, name ASC
+SELECT id, name, kind, enabled, priority, url, api_key, settings, created_at, updated_at FROM indexers WHERE enabled = TRUE ORDER BY priority ASC, name ASC
 `
 
 func (q *Queries) ListEnabledIndexers(ctx context.Context) ([]Indexer, error) {
@@ -311,7 +311,7 @@ func (q *Queries) ListIndexers(ctx context.Context) ([]Indexer, error) {
 const listIndexersForService = `-- name: ListIndexersForService :many
 SELECT i.id, i.name, i.kind, i.enabled, i.priority, i.url, i.api_key, i.settings, i.created_at, i.updated_at FROM indexers i
 JOIN indexer_assignments ia ON i.id = ia.indexer_id
-WHERE ia.service_id = ?
+WHERE ia.service_id = $1
 ORDER BY i.priority ASC, i.name ASC
 `
 
@@ -351,23 +351,23 @@ func (q *Queries) ListIndexersForService(ctx context.Context, serviceID string) 
 
 const updateIndexer = `-- name: UpdateIndexer :one
 UPDATE indexers SET
-    name       = ?,
-    kind       = ?,
-    enabled    = ?,
-    priority   = ?,
-    url        = ?,
-    api_key    = ?,
-    settings   = ?,
-    updated_at = ?
-WHERE id = ?
+    name       = $1,
+    kind       = $2,
+    enabled    = $3,
+    priority   = $4,
+    url        = $5,
+    api_key    = $6,
+    settings   = $7,
+    updated_at = $8
+WHERE id = $9
 RETURNING id, name, kind, enabled, priority, url, api_key, settings, created_at, updated_at
 `
 
 type UpdateIndexerParams struct {
 	Name      string `json:"name"`
 	Kind      string `json:"kind"`
-	Enabled   int64  `json:"enabled"`
-	Priority  int64  `json:"priority"`
+	Enabled   bool   `json:"enabled"`
+	Priority  int32  `json:"priority"`
 	Url       string `json:"url"`
 	ApiKey    string `json:"apiKey"`
 	Settings  string `json:"settings"`

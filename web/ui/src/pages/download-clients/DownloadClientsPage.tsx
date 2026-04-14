@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Plus, Check, AlertCircle, Loader2, ChevronRight } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import Pill from "@/components/Pill";
-import Modal from "@/components/Modal";
+import Modal from "@beacon-shared/Modal";
 import { useDownloadClients, useCreateDownloadClient, useTestDownloadClient } from "@/api/download-clients";
 import { card } from "@/lib/styles";
 import type { TestResult } from "@/api/download-clients";

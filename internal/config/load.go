@@ -29,10 +29,12 @@ func Load(configPath string) (*Config, error) {
 	// Defaults — use absolute paths so data survives CWD changes.
 	v.SetDefault("server.host", "0.0.0.0")
 	v.SetDefault("server.port", 9696)
-	v.SetDefault("database.driver", "sqlite")
-	v.SetDefault("database.path", filepath.Join(dir, "pulse.db"))
+	v.SetDefault("server.external_url", "")
+	v.SetDefault("database.driver", "postgres")
+	v.SetDefault("database.dsn", "")
 	v.SetDefault("log.level", "info")
 	v.SetDefault("log.format", "json")
+	v.SetDefault("flaresolverr.url", "")
 
 	// Env vars: PULSE_SERVER_PORT, etc.
 	v.SetEnvPrefix("PULSE")
@@ -104,7 +106,6 @@ func WriteDefault(path string) error {
 		return err
 	}
 
-	dir := dataDir()
 	key, _ := generateAPIKey()
 	content := fmt.Sprintf(`# Pulse configuration
 server:
@@ -112,8 +113,8 @@ server:
   port: 9696
 
 database:
-  driver: sqlite
-  path: %s
+  driver: postgres
+  dsn: "postgres://pulse:pulse@localhost:5432/pulse_db?sslmode=disable"
 
 log:
   level: info
@@ -121,7 +122,7 @@ log:
 
 auth:
   api_key: "%s"
-`, filepath.Join(dir, "pulse.db"), key)
+`, key)
 
 	return os.WriteFile(path, []byte(content), 0o600)
 }

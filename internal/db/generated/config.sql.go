@@ -3,14 +3,14 @@
 //   sqlc v1.30.0
 // source: config.sql
 
-package dbsqlite
+package db
 
 import (
 	"context"
 )
 
 const deleteConfigEntry = `-- name: DeleteConfigEntry :exec
-DELETE FROM config_entries WHERE namespace = ? AND key = ?
+DELETE FROM config_entries WHERE namespace = $1 AND key = $2
 `
 
 type DeleteConfigEntryParams struct {
@@ -24,7 +24,7 @@ func (q *Queries) DeleteConfigEntry(ctx context.Context, arg DeleteConfigEntryPa
 }
 
 const deleteConfigNamespace = `-- name: DeleteConfigNamespace :exec
-DELETE FROM config_entries WHERE namespace = ?
+DELETE FROM config_entries WHERE namespace = $1
 `
 
 func (q *Queries) DeleteConfigNamespace(ctx context.Context, namespace string) error {
@@ -33,7 +33,7 @@ func (q *Queries) DeleteConfigNamespace(ctx context.Context, namespace string) e
 }
 
 const deleteSubscriptionsByService = `-- name: DeleteSubscriptionsByService :exec
-DELETE FROM config_subscriptions WHERE service_id = ?
+DELETE FROM config_subscriptions WHERE service_id = $1
 `
 
 func (q *Queries) DeleteSubscriptionsByService(ctx context.Context, serviceID string) error {
@@ -42,7 +42,7 @@ func (q *Queries) DeleteSubscriptionsByService(ctx context.Context, serviceID st
 }
 
 const getConfigEntry = `-- name: GetConfigEntry :one
-SELECT id, namespace, "key", value, updated_at FROM config_entries WHERE namespace = ? AND key = ?
+SELECT id, namespace, key, value, updated_at FROM config_entries WHERE namespace = $1 AND key = $2
 `
 
 type GetConfigEntryParams struct {
@@ -64,7 +64,7 @@ func (q *Queries) GetConfigEntry(ctx context.Context, arg GetConfigEntryParams) 
 }
 
 const listAllConfig = `-- name: ListAllConfig :many
-SELECT id, namespace, "key", value, updated_at FROM config_entries ORDER BY namespace ASC, key ASC
+SELECT id, namespace, key, value, updated_at FROM config_entries ORDER BY namespace ASC, key ASC
 `
 
 func (q *Queries) ListAllConfig(ctx context.Context) ([]ConfigEntry, error) {
@@ -97,7 +97,7 @@ func (q *Queries) ListAllConfig(ctx context.Context) ([]ConfigEntry, error) {
 }
 
 const listConfigByNamespace = `-- name: ListConfigByNamespace :many
-SELECT id, namespace, "key", value, updated_at FROM config_entries WHERE namespace = ? ORDER BY key ASC
+SELECT id, namespace, key, value, updated_at FROM config_entries WHERE namespace = $1 ORDER BY key ASC
 `
 
 func (q *Queries) ListConfigByNamespace(ctx context.Context, namespace string) ([]ConfigEntry, error) {
@@ -159,7 +159,7 @@ func (q *Queries) ListConfigNamespaces(ctx context.Context) ([]string, error) {
 const listSubscribersByNamespace = `-- name: ListSubscribersByNamespace :many
 SELECT s.id, s.name, s.type, s.api_url, s.api_key, s.health_url, s.version, s.status, s.last_seen, s.registered, s.metadata FROM services s
 JOIN config_subscriptions cs ON s.id = cs.service_id
-WHERE cs.namespace = ?
+WHERE cs.namespace = $1
 ORDER BY s.name ASC
 `
 
@@ -199,7 +199,7 @@ func (q *Queries) ListSubscribersByNamespace(ctx context.Context, namespace stri
 }
 
 const listSubscriptionsByService = `-- name: ListSubscriptionsByService :many
-SELECT namespace FROM config_subscriptions WHERE service_id = ?
+SELECT namespace FROM config_subscriptions WHERE service_id = $1
 `
 
 func (q *Queries) ListSubscriptionsByService(ctx context.Context, serviceID string) ([]string, error) {
@@ -227,11 +227,11 @@ func (q *Queries) ListSubscriptionsByService(ctx context.Context, serviceID stri
 
 const setConfigEntry = `-- name: SetConfigEntry :one
 INSERT INTO config_entries (id, namespace, key, value, updated_at)
-VALUES (?, ?, ?, ?, ?)
+VALUES ($1, $2, $3, $4, $5)
 ON CONFLICT (namespace, key) DO UPDATE SET
     value      = excluded.value,
     updated_at = excluded.updated_at
-RETURNING id, namespace, "key", value, updated_at
+RETURNING id, namespace, key, value, updated_at
 `
 
 type SetConfigEntryParams struct {
@@ -263,8 +263,9 @@ func (q *Queries) SetConfigEntry(ctx context.Context, arg SetConfigEntryParams) 
 
 const subscribe = `-- name: Subscribe :exec
 
-INSERT OR IGNORE INTO config_subscriptions (id, service_id, namespace)
-VALUES (?, ?, ?)
+INSERT INTO config_subscriptions (id, service_id, namespace)
+VALUES ($1, $2, $3)
+ON CONFLICT DO NOTHING
 `
 
 type SubscribeParams struct {
@@ -280,7 +281,7 @@ func (q *Queries) Subscribe(ctx context.Context, arg SubscribeParams) error {
 }
 
 const unsubscribe = `-- name: Unsubscribe :exec
-DELETE FROM config_subscriptions WHERE service_id = ? AND namespace = ?
+DELETE FROM config_subscriptions WHERE service_id = $1 AND namespace = $2
 `
 
 type UnsubscribeParams struct {

@@ -15,21 +15,23 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
+	db "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/scraper"
 	"github.com/beacon-stack/pulse/internal/torznab"
 )
 
 // TorznabHandler handles Torznab proxy requests.
 type TorznabHandler struct {
-	engine *scraper.Engine
-	q      dbsqlite.Querier
-	logger *slog.Logger
+	engine      *scraper.Engine
+	q           db.Querier
+	externalURL string // e.g. "http://pulse:9696" — used for proxy download URLs in Docker
+	logger      *slog.Logger
 }
 
-// NewTorznabHandler creates a new handler.
-func NewTorznabHandler(engine *scraper.Engine, q dbsqlite.Querier, logger *slog.Logger) *TorznabHandler {
-	return &TorznabHandler{engine: engine, q: q, logger: logger}
+// NewTorznabHandler creates a new handler. externalURL is optional; when set,
+// torznab download proxy URLs use it instead of the request's Host header.
+func NewTorznabHandler(engine *scraper.Engine, q db.Querier, externalURL string, logger *slog.Logger) *TorznabHandler {
+	return &TorznabHandler{engine: engine, q: q, externalURL: strings.TrimRight(externalURL, "/"), logger: logger}
 }
 
 // RegisterTorznabRoutes registers the Torznab proxy endpoint on the chi router.
@@ -79,7 +81,7 @@ func (h *TorznabHandler) Handle(w http.ResponseWriter, r *http.Request) {
 }
 
 // handleCaps returns the Torznab capabilities document.
-func (h *TorznabHandler) handleCaps(w http.ResponseWriter, runner *scraper.Runner, idx dbsqlite.Indexer) {
+func (h *TorznabHandler) handleCaps(w http.ResponseWriter, runner *scraper.Runner, idx db.Indexer) {
 	def := runner.Definition()
 
 	// Build category list from the definition.
@@ -117,7 +119,7 @@ func (h *TorznabHandler) handleCaps(w http.ResponseWriter, runner *scraper.Runne
 }
 
 // handleSearch executes a search and returns Torznab XML results.
-func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, runner *scraper.Runner, idx dbsqlite.Indexer) {
+func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, runner *scraper.Runner, idx db.Indexer) {
 	query := r.URL.Query().Get("q")
 	imdbID := r.URL.Query().Get("imdbid")
 
@@ -164,13 +166,20 @@ func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, ru
 // writeResults encodes search results as Torznab XML.
 // Download URLs are rewritten to point at Pulse's download proxy
 // so clients don't need CF cookies or tracker sessions.
-func (h *TorznabHandler) writeResults(w http.ResponseWriter, r *http.Request, idx dbsqlite.Indexer, results []scraper.SearchResult) {
-	// Build the proxy download base URL from the request
-	scheme := "http"
-	if r.TLS != nil {
-		scheme = "https"
+func (h *TorznabHandler) writeResults(w http.ResponseWriter, r *http.Request, idx db.Indexer, results []scraper.SearchResult) {
+	// Build the proxy download base URL.
+	// Use the configured external URL when set (Docker), otherwise derive from the request.
+	var baseURL string
+	if h.externalURL != "" {
+		baseURL = h.externalURL
+	} else {
+		scheme := "http"
+		if r.TLS != nil {
+			scheme = "https"
+		}
+		baseURL = fmt.Sprintf("%s://%s", scheme, r.Host)
 	}
-	proxyBase := fmt.Sprintf("%s://%s/api/v1/torznab/%s/download", scheme, r.Host, idx.ID)
+	proxyBase := fmt.Sprintf("%s/api/v1/torznab/%s/download", baseURL, idx.ID)
 
 	var items []torznab.Item
 	for _, res := range results {

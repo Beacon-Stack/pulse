@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/uuid"
 
-	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
+	db "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/events"
 )
 
@@ -32,13 +32,13 @@ type AssignmentInput struct {
 
 // IndexerInfo is the enriched view with assignments.
 type IndexerInfo struct {
-	dbsqlite.Indexer
+	db.Indexer
 	AssignedServices []string `json:"assigned_services,omitempty"`
 }
 
 // Manager handles centralized indexer management.
 type Manager struct {
-	q            dbsqlite.Querier
+	q            db.Querier
 	bus          *events.Bus
 	pusher       *Pusher
 	autoAssigner *AutoAssigner
@@ -46,7 +46,7 @@ type Manager struct {
 }
 
 // NewManager creates a new indexer manager.
-func NewManager(q dbsqlite.Querier, bus *events.Bus, logger *slog.Logger) *Manager {
+func NewManager(q db.Querier, bus *events.Bus, logger *slog.Logger) *Manager {
 	pusher := NewPusher(q, logger)
 	return &Manager{
 		q:            q,
@@ -64,7 +64,7 @@ func (m *Manager) AutoAssigner() *AutoAssigner {
 }
 
 // Create adds a new indexer.
-func (m *Manager) Create(ctx context.Context, input Input) (*dbsqlite.Indexer, error) {
+func (m *Manager) Create(ctx context.Context, input Input) (*db.Indexer, error) {
 	now := time.Now().UTC().Format(time.RFC3339)
 	if input.Settings == "" {
 		input.Settings = "{}"
@@ -73,17 +73,12 @@ func (m *Manager) Create(ctx context.Context, input Input) (*dbsqlite.Indexer, e
 		input.Kind = "torznab"
 	}
 
-	var enabled int64
-	if input.Enabled {
-		enabled = 1
-	}
-
-	row, err := m.q.CreateIndexer(ctx, dbsqlite.CreateIndexerParams{
+	row, err := m.q.CreateIndexer(ctx, db.CreateIndexerParams{
 		ID:        uuid.New().String(),
 		Name:      input.Name,
 		Kind:      input.Kind,
-		Enabled:   enabled,
-		Priority:  int64(input.Priority),
+		Enabled:   input.Enabled,
+		Priority:  int32(input.Priority),
 		Url:       input.URL,
 		ApiKey:    input.APIKey,
 		Settings:  input.Settings,
@@ -109,7 +104,7 @@ func (m *Manager) Create(ctx context.Context, input Input) (*dbsqlite.Indexer, e
 }
 
 // Get returns a single indexer.
-func (m *Manager) Get(ctx context.Context, id string) (*dbsqlite.Indexer, error) {
+func (m *Manager) Get(ctx context.Context, id string) (*db.Indexer, error) {
 	row, err := m.q.GetIndexer(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("indexer not found: %w", err)
@@ -118,32 +113,27 @@ func (m *Manager) Get(ctx context.Context, id string) (*dbsqlite.Indexer, error)
 }
 
 // List returns all indexers.
-func (m *Manager) List(ctx context.Context) ([]dbsqlite.Indexer, error) {
+func (m *Manager) List(ctx context.Context) ([]db.Indexer, error) {
 	return m.q.ListIndexers(ctx)
 }
 
 // ListEnabled returns only enabled indexers.
-func (m *Manager) ListEnabled(ctx context.Context) ([]dbsqlite.Indexer, error) {
+func (m *Manager) ListEnabled(ctx context.Context) ([]db.Indexer, error) {
 	return m.q.ListEnabledIndexers(ctx)
 }
 
 // Update modifies an existing indexer.
-func (m *Manager) Update(ctx context.Context, id string, input Input) (*dbsqlite.Indexer, error) {
+func (m *Manager) Update(ctx context.Context, id string, input Input) (*db.Indexer, error) {
 	now := time.Now().UTC().Format(time.RFC3339)
 	if input.Settings == "" {
 		input.Settings = "{}"
 	}
 
-	var enabled int64
-	if input.Enabled {
-		enabled = 1
-	}
-
-	row, err := m.q.UpdateIndexer(ctx, dbsqlite.UpdateIndexerParams{
+	row, err := m.q.UpdateIndexer(ctx, db.UpdateIndexerParams{
 		Name:      input.Name,
 		Kind:      input.Kind,
-		Enabled:   enabled,
-		Priority:  int64(input.Priority),
+		Enabled:   input.Enabled,
+		Priority:  int32(input.Priority),
 		Url:       input.URL,
 		ApiKey:    input.APIKey,
 		Settings:  input.Settings,
@@ -198,12 +188,12 @@ func (m *Manager) Delete(ctx context.Context, id string) error {
 }
 
 // Assign links an indexer to a service.
-func (m *Manager) Assign(ctx context.Context, input AssignmentInput) (*dbsqlite.IndexerAssignment, error) {
+func (m *Manager) Assign(ctx context.Context, input AssignmentInput) (*db.IndexerAssignment, error) {
 	if input.Overrides == "" {
 		input.Overrides = "{}"
 	}
 
-	row, err := m.q.CreateAssignment(ctx, dbsqlite.CreateAssignmentParams{
+	row, err := m.q.CreateAssignment(ctx, db.CreateAssignmentParams{
 		ID:        uuid.New().String(),
 		IndexerID: input.IndexerID,
 		ServiceID: input.ServiceID,
@@ -227,7 +217,7 @@ func (m *Manager) Assign(ctx context.Context, input AssignmentInput) (*dbsqlite.
 
 // Unassign removes an indexer-service link.
 func (m *Manager) Unassign(ctx context.Context, indexerID, serviceID string) error {
-	if err := m.q.DeleteAssignment(ctx, dbsqlite.DeleteAssignmentParams{
+	if err := m.q.DeleteAssignment(ctx, db.DeleteAssignmentParams{
 		IndexerID: indexerID,
 		ServiceID: serviceID,
 	}); err != nil {
@@ -247,11 +237,11 @@ func (m *Manager) Unassign(ctx context.Context, indexerID, serviceID string) err
 }
 
 // ListForService returns indexers assigned to a specific service.
-func (m *Manager) ListForService(ctx context.Context, serviceID string) ([]dbsqlite.Indexer, error) {
+func (m *Manager) ListForService(ctx context.Context, serviceID string) ([]db.Indexer, error) {
 	return m.q.ListIndexersForService(ctx, serviceID)
 }
 
 // ListAssignments returns all assignments for an indexer.
-func (m *Manager) ListAssignments(ctx context.Context, indexerID string) ([]dbsqlite.IndexerAssignment, error) {
+func (m *Manager) ListAssignments(ctx context.Context, indexerID string) ([]db.IndexerAssignment, error) {
 	return m.q.ListAssignmentsByIndexer(ctx, indexerID)
 }

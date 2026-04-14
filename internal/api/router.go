@@ -15,12 +15,13 @@ import (
 	v1 "github.com/beacon-stack/pulse/internal/api/v1"
 	"github.com/beacon-stack/pulse/internal/api/ws"
 	appconfig "github.com/beacon-stack/pulse/internal/config"
-	cfgstore "github.com/beacon-stack/pulse/internal/core/config"
 	"github.com/beacon-stack/pulse/internal/core/downloadclient"
 	"github.com/beacon-stack/pulse/internal/core/indexer"
+	"github.com/beacon-stack/pulse/internal/core/qualityprofile"
 	"github.com/beacon-stack/pulse/internal/core/registry"
+	"github.com/beacon-stack/pulse/internal/core/sharedsettings"
 	"github.com/beacon-stack/pulse/internal/core/tag"
-	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
+	db "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/scraper"
 	"github.com/beacon-stack/pulse/web"
 )
@@ -31,13 +32,14 @@ type RouterConfig struct {
 	Logger          *slog.Logger
 	StartTime       time.Time
 	RegistryService *registry.Service
-	ConfigStore     *cfgstore.Store
 	IndexerManager  *indexer.Manager
 	TagService      *tag.Service
 	WSHub           *ws.Hub
 	DownloadClientService *downloadclient.Service
+	QualityProfileService *qualityprofile.Service
+	SharedSettingsService *sharedsettings.Service
 	ScraperEngine        *scraper.Engine
-	Queries              dbsqlite.Querier
+	Queries              db.Querier
 	ExternalURL          string // e.g., "http://pulse:9696" — used for Torznab proxy URL rewriting
 }
 
@@ -59,7 +61,7 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	// Torznab proxy — registered directly on chi (XML responses, not JSON).
 	// Auth is via the apikey query parameter (standard Torznab auth).
 	if cfg.ScraperEngine != nil && cfg.Queries != nil {
-		torznabHandler := v1.NewTorznabHandler(cfg.ScraperEngine, cfg.Queries, cfg.Logger)
+		torznabHandler := v1.NewTorznabHandler(cfg.ScraperEngine, cfg.Queries, cfg.ExternalURL, cfg.Logger)
 		v1.RegisterTorznabRoutes(r, torznabHandler)
 	}
 
@@ -115,10 +117,6 @@ func NewRouter(cfg RouterConfig) http.Handler {
 		v1.RegisterServiceRoutes(humaAPI, cfg.RegistryService)
 	}
 
-	if cfg.ConfigStore != nil {
-		v1.RegisterConfigRoutes(humaAPI, cfg.ConfigStore)
-	}
-
 	if cfg.IndexerManager != nil {
 		v1.RegisterIndexerRoutes(humaAPI, cfg.IndexerManager, cfg.ExternalURL)
 	}
@@ -133,6 +131,14 @@ func NewRouter(cfg RouterConfig) http.Handler {
 
 	if cfg.DownloadClientService != nil {
 		v1.RegisterDownloadClientRoutes(humaAPI, cfg.DownloadClientService)
+	}
+
+	if cfg.QualityProfileService != nil {
+		v1.RegisterQualityProfileRoutes(humaAPI, cfg.QualityProfileService)
+	}
+
+	if cfg.SharedSettingsService != nil {
+		v1.RegisterSharedSettingsRoutes(humaAPI, cfg.SharedSettingsService)
 	}
 
 	v1.RegisterCatalogRoutes(humaAPI)

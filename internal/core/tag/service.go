@@ -6,7 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
-	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
+	db "github.com/beacon-stack/pulse/internal/db/generated"
 )
 
 // TagWithCounts is a tag enriched with usage counts.
@@ -19,11 +19,11 @@ type TagWithCounts struct {
 
 // Service manages tags.
 type Service struct {
-	q dbsqlite.Querier
+	q db.Querier
 }
 
 // NewService creates a new tag service.
-func NewService(q dbsqlite.Querier) *Service {
+func NewService(q db.Querier) *Service {
 	return &Service{q: q}
 }
 
@@ -48,8 +48,8 @@ func (s *Service) List(ctx context.Context) ([]TagWithCounts, error) {
 }
 
 // Create creates a new tag.
-func (s *Service) Create(ctx context.Context, name string) (*dbsqlite.Tag, error) {
-	row, err := s.q.CreateTag(ctx, dbsqlite.CreateTagParams{
+func (s *Service) Create(ctx context.Context, name string) (*db.Tag, error) {
+	row, err := s.q.CreateTag(ctx, db.CreateTagParams{
 		ID:   uuid.New().String(),
 		Name: name,
 	})
@@ -60,8 +60,8 @@ func (s *Service) Create(ctx context.Context, name string) (*dbsqlite.Tag, error
 }
 
 // Update renames a tag.
-func (s *Service) Update(ctx context.Context, id, name string) (*dbsqlite.Tag, error) {
-	row, err := s.q.UpdateTag(ctx, dbsqlite.UpdateTagParams{
+func (s *Service) Update(ctx context.Context, id, name string) (*db.Tag, error) {
+	row, err := s.q.UpdateTag(ctx, db.UpdateTagParams{
 		Name: name,
 		ID:   id,
 	})

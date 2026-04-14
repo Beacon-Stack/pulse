@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, ChevronRight, FlaskConical, Check, AlertCircle, Loader2, Trash2, CheckSquare } from "lucide-react";
+import { useConfirm } from "@beacon-shared/ConfirmDialog";
 import PageHeader from "@/components/PageHeader";
 import Pill from "@/components/Pill";
 import { useIndexers, useDeleteIndexer } from "@/api/indexers";
@@ -29,6 +30,7 @@ export default function IndexersPage() {
   const { data: indexers, isLoading } = useIndexers();
   const deleteIndexer = useDeleteIndexer();
   const { data: catalogData } = useCatalog();
+  const confirm = useConfirm();
 
   // Build a name→categories lookup from the catalog
   const catsByName = new Map<string, string[]>();
@@ -72,7 +74,15 @@ export default function IndexersPage() {
 
   const deleteSelected = async () => {
     if (selected.size === 0) return;
-    if (!confirm(`Delete ${selected.size} indexer${selected.size > 1 ? "s" : ""}? This cannot be undone.`)) return;
+    const n = selected.size;
+    if (
+      !(await confirm({
+        title: `Delete ${n} indexer${n > 1 ? "s" : ""}`,
+        message: `Delete ${n} indexer${n > 1 ? "s" : ""}? All services using ${n > 1 ? "them" : "it"} will stop receiving results from ${n > 1 ? "these sources" : "this source"}.`,
+        confirmLabel: "Delete",
+      }))
+    )
+      return;
     setDeleting(true);
     for (const id of selected) {
       await deleteIndexer.mutateAsync(id).catch(() => {});

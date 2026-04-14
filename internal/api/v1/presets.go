@@ -8,7 +8,7 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 
-	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
+	db "github.com/beacon-stack/pulse/internal/db/generated"
 )
 
 type presetBody struct {
@@ -30,7 +30,7 @@ type presetDeleteInput struct {
 	ID string `path:"id"`
 }
 
-func toPresetBody(row dbsqlite.FilterPreset) presetBody {
+func toPresetBody(row db.FilterPreset) presetBody {
 	return presetBody{
 		ID:        row.ID,
 		Name:      row.Name,
@@ -41,7 +41,7 @@ func toPresetBody(row dbsqlite.FilterPreset) presetBody {
 }
 
 // RegisterPresetRoutes registers filter preset CRUD endpoints.
-func RegisterPresetRoutes(api huma.API, q dbsqlite.Querier) {
+func RegisterPresetRoutes(api huma.API, q db.Querier) {
 	// GET /api/v1/presets — list all
 	huma.Register(api, huma.Operation{
 		OperationID: "list-presets",
@@ -70,7 +70,7 @@ func RegisterPresetRoutes(api huma.API, q dbsqlite.Querier) {
 		Tags:        []string{"Presets"},
 	}, func(ctx context.Context, input *presetSaveInput) (*struct{ Body presetBody }, error) {
 		now := time.Now().UTC().Format(time.RFC3339)
-		row, err := q.UpsertFilterPreset(ctx, dbsqlite.UpsertFilterPresetParams{
+		row, err := q.UpsertFilterPreset(ctx, db.UpsertFilterPresetParams{
 			ID:        uuid.New().String(),
 			Name:      input.Body.Name,
 			Filters:   input.Body.Filters,

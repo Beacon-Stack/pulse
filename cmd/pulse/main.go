@@ -6,9 +6,12 @@ import (
 	"flag"
 	"fmt"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -22,7 +25,9 @@ import (
 	"github.com/beacon-stack/pulse/internal/core/tag"
 	"github.com/beacon-stack/pulse/internal/db"
 	"github.com/beacon-stack/pulse/internal/core/downloadclient"
-	dbsqlite "github.com/beacon-stack/pulse/internal/db/generated/sqlite"
+	"github.com/beacon-stack/pulse/internal/core/qualityprofile"
+	"github.com/beacon-stack/pulse/internal/core/sharedsettings"
+	dbgen "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/events"
 	"github.com/beacon-stack/pulse/internal/scraper"
 )
@@ -64,7 +69,6 @@ func main() {
 		"host", cfg.Server.Host,
 		"port", cfg.Server.Port,
 		"db_driver", cfg.Database.Driver,
-		"db_path", cfg.Database.Path,
 	)
 
 	if cfg.ConfigFile != "" {
@@ -89,14 +93,28 @@ func main() {
 	bus := events.New(logger)
 
 	// ── SQLC queries ─────────────────────────────────────────────────────
-	queries := dbsqlite.New(database.SQL)
+	queries := dbgen.New(database.SQL)
 
 	// ── Core services ────────────────────────────────────────────────────
 	registrySvc := registry.NewService(queries, bus, logger)
 	configStore := cfgstore.NewStore(queries, bus, logger)
 	indexerMgr := indexer.NewManager(queries, bus, logger)
+
+	// Retroactively auto-assign existing indexers whenever a service registers
+	// (or re-registers). Without this hook, a service that comes online after
+	// indexers were added never gets those indexers until they're manually
+	// assigned via the UI.
+	registrySvc.SetOnRegister(func(ctx context.Context, serviceID string) {
+		indexerMgr.AutoAssigner().AssignExistingIndexersToService(ctx, serviceID)
+	})
+
 	tagSvc := tag.NewService(queries)
 	dlClientSvc := downloadclient.NewService(queries, bus, logger)
+	qualityProfileSvc := qualityprofile.NewService(queries, bus, logger)
+	if err := qualityProfileSvc.SeedDefaults(context.Background(), configStore); err != nil {
+		logger.Warn("failed to seed default quality profiles", "error", err)
+	}
+	sharedSettingsSvc := sharedsettings.NewService(queries, bus, logger)
 	healthChecker := health.NewChecker(queries, bus, logger)
 
 	// When a download client changes, notify all services that support its protocol.
@@ -115,8 +133,63 @@ func main() {
 
 	// When a new service registers, auto-assign existing indexers based on
 	// category↔capability matching (e.g., Movies indexers → content:movies services).
+	// Also auto-register download-client type services as download clients.
 	registrySvc.SetOnRegister(func(ctx context.Context, serviceID string) {
 		indexerMgr.AutoAssigner().AssignExistingIndexersToService(ctx, serviceID)
+
+		// Auto-register download-client services.
+		svcInfo, err := registrySvc.Get(ctx, serviceID)
+		if err != nil {
+			return
+		}
+		if svcInfo.Type != "download-client" {
+			return
+		}
+
+		// Parse host and port from the service's API URL.
+		host, port := parseHostPort(svcInfo.ApiUrl)
+		if host == "" {
+			return
+		}
+
+		// Determine the kind from the service name.
+		kind := svcInfo.Name
+
+		// Determine protocol from capabilities.
+		protocol := "torrent"
+		for _, cap := range svcInfo.Capabilities {
+			if cap == "supports_usenet" {
+				protocol = "usenet"
+			}
+		}
+
+		// Check if a download client with this name already exists.
+		existing, _ := dlClientSvc.List(ctx)
+		for _, e := range existing {
+			if e.Name == svcInfo.Name {
+				logger.Info("pulse: download-client service already registered",
+					"name", svcInfo.Name, "service_id", serviceID)
+				return
+			}
+		}
+
+		_, err = dlClientSvc.Create(ctx, downloadclient.Input{
+			Name:     svcInfo.Name,
+			Kind:     kind,
+			Protocol: protocol,
+			Enabled:  true,
+			Priority: 1,
+			Host:     host,
+			Port:     port,
+			Settings: `{"pulse":true}`,
+		})
+		if err != nil {
+			logger.Warn("pulse: failed to auto-register download client",
+				"name", svcInfo.Name, "error", err)
+			return
+		}
+		logger.Info("pulse: auto-registered download-client service",
+			"name", svcInfo.Name, "host", host, "port", port)
 	})
 
 	// ── Prowlarr-sourced indexer catalog ──────────────────────────────────
@@ -153,10 +226,11 @@ func main() {
 		Logger:          logger,
 		StartTime:       startTime,
 		RegistryService: registrySvc,
-		ConfigStore:     configStore,
 		IndexerManager:  indexerMgr,
 		TagService:              tagSvc,
 		DownloadClientService:   dlClientSvc,
+		QualityProfileService:   qualityProfileSvc,
+		SharedSettingsService:   sharedSettingsSvc,
 		WSHub:           wsHub,
 		ScraperEngine:   scraperEngine,
 		Queries:         queries,
@@ -253,4 +327,23 @@ func main() {
 		logger.Error("server shutdown error", "error", err)
 	}
 	logger.Info("pulse stopped")
+}
+
+// parseHostPort extracts host and port from a URL like "http://hostname:8484".
+func parseHostPort(apiURL string) (string, int) {
+	// Strip scheme.
+	u := apiURL
+	if idx := strings.Index(u, "://"); idx >= 0 {
+		u = u[idx+3:]
+	}
+	// Strip path.
+	if idx := strings.Index(u, "/"); idx >= 0 {
+		u = u[:idx]
+	}
+	host, portStr, err := net.SplitHostPort(u)
+	if err != nil {
+		return u, 0
+	}
+	port, _ := strconv.Atoi(portStr)
+	return host, port
 }

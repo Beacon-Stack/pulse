@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Trash2, Check, AlertCircle, Loader2,
 } from "lucide-react";
+import { useConfirm } from "@beacon-shared/ConfirmDialog";
 import Pill from "@/components/Pill";
 import { card, sectionHeader } from "@/lib/styles";
 import { formatDate } from "@/lib/utils";
@@ -28,6 +29,7 @@ export default function DownloadClientDetailPage() {
   const { data: dc, isLoading } = useDownloadClient(id!);
   const updateDC = useUpdateDownloadClient();
   const deleteDC = useDeleteDownloadClient();
+  const confirm = useConfirm();
   const testDC = useTestDownloadClient();
 
   const [testResult, setTestResult] = useState<TestResult | null>(null);
@@ -83,9 +85,16 @@ export default function DownloadClientDetailPage() {
     );
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!dc) return;
-    if (!confirm(`Delete "${dc.name}"? This cannot be undone.`)) return;
+    if (
+      !(await confirm({
+        title: "Delete download client",
+        message: `Delete "${dc.name}"? Services using it will lose their configuration.`,
+        confirmLabel: "Delete",
+      }))
+    )
+      return;
     deleteDC.mutate(dc.id, { onSuccess: () => navigate("/download-clients") });
   };
 
