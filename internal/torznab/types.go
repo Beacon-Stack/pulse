@@ -88,7 +88,9 @@ type Enclosure struct {
 // MarshalXML produces the Torznab-compatible XML for an Item.
 func (item Item) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name = xml.Name{Local: "item"}
-	e.EncodeToken(start)
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
 
 	writeElement(e, "title", item.Title)
 	writeElement(e, "guid", item.GUID)
@@ -103,39 +105,49 @@ func (item Item) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		if encType == "" {
 			encType = "application/x-bittorrent"
 		}
-		e.EncodeToken(xml.StartElement{
+		if err := e.EncodeToken(xml.StartElement{
 			Name: xml.Name{Local: "enclosure"},
 			Attr: []xml.Attr{
 				{Name: xml.Name{Local: "url"}, Value: item.Enclosure.URL},
 				{Name: xml.Name{Local: "length"}, Value: strconv.FormatInt(item.Enclosure.Length, 10)},
 				{Name: xml.Name{Local: "type"}, Value: encType},
 			},
-		})
-		e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "enclosure"}})
+		}); err != nil {
+			return err
+		}
+		if err := e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "enclosure"}}); err != nil {
+			return err
+		}
 	}
 
 	// Torznab attributes
 	torznabNS := "http://torznab.com/schemas/2015/feed"
 	for name, value := range item.Attrs {
-		e.EncodeToken(xml.StartElement{
+		if err := e.EncodeToken(xml.StartElement{
 			Name: xml.Name{Space: torznabNS, Local: "attr"},
 			Attr: []xml.Attr{
 				{Name: xml.Name{Local: "name"}, Value: name},
 				{Name: xml.Name{Local: "value"}, Value: value},
 			},
-		})
-		e.EncodeToken(xml.EndElement{Name: xml.Name{Space: torznabNS, Local: "attr"}})
+		}); err != nil {
+			return err
+		}
+		if err := e.EncodeToken(xml.EndElement{Name: xml.Name{Space: torznabNS, Local: "attr"}}); err != nil {
+			return err
+		}
 	}
 
-	e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "item"}})
-	return nil
+	return e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "item"}})
 }
 
 func writeElement(e *xml.Encoder, name, value string) {
 	start := xml.StartElement{Name: xml.Name{Local: name}}
-	e.EncodeToken(start)
-	e.EncodeToken(xml.CharData(value))
-	e.EncodeToken(xml.EndElement{Name: xml.Name{Local: name}})
+	// The outer MarshalXML returns any encoder error via its final
+	// EncodeToken call, so these helpers ignore errors by design —
+	// a broken encoder will surface at the next checked call.
+	_ = e.EncodeToken(start)
+	_ = e.EncodeToken(xml.CharData(value))
+	_ = e.EncodeToken(xml.EndElement{Name: xml.Name{Local: name}})
 }
 
 // ── Builders ────────────────────────────────────────────────────────────────

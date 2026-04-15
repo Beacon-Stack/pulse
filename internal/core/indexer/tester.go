@@ -33,11 +33,7 @@ func TestIndexer(ctx context.Context, kind, url, apiKey string) TestResult {
 
 func testTorznab(ctx context.Context, client *http.Client, baseURL, apiKey string, start time.Time) TestResult {
 	// Torznab/Newznab caps endpoint: /api?t=caps&apikey=...
-	capsURL := baseURL
-	if capsURL != "" && capsURL[len(capsURL)-1] != '/' {
-		capsURL += "/"
-	}
-	capsURL = baseURL + "?t=caps"
+	capsURL := baseURL + "?t=caps"
 	if apiKey != "" {
 		capsURL += "&apikey=" + apiKey
 	}
@@ -105,7 +101,7 @@ func testGenericHTTP(ctx context.Context, client *http.Client, url, apiKey strin
 		return TestResult{Success: false, Message: fmt.Sprintf("Connection failed: %v", err), Duration: since(start)}
 	}
 	defer func() {
-		io.Copy(io.Discard, resp.Body)
+		_, _ = io.Copy(io.Discard, resp.Body)
 		resp.Body.Close()
 	}()
 

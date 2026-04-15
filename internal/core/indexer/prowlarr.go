@@ -119,13 +119,6 @@ func (pc *ProwlarrCatalog) Refresh(ctx context.Context) error {
 
 	pc.logger.Info("prowlarr: found definition files", "count", len(files))
 
-	// Step 2: Fetch and parse each YAML file.
-	// Use a semaphore to limit concurrent requests.
-	type result struct {
-		entry CatalogEntry
-		ok    bool
-	}
-
 	// Fetch all definitions via the zipball to avoid per-file rate limits.
 	pc.logger.Info("prowlarr: downloading zipball...")
 	entries, errCount, err := pc.fetchAllViaZip(ctx, files)

@@ -114,8 +114,8 @@ func (h *TorznabHandler) handleCaps(w http.ResponseWriter, runner *scraper.Runne
 
 	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(xml.Header))
-	xml.NewEncoder(w).Encode(caps)
+	_, _ = w.Write([]byte(xml.Header))
+	_ = xml.NewEncoder(w).Encode(caps)
 }
 
 // handleSearch executes a search and returns Torznab XML results.
@@ -211,8 +211,8 @@ func (h *TorznabHandler) writeResults(w http.ResponseWriter, r *http.Request, id
 
 	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(xml.Header))
-	xml.NewEncoder(w).Encode(feed)
+	_, _ = w.Write([]byte(xml.Header))
+	_ = xml.NewEncoder(w).Encode(feed)
 }
 
 // xmlError writes a Torznab error response.
@@ -304,7 +304,7 @@ func (h *TorznabHandler) HandleDownload(w http.ResponseWriter, r *http.Request) 
 		w.Header().Set("Content-Disposition", cd)
 	}
 	w.WriteHeader(proxyResp.StatusCode)
-	io.Copy(w, proxyResp.Body)
+	_, _ = io.Copy(w, proxyResp.Body)
 }
 
 // TestSearchResult is the JSON response from the test-search endpoint.
@@ -371,7 +371,7 @@ func (h *TorznabHandler) HandleTestSearch(w http.ResponseWriter, r *http.Request
 
 func writeJSON(w http.ResponseWriter, v interface{}) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(v)
+	_ = json.NewEncoder(w).Encode(v)
 }
 
 func since(start time.Time) string {

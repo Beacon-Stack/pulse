@@ -45,7 +45,7 @@ func setupTestServer(t *testing.T) *httptest.Server {
 
 	// Clean all tables for test isolation.
 	for _, table := range []string{"indexer_tags", "service_tags", "tags", "config_subscriptions", "config_entries", "indexer_assignments", "indexers", "service_capabilities", "services", "filter_presets", "download_clients"} {
-		sqlDB.Exec("DELETE FROM " + table)
+		_, _ = sqlDB.Exec("DELETE FROM " + table)
 	}
 
 	logger := slog.Default()
