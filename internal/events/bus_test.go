@@ -31,17 +31,21 @@ func TestBusPublishSubscribe(t *testing.T) {
 
 func TestBusPublishSetsTimestamp(t *testing.T) {
 	bus := New(slog.Default())
-	var received Event
+	received := make(chan Event, 1)
 
 	bus.Subscribe(func(_ context.Context, e Event) {
-		received = e
+		received <- e
 	})
 
 	bus.Publish(context.Background(), Event{Type: TypeConfigUpdated})
-	time.Sleep(50 * time.Millisecond)
 
-	if received.Timestamp.IsZero() {
-		t.Error("expected non-zero timestamp")
+	select {
+	case e := <-received:
+		if e.Timestamp.IsZero() {
+			t.Error("expected non-zero timestamp")
+		}
+	case <-time.After(1 * time.Second):
+		t.Fatal("timed out waiting for event")
 	}
 }
 

@@ -78,11 +78,6 @@ type dlClientTestInput struct {
 	}
 }
 
-func toDLClientBody(row interface{ GetID() string }) dlClientBody {
-	// This is handled inline since the generated type doesn't have methods
-	return dlClientBody{}
-}
-
 // RegisterDownloadClientRoutes registers download client management endpoints.
 func RegisterDownloadClientRoutes(api huma.API, svc *downloadclient.Service) {
 	// POST /api/v1/download-clients — create

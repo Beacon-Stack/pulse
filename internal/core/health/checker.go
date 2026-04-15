@@ -82,7 +82,7 @@ func (c *Checker) checkOne(ctx context.Context, svc db.Service) {
 		return
 	}
 	defer func() {
-		io.Copy(io.Discard, resp.Body)
+		_, _ = io.Copy(io.Discard, resp.Body)
 		resp.Body.Close()
 	}()
 
