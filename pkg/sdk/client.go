@@ -349,7 +349,7 @@ func (c *Client) register(ctx context.Context) (*Service, error) {
 		"capabilities": c.cfg.Capabilities,
 	}
 	if c.cfg.ServiceAPIKey != "" {
-		body["service_api_key"] = c.cfg.ServiceAPIKey
+		body["api_key"] = c.cfg.ServiceAPIKey
 	}
 	var svc Service
 	if err := c.doRequest(ctx, "POST", "/api/v1/services/register", body, &svc); err != nil {
