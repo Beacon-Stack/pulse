@@ -57,7 +57,7 @@ Central tag registry with usage counts. Tags are used by indexer assignment, not
 
 ### Docker Compose (recommended, as part of the Beacon stack)
 
-Pulse is designed to run alongside the rest of the Beacon stack. The full `docker-compose.yml` with Postgres, Pulse, Pilot, Prism, and Haul lives in [`beacon-stack/stack`](https://github.com/beacon-stack/stack).
+Pulse is designed to run alongside the rest of the Beacon stack. The full `docker-compose.yml` with Postgres, Pulse, Pilot, Prism, and Haul lives in [`beacon-stack/deploy`](https://github.com/beacon-stack/deploy).
 
 ### Standalone Docker
 
