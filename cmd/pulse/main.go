@@ -164,11 +164,29 @@ func main() {
 		}
 
 		// Check if a download client with this name already exists.
+		// If it does, update it (service may have restarted on a new port
+		// or regenerated its API key). If not, create it.
 		existing, _ := dlClientSvc.List(ctx)
 		for _, e := range existing {
 			if e.Name == svcInfo.Name {
-				logger.Info("pulse: download-client service already registered",
-					"name", svcInfo.Name, "service_id", serviceID)
+				_, updateErr := dlClientSvc.Update(ctx, e.ID, downloadclient.Input{
+					Name:     svcInfo.Name,
+					Kind:     kind,
+					Protocol: protocol,
+					Enabled:  e.Enabled,
+					Priority: int(e.Priority),
+					Host:     host,
+					Port:     port,
+					Password: svcInfo.ApiKey,
+					Settings: `{"pulse":true}`,
+				})
+				if updateErr != nil {
+					logger.Warn("pulse: failed to update download-client on re-register",
+						"name", svcInfo.Name, "error", updateErr)
+				} else {
+					logger.Info("pulse: updated download-client service on re-register",
+						"name", svcInfo.Name, "host", host, "port", port)
+				}
 				return
 			}
 		}
@@ -181,6 +199,7 @@ func main() {
 			Priority: 1,
 			Host:     host,
 			Port:     port,
+			Password: svcInfo.ApiKey,
 			Settings: `{"pulse":true}`,
 		})
 		if err != nil {
