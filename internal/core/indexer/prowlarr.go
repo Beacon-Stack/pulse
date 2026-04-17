@@ -494,6 +494,8 @@ func strValMap(m map[string]interface{}, key string) string {
 func normalizeCategory(cat string) string {
 	c := strings.ToLower(cat)
 	switch {
+	case strings.Contains(c, "anime"):
+		return "Anime"
 	case strings.HasPrefix(c, "movies"), strings.HasPrefix(c, "movie"):
 		return "Movies"
 	case strings.HasPrefix(c, "tv"):
