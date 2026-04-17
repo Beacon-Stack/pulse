@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/spf13/viper"
+
+	"github.com/beacon-stack/pulse/pkg/secretfile"
 )
 
 // dataDir returns the default data directory: ~/.config/pulse/
@@ -32,6 +34,7 @@ func Load(configPath string) (*Config, error) {
 	v.SetDefault("server.external_url", "")
 	v.SetDefault("database.driver", "postgres")
 	v.SetDefault("database.dsn", "")
+	v.SetDefault("database.password_file", "")
 	v.SetDefault("log.level", "info")
 	v.SetDefault("log.format", "json")
 	v.SetDefault("flaresolverr.url", "")
@@ -65,6 +68,14 @@ func Load(configPath string) (*Config, error) {
 	var cfg Config
 	if err := v.Unmarshal(&cfg); err != nil {
 		return nil, fmt.Errorf("unmarshaling config: %w", err)
+	}
+
+	if cfg.Database.PasswordFile != "" {
+		merged, err := secretfile.OverrideDSNPassword(cfg.Database.DSN.Value(), cfg.Database.PasswordFile)
+		if err != nil {
+			return nil, fmt.Errorf("applying database password file: %w", err)
+		}
+		cfg.Database.DSN = Secret(merged)
 	}
 
 	if v.ConfigFileUsed() != "" {

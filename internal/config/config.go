@@ -34,6 +34,11 @@ type ServerConfig struct {
 type DatabaseConfig struct {
 	Driver string `mapstructure:"driver"`
 	DSN    Secret `mapstructure:"dsn"`
+
+	// PasswordFile is a path to a file containing the database password,
+	// typically a Docker secret mounted at /run/secrets/*. When non-empty,
+	// its contents replace the password component of DSN at load time.
+	PasswordFile string `mapstructure:"password_file"`
 }
 
 // LogConfig controls log output format and verbosity.
