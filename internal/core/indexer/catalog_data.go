@@ -1,11 +1,11 @@
 package indexer
 
-// Code generated from Prowlarr/Indexers definitions/v11 on 2026-04-16.
-// 546 indexer definitions. Regenerate with: go run gen_catalog.go > catalog_data.go
+// Code generated from Prowlarr/Indexers definitions/v11 on 2026-04-17.
+// 547 indexer definitions. Regenerate with: go run gen_catalog.go > catalog_data.go
 
 var builtinCatalog = []CatalogEntry{
 	{ID: "0magnet", Name: "0Magnet", Description: "ØMagnet is a CHINESE Public tracker for Asian 3X (JAV)", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Other"}, URLs: []string{"https://13mag.net/", "https://16mag.net/"}, Settings: []Field{}},
-	{ID: "1337x", Name: "1337x", Description: "1337x is a Public torrent site that offers verified torrent downloads", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://1337x.to/", "https://1337x.st/", "https://x1337x.ws/", "https://x1337x.eu/", "https://x1337x.cc/"}, Settings: []Field{
+	{ID: "1337x", Name: "1337x", Description: "1337x is a Public torrent site that offers verified torrent downloads", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://1337x.to/", "https://1337x.st/", "https://x1337x.ws/", "https://x1337x.eu/", "https://x1337x.cc/"}, Settings: []Field{
 		{Name: "uploader", Type: "text", Label: "Filter by Uploader"},
 		{Name: "info_uploader", Type: "info", Label: "About filtering by Uploader", Default: "You can filter by Uploader by entering a Case Sensitive username, or leave empty to get all results.<br>Note: this is the username of the Uploader and not the Groupname that often show up at the end of 1337x titles, eg -GalaxyRG."},
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
@@ -22,9 +22,9 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 	}},
 	{ID: "acgrip", Name: "ACG.RIP", Description: "ACG.RIP is a CHINESE Public torrent tracker for the latest anime and Japanese related torrents", Language: "zh-CN", Protocol: "torrent", Privacy: "public", Categories: []string{"Other"}, URLs: []string{"https://acg.rip/"}, Settings: []Field{}},
-	{ID: "anisource", Name: "AniSource", Description: "AniSource is a Public site for HD Anime raws.", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"TV"}, URLs: []string{"https://asnet.pw/"}, Settings: []Field{}},
-	{ID: "arabtorrents-com", Name: "arab-torrents.com", Description: "arab-torrents.com is an ARABIC Public Torrent Tracker for MOVIES / TV / GENERAL", Language: "ar-AE", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://arab-torrents.com/"}, Settings: []Field{}},
-	{ID: "bangumi-moe", Name: "Bangumi Moe", Description: "Bangumi Moe is a Public torrent site for ANIME", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://bangumi.moe/"}, Settings: []Field{}},
+	{ID: "anisource", Name: "AniSource", Description: "AniSource is a Public site for HD Anime raws.", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime"}, URLs: []string{"https://asnet.pw/"}, Settings: []Field{}},
+	{ID: "arabtorrents-com", Name: "arab-torrents.com", Description: "arab-torrents.com is an ARABIC Public Torrent Tracker for MOVIES / TV / GENERAL", Language: "ar-AE", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://arab-torrents.com/"}, Settings: []Field{}},
+	{ID: "bangumi-moe", Name: "Bangumi Moe", Description: "Bangumi Moe is a Public torrent site for ANIME", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other"}, URLs: []string{"https://bangumi.moe/"}, Settings: []Field{}},
 	{ID: "bigfangroup", Name: "BigFANGroup", Description: "BigFANGroup is a RUSSIAN Public Torrent Tracker for MOVIES / TV", Language: "ru-RU", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://bigfangroup.org/", "https://www.freebfg.org/"}, Settings: []Field{
 		{Name: "stripcyrillic", Type: "checkbox", Label: "Strip Cyrillic Letters", Default: "false"},
 		{Name: "addrussiantotitle", Type: "checkbox", Label: "Add RUS to end of all titles to improve language detection by Sonarr and Radarr. Will cause English-only results to be misidentified.", Default: "false"},
@@ -57,14 +57,14 @@ var builtinCatalog = []CatalogEntry{
 	{ID: "damagnet", Name: "DaMagNet", Description: "DaMagNet is a Public DHT Crawler", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Other"}, URLs: []string{"https://damag.net/"}, Settings: []Field{
 		{Name: "info_category_8000", Type: "text", Label: ""},
 	}},
-	{ID: "demonoid-clone", Name: "Demonoid Clone", Description: "Demonoid Clone is a Public Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://demonoid.nl/"}, Settings: []Field{}},
-	{ID: "dmhy", Name: "dmhy", Description: "dmhy is a TAIWANESE Public magnet tracker for ANIME", Language: "zh-TW", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://share.dmhy.org/"}, Settings: []Field{
+	{ID: "demonoid-clone", Name: "Demonoid Clone", Description: "Demonoid Clone is a Public Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://demonoid.nl/"}, Settings: []Field{}},
+	{ID: "dmhy", Name: "dmhy", Description: "dmhy is a TAIWANESE Public magnet tracker for ANIME", Language: "zh-TW", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://share.dmhy.org/"}, Settings: []Field{
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 	}},
-	{ID: "ehentai", Name: "E-Hentai", Description: "E-Hentai is a Public site for Hentai doujinshi, manga.", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"TV"}, URLs: []string{"https://e-hentai.org/"}, Settings: []Field{}},
+	{ID: "ehentai", Name: "E-Hentai", Description: "E-Hentai is a Public site for Hentai doujinshi, manga.", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime"}, URLs: []string{"https://e-hentai.org/"}, Settings: []Field{}},
 	{ID: "ebookbay", Name: "EBookBay", Description: "EBook Bay (EBB) is a Public Torrent Tracker for E-BOOKS", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books"}, URLs: []string{"https://ebb.la/"}, Settings: []Field{}},
 	{ID: "elitetorrent-wf", Name: "Elitetorrent-wf", Description: "Elitetorrent-wf is a SPANISH Public tracker for MOVIES / TV", Language: "es-ES", Protocol: "torrent", Privacy: "public", Categories: []string{"Other"}, URLs: []string{"https://www.elitetorrent.wf/"}, Settings: []Field{}},
-	{ID: "extratorrent-st", Name: "ExtraTorrent.st", Description: "ExtraTorrent.st is a Public tracker for MOVIE / TV / GENERAL magnets", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://extratorrent.st/", "https://extratorrent.ninjaproxy1.com/", "https://extratorrent.proxyninja.org/", "https://extratorrent.proxyninja.net/"}, Settings: []Field{
+	{ID: "extratorrent-st", Name: "ExtraTorrent.st", Description: "ExtraTorrent.st is a Public tracker for MOVIE / TV / GENERAL magnets", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://extratorrent.st/", "https://extratorrent.ninjaproxy1.com/", "https://extratorrent.proxyninja.org/", "https://extratorrent.proxyninja.net/"}, Settings: []Field{
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 	}},
 	{ID: "eztv", Name: "EZTV", Description: "EZTV is a Public torrent site for TV shows", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Other"}, URLs: []string{"https://eztvx.to/", "https://eztv.wf/", "https://eztv.tf/", "https://eztv.yt/", "https://eztv1.xyz/"}, Settings: []Field{}},
@@ -73,7 +73,7 @@ var builtinCatalog = []CatalogEntry{
 	}},
 	{ID: "freejavtorrent", Name: "Free JAV Torrent", Description: "Free JAV Torrent is a Public tracker for Asian 3X (JAV)", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Other"}, URLs: []string{"https://www.freejavtorrent.com/"}, Settings: []Field{}},
 	{ID: "gamestorrents", Name: "GamesTorrents", Description: "GamesTorrents is a SPANISH Public tracker for GAMES", Language: "es-ES", Protocol: "torrent", Privacy: "public", Categories: []string{"Other"}, URLs: []string{"https://www.gamestorrents.app/"}, Settings: []Field{}},
-	{ID: "ilcorsaronero", Name: "ilCorSaRoNeRo", Description: "ilCorSaRoNeRo is an ITALIAN Public site for MOVIES / TV / GENERAL", Language: "it-IT", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://ilcorsaronero.link/", "https://ilcorsaronero.torrentbay.st/"}, Settings: []Field{
+	{ID: "ilcorsaronero", Name: "ilCorSaRoNeRo", Description: "ilCorSaRoNeRo is an ITALIAN Public site for MOVIES / TV / GENERAL", Language: "it-IT", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://ilcorsaronero.link/", "https://ilcorsaronero.torrentbay.st/"}, Settings: []Field{
 		{Name: "category-id", Type: "select", Label: "Category (for Keyword search)", Default: "all"},
 		{Name: "dl_type", Type: "select", Label: "Download type", Default: "Magnet"},
 	}},
@@ -83,14 +83,14 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "publicdate"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "-"},
 	}},
-	{ID: "kickasstorrents-to", Name: "kickasstorrents.to", Description: "kickasstorrents.to is a Public KickAssTorrent clone for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://kickass.torrentbay.st/", "https://kickass.torrentsbay.org/", "https://kickasstorrents.unblockninja.com/", "https://kickasstorrents.ninjaproxy1.com/", "https://kickasstorrents.proxyninja.org/", "https://kickasstorrents.proxyninja.net/"}, Settings: []Field{
+	{ID: "kickasstorrents-to", Name: "kickasstorrents.to", Description: "kickasstorrents.to is a Public KickAssTorrent clone for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://kickass.torrentbay.st/", "https://kickass.torrentsbay.org/", "https://kickasstorrents.unblockninja.com/", "https://kickasstorrents.ninjaproxy1.com/", "https://kickasstorrents.proxyninja.org/", "https://kickasstorrents.proxyninja.net/"}, Settings: []Field{
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 	}},
 	{ID: "kickasstorrents-ws", Name: "kickasstorrents.ws", Description: "kickasstorrents.ws is a Public KickAssTorrent clone for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://kickass.ws/", "https://kickasstorrents.bz/", "https://kkickass.com/", "https://kkat.net/", "https://kick4ss.com/", "https://kickasst.net/", "https://kickasstorrents.id/", "https://thekat.cc/", "https://kattracker.com/"}, Settings: []Field{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "time_add"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "limetorrents", Name: "LimeTorrents", Description: "LimeTorrents is a Public general torrent index with mostly verified torrents", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.limetorrents.fun/", "https://limetorrents.unblockninja.com/", "https://limetorrents.ninjaproxy1.com/", "https://limetorrents.proxyninja.org/", "https://limetorrents.proxyninja.net/", "https://limetorrents.torrentbay.st/", "https://limetorrents.torrentsbay.org/"}, Settings: []Field{
+	{ID: "limetorrents", Name: "LimeTorrents", Description: "LimeTorrents is a Public general torrent index with mostly verified torrents", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.limetorrents.fun/", "https://limetorrents.unblockninja.com/", "https://limetorrents.ninjaproxy1.com/", "https://limetorrents.proxyninja.org/", "https://limetorrents.proxyninja.net/", "https://limetorrents.torrentbay.st/", "https://limetorrents.torrentsbay.org/"}, Settings: []Field{
 		{Name: "downloadlink", Type: "select", Label: "Download link", Default: "magnet:"},
 		{Name: "downloadlink2", Type: "select", Label: "Download link (fallback)", Default: "http://itorrents.org/"},
 		{Name: "info_download", Type: "info", Label: "About the Download links", Default: "As the .torrent download links on this site are known to fail from time to time, you can optionally set as a fallback an automatic alternate link."},
@@ -114,7 +114,7 @@ var builtinCatalog = []CatalogEntry{
 	{ID: "magnetz", Name: "Magnetz", Description: "Magnetz is a Public torrent meta-search engine", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Other"}, URLs: []string{"https://magnetz.eu/"}, Settings: []Field{
 		{Name: "info_category_8000", Type: "text", Label: ""},
 	}},
-	{ID: "megapeer", Name: "MegaPeer", Description: "MegaPeer is a RUSSIAN Public Torrent Tracker for MOVIES / TV", Language: "ru-RU", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://megapeer.vip/"}, Settings: []Field{
+	{ID: "megapeer", Name: "MegaPeer", Description: "MegaPeer is a RUSSIAN Public Torrent Tracker for MOVIES / TV", Language: "ru-RU", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://megapeer.vip/"}, Settings: []Field{
 		{Name: "info_category_8000", Type: "text", Label: ""},
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 		{Name: "stripcyrillic", Type: "checkbox", Label: "Strip Cyrillic Letters", Default: "false"},
@@ -122,13 +122,13 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "0"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "0"},
 	}},
-	{ID: "mikan", Name: "Mikan", Description: "Mikan is a CHINESE Public torrent tracker for ANIME", Language: "zh-CN", Protocol: "torrent", Privacy: "public", Categories: []string{"TV"}, URLs: []string{"https://mikanani.me/"}, Settings: []Field{}},
+	{ID: "mikan", Name: "Mikan", Description: "Mikan is a CHINESE Public torrent tracker for ANIME", Language: "zh-CN", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime"}, URLs: []string{"https://mikanani.me/"}, Settings: []Field{}},
 	{ID: "mixtapetorrent", Name: "MixtapeTorrent", Description: "MixtapeTorrent is a Public Music site for MixTapes", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Other"}, URLs: []string{"http://www.mixtapetorrent.com/"}, Settings: []Field{}},
 	{ID: "moviesdvdr", Name: "MoviesDVDR", Description: "MoviesDVDR is a SPANISH Public tracker for MOVIES", Language: "es-ES", Protocol: "torrent", Privacy: "public", Categories: []string{"Other"}, URLs: []string{"https://www.moviesdvdr.co/"}, Settings: []Field{}},
 	{ID: "mypornclub", Name: "MyPornClub", Description: "MyPornClub is a Public Torrent Tracker for 3X", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"XXX"}, URLs: []string{"https://myporn.club/"}, Settings: []Field{
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 	}},
-	{ID: "nekobt", Name: "nekoBT", Description: "nekoBT is a Public Torrent Tracker for ANIME", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Movies", "TV"}, URLs: []string{"https://nekobt.to/"}, Settings: []Field{
+	{ID: "nekobt", Name: "nekoBT", Description: "nekoBT is a Public Torrent Tracker for ANIME", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Movies"}, URLs: []string{"https://nekobt.to/"}, Settings: []Field{
 		{Name: "incltags", Type: "checkbox", Label: "Include tags in titles.", Default: "false"},
 		{Name: "info_tags", Type: "info", Label: "About including tags in titles.", Default: "To be used with Sonarr and Radarr custom formats, and any other downstream automations/filtering. See <a href=\"https://wiki.nekobt.to/info/metadata/#auto-titles\" target=\"_blank\">wiki</a> for more information."},
 		{Name: "levels", Type: "select", Label: "Subtitle-Level", Default: "_"},
@@ -147,19 +147,19 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "2"},
 	}},
 	{ID: "nipponsei", Name: "Nipponsei", Description: "Nipponsei is a Public site for MUSIC fresh from JAPAN", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio"}, URLs: []string{"https://nipponsei.minglong.org/"}, Settings: []Field{}},
-	{ID: "noname-club", Name: "NoNaMe Club", Description: "NoNaMe Club (NNM-Club) is a RUSSIAN Public Tracker for MOVIES / TV / MUSIC", Language: "ru-RU", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://nnmclub.to/"}, Settings: []Field{
+	{ID: "noname-club", Name: "NoNaMe Club", Description: "NoNaMe Club (NNM-Club) is a RUSSIAN Public Tracker for MOVIES / TV / MUSIC", Language: "ru-RU", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://nnmclub.to/"}, Settings: []Field{
 		{Name: "stripcyrillic", Type: "checkbox", Label: "Strip Cyrillic Letters", Default: "false"},
 		{Name: "addrussiantotitle", Type: "checkbox", Label: "Add RUS to end of all titles to improve language detection by Sonarr and Radarr. Will cause English-only results to be misidentified.", Default: "false"},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "1"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "2"},
 	}},
-	{ID: "nortorrent", Name: "NorTorrent", Description: "NorTorrent is a FRENCH Public tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.nortorrent.cc/"}, Settings: []Field{
+	{ID: "nortorrent", Name: "NorTorrent", Description: "NorTorrent is a FRENCH Public tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.nortorrent.cc/"}, Settings: []Field{
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 		{Name: "multilang", Type: "checkbox", Label: "Replace MULTi by another language in release name", Default: "false"},
 		{Name: "multilanguage", Type: "select", Label: "Replace MULTi by this language", Default: "FRENCH"},
 		{Name: "vostfr", Type: "checkbox", Label: "Replace VOSTFR and SUBFRENCH with ENGLISH", Default: "false"},
 	}},
-	{ID: "nyaasi", Name: "Nyaa.si", Description: "Nyaa is a Public torrent site focused on Eastern ASIAN media including anime, manga, literature and music", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://nyaa.si/", "https://nyaa.iss.ink/", "https://nyaa.land/", "https://nyaa.mom/", "https://nyaa.unblockninja.com/"}, Settings: []Field{
+	{ID: "nyaasi", Name: "Nyaa.si", Description: "Nyaa is a Public torrent site focused on Eastern ASIAN media including anime, manga, literature and music", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://nyaa.si/", "https://nyaa.iss.ink/", "https://nyaa.land/", "https://nyaa.mom/", "https://nyaa.unblockninja.com/"}, Settings: []Field{
 		{Name: "prefer_magnet_links", Type: "checkbox", Label: "Prefer Magnet Links", Default: "true"},
 		{Name: "sonarr_compatibility", Type: "checkbox", Label: "Improve Sonarr compatibility by trying to add Season information into Release Titles", Default: "false"},
 		{Name: "strip_s01", Type: "checkbox", Label: "Remove first season keywords (S1/S01/Season 1), as some results do not include this for first/single season releases", Default: "false"},
@@ -184,7 +184,7 @@ var builtinCatalog = []CatalogEntry{
 	}},
 	{ID: "pornotorrent", Name: "PornoTorrent", Description: "PornoTorrent is a BRAZILIAN Public Torrent Tracker for 3X", Language: "pt-BR", Protocol: "torrent", Privacy: "public", Categories: []string{"XXX"}, URLs: []string{"https://pornotorrent.com.br/"}, Settings: []Field{}},
 	{ID: "pornrips", Name: "PornRips", Description: "PornRips is a Public site for 3X", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Other"}, URLs: []string{"https://pornrips.to/"}, Settings: []Field{}},
-	{ID: "postman", Name: "Postman", Description: "Postman is a Public I2P Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"http://tracker2.postman.i2p/"}, Settings: []Field{
+	{ID: "postman", Name: "Postman", Description: "Postman is a Public I2P Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"http://tracker2.postman.i2p/"}, Settings: []Field{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "1"},
 	}},
 	{ID: "rintornet", Name: "RinTor.NeT", Description: "RinTor.NeT is a RUSSIAN Public tracker for 3X", Language: "ru-RU", Protocol: "torrent", Privacy: "public", Categories: []string{"XXX"}, URLs: []string{"https://www.rintor.net/"}, Settings: []Field{}},
@@ -194,7 +194,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site (Applies only to Search with Keywords)", Default: "0"},
 		{Name: "info_category_8000", Type: "text", Label: ""},
 	}},
-	{ID: "rutracker-ru", Name: "RuTracker.RU", Description: "RuTracker.RU is a RUSSIAN Public Torrent Tracker for MOVIES / TV / GENERAL", Language: "ru-RU", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"http://rutracker.ru/"}, Settings: []Field{
+	{ID: "rutracker-ru", Name: "RuTracker.RU", Description: "RuTracker.RU is a RUSSIAN Public Torrent Tracker for MOVIES / TV / GENERAL", Language: "ru-RU", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"http://rutracker.ru/"}, Settings: []Field{
 		{Name: "stripcyrillic", Type: "checkbox", Label: "Strip Cyrillic Letters", Default: "false"},
 		{Name: "addrussiantotitle", Type: "checkbox", Label: "Add RUS to end of all titles to improve language detection by Sonarr and Radarr. Will cause English-only results to be misidentified.", Default: "false"},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "1"},
@@ -205,7 +205,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 	}},
-	{ID: "shanaproject", Name: "Shana Project", Description: "Shana Project is a Public torrent site for ANIME", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"TV"}, URLs: []string{"https://www.shanaproject.com/"}, Settings: []Field{
+	{ID: "shanaproject", Name: "Shana Project", Description: "Shana Project is a Public torrent site for ANIME", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime"}, URLs: []string{"https://www.shanaproject.com/"}, Settings: []Field{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "date"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "Descending"},
 		{Name: "info", Type: "info", Label: "Searching", Default: "This site only supports searching for Titles. Do not add a season or episode number, or a quality to your query."},
@@ -224,10 +224,10 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "uploader", Type: "text", Label: "Filter by Uploader"},
 		{Name: "info_uploader", Type: "info", Label: "About filtering by Uploader", Default: "You can filter by Uploader by entering a Case Sensitive username, or leave empty to get all results.<br>Note: this is the username of the Uploader and not the Groupname that often show up at the end of TPB titles, eg -MeGusta."},
 	}},
-	{ID: "tokyotosho", Name: "Tokyo Toshokan", Description: "Tokyo Toshokan is a Public BitTorrent Library for JAPANESE Media", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Other", "TV", "XXX"}, URLs: []string{"https://www.tokyotosho.info/"}, Settings: []Field{
+	{ID: "tokyotosho", Name: "Tokyo Toshokan", Description: "Tokyo Toshokan is a Public BitTorrent Library for JAPANESE Media", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Other", "XXX"}, URLs: []string{"https://www.tokyotosho.info/"}, Settings: []Field{
 		{Name: "cat", Type: "select", Label: "Category", Default: "0"},
 	}},
-	{ID: "torrentdownloads", Name: "Torrent Downloads", Description: "Torrent Downloads (TD) is a Public torrent site for all kinds of content", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.torrentdownloads.pro/", "https://torrentdownloads.unblockninja.com/", "https://torrentdownloads.ninjaproxy1.com/", "https://torrentdownloads.proxyninja.org/", "https://torrentdownloads.proxyninja.net/"}, Settings: []Field{
+	{ID: "torrentdownloads", Name: "Torrent Downloads", Description: "Torrent Downloads (TD) is a Public torrent site for all kinds of content", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.torrentdownloads.pro/", "https://torrentdownloads.unblockninja.com/", "https://torrentdownloads.ninjaproxy1.com/", "https://torrentdownloads.proxyninja.org/", "https://torrentdownloads.proxyninja.net/"}, Settings: []Field{
 		{Name: "downloadlink", Type: "select", Label: "Download link", Default: "magnet:"},
 		{Name: "downloadlink2", Type: "select", Label: "Download link (fallback)", Default: "http://itorrents.org/"},
 		{Name: "info_download", Type: "info", Label: "About the Download links", Default: "As the .torrent download links on this site are known to fail from time to time, you can optionally set as a fallback an automatic alternate link."},
@@ -254,10 +254,10 @@ var builtinCatalog = []CatalogEntry{
 	{ID: "torrentcore", Name: "Torrent[CORE]", Description: "Torrent[CORE] is a Public DHT Crawler", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://torrentcore.xyz/"}, Settings: []Field{
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 	}},
-	{ID: "torrentdownload", Name: "TorrentDownload", Description: "TorrentDownload is a Public torrent meta-search engine", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.torrentdownload.info/"}, Settings: []Field{
+	{ID: "torrentdownload", Name: "TorrentDownload", Description: "TorrentDownload is a Public torrent meta-search engine", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.torrentdownload.info/"}, Settings: []Field{
 		{Name: "sort", Type: "select", Label: "Sort requested from site (Applies only to Search with Keywords)", Default: "d"},
 	}},
-	{ID: "torrentgalaxyclone", Name: "TorrentGalaxyClone", Description: "TorrentGalaxyClone is a Public site for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://torrentgalaxy.one/", "https://torrentgalaxy.info/", "https://torrentgalaxy.space/"}, Settings: []Field{
+	{ID: "torrentgalaxyclone", Name: "TorrentGalaxyClone", Description: "TorrentGalaxyClone is a Public site for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://torrentgalaxy.one/", "https://torrentgalaxy.info/", "https://torrentgalaxy.space/"}, Settings: []Field{
 		{Name: "uploader", Type: "text", Label: "Filter by Uploader"},
 		{Name: "info_uploader", Type: "info", Label: "About filtering by Uploader", Default: "You can filter by Uploader by entering a Case Sensitive username, or leave empty to get all results.<br>Note: this is the username of the Uploader and not the Groupname that often show up at the end of TGx titles, eg RMTeam."},
 	}},
@@ -270,18 +270,18 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "latest"},
 		{Name: "info_category_8000", Type: "text", Label: ""},
 	}},
-	{ID: "torrentqq", Name: "TorrentQQ", Description: "TorrentQQ (토렌트큐큐) is a Public KOREAN tracker for Korean media.", Language: "ko-KR", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://torrentqq415.com/"}, Settings: []Field{
+	{ID: "torrentqq", Name: "TorrentQQ", Description: "TorrentQQ (토렌트큐큐) is a Public KOREAN tracker for Korean media.", Language: "ko-KR", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://torrentqq415.com/"}, Settings: []Field{
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 	}},
-	{ID: "torrentsome", Name: "Torrentsome", Description: "Torrentsome is a KOREAN Public tracker for Korean media.", Language: "ko-KR", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "TV"}, URLs: []string{"https://torrentsome241.com/"}, Settings: []Field{
+	{ID: "torrentsome", Name: "Torrentsome", Description: "Torrentsome is a KOREAN Public tracker for Korean media.", Language: "ko-KR", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "TV"}, URLs: []string{"https://torrentsome242.com/"}, Settings: []Field{
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 	}},
-	{ID: "torrenttip", Name: "Torrenttip", Description: "Torrenttip (토렌트팁) is a Public KOREAN tracker for Korean media.", Language: "ko-KR", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://torrenttip222.top/"}, Settings: []Field{
+	{ID: "torrenttip", Name: "Torrenttip", Description: "Torrenttip (토렌트팁) is a Public KOREAN tracker for Korean media.", Language: "ko-KR", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://torrenttip223.top/"}, Settings: []Field{
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 	}},
 	{ID: "u3c3", Name: "U3C3", Description: "U3C3 is a CHINESE Public tracker focused on 3X Eastern Asian media", Language: "zh-CN", Protocol: "torrent", Privacy: "public", Categories: []string{"Books", "Other", "XXX"}, URLs: []string{"https://u3c3.com/", "https://u001.25img.com/", "https://u002.25img.com/", "https://u003.25img.com/", "https://m0m0m1m.mnmnmnmnmn.com/"}, Settings: []Field{}},
-	{ID: "uindex", Name: "Uindex", Description: "Uindex is a Public Torrent Tracker for MOVIES / TV / MUSIC / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://uindex.org/"}, Settings: []Field{}},
-	{ID: "uztracker", Name: "UzTracker", Description: "UzTracker is an UZBEK Public Torrent Tracker for MOVIES / TV / GENERAL", Language: "ru-RU", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://uztracker.net/"}, Settings: []Field{
+	{ID: "uindex", Name: "Uindex", Description: "Uindex is a Public Torrent Tracker for MOVIES / TV / MUSIC / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://uindex.org/"}, Settings: []Field{}},
+	{ID: "uztracker", Name: "UzTracker", Description: "UzTracker is an UZBEK Public Torrent Tracker for MOVIES / TV / GENERAL", Language: "ru-RU", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://uztracker.net/"}, Settings: []Field{
 		{Name: "stripcyrillic", Type: "checkbox", Label: "Strip Cyrillic Letters", Default: "false"},
 		{Name: "addrussiantotitle", Type: "checkbox", Label: "Add RUS to end of all titles to improve language detection by Sonarr and Radarr. Will cause English-only results to be misidentified.", Default: "false"},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "1"},
@@ -293,7 +293,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "date"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "DESC"},
 	}},
-	{ID: "world-torrent", Name: "World-torrent", Description: "World-torrent is a FRENCH Public site for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.mania-torrent.cc/", "https://www.cine-torrent.cc/", "https://www.magnet-torrent.cc/", "https://www.mega-torrent.pw/", "https://www.zone-torrent.org/", "https://www.warez-torrent.cc/"}, Settings: []Field{
+	{ID: "world-torrent", Name: "World-torrent", Description: "World-torrent is a FRENCH Public site for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.mania-torrent.cc/", "https://www.cine-torrent.cc/", "https://www.magnet-torrent.cc/", "https://www.mega-torrent.pw/", "https://www.zone-torrent.org/", "https://www.warez-torrent.cc/"}, Settings: []Field{
 		{Name: "multilang", Type: "checkbox", Label: "Replace MULTi by another language in release name", Default: "false"},
 		{Name: "multilanguage", Type: "select", Label: "Replace MULTi by this language", Default: "FRENCH"},
 		{Name: "vostfr", Type: "checkbox", Label: "Replace VOSTFR and SUBFRENCH with ENGLISH", Default: "false"},
@@ -305,14 +305,14 @@ var builtinCatalog = []CatalogEntry{
 	{ID: "yts", Name: "YTS", Description: "YTS is a Public torrent site specialising in HD movies of small size", Language: "en-US", Protocol: "torrent", Privacy: "public", Categories: []string{"Movies"}, URLs: []string{"https://yts.bz/", "https://yts.ninjaproxy1.com/", "https://yts.proxyninja.org/", "https://yts.proxyninja.net/", "https://yts.torrentbay.st/", "https://yts.torrentsbay.org/"}, Settings: []Field{
 		{Name: "apiurl", Type: "text", Label: "API URL", Default: "movies-api.accel.li"},
 	}},
-	{ID: "zamundarip", Name: "Zamunda RIP", Description: "Zamunda RIP is a BULGARIAN Public Torrent Archive for MOVIES / TV / GENERAL", Language: "bg-BG", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://zamunda.rip/"}, Settings: []Field{}},
-	{ID: "zktorrent", Name: "ZkTorrent", Description: "ZkTorrent is a FRENCH Public site for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "public", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.zktorrent.cc/"}, Settings: []Field{
+	{ID: "zamundarip", Name: "Zamunda RIP", Description: "Zamunda RIP is a BULGARIAN Public Torrent Archive for MOVIES / TV / GENERAL", Language: "bg-BG", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://zamunda.rip/"}, Settings: []Field{}},
+	{ID: "zktorrent", Name: "ZkTorrent", Description: "ZkTorrent is a FRENCH Public site for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "public", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.zktorrent.cc/"}, Settings: []Field{
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 		{Name: "multilang", Type: "checkbox", Label: "Replace MULTi by another language in release name", Default: "false"},
 		{Name: "multilanguage", Type: "select", Label: "Replace MULTi by this language", Default: "FRENCH"},
 		{Name: "vostfr", Type: "checkbox", Label: "Replace VOSTFR and SUBFRENCH with ENGLISH", Default: "false"},
 	}},
-	{ID: "animebybelka", Name: "Anime by Belka", Description: "Anime by Belka (Аниме от Белки) is a RUSSIAN Semi-Private Torrent Tracker for ANIME", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://anibelka.com/"}, Settings: []Field{
+	{ID: "animebybelka", Name: "Anime by Belka", Description: "Anime by Belka (Аниме от Белки) is a RUSSIAN Semi-Private Torrent Tracker for ANIME", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other"}, URLs: []string{"https://anibelka.com/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "useragent", Type: "text", Label: "User-Agent"},
@@ -322,12 +322,12 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "t"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "d"},
 	}},
-	{ID: "animelayer", Name: "AnimeLayer", Description: "AnimeLayer is a RUSSIAN Semi-Private Torrent Tracker for ANIME", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "TV"}, URLs: []string{"https://animelayer.ru/"}, Settings: []Field{
+	{ID: "animelayer", Name: "AnimeLayer", Description: "AnimeLayer is a RUSSIAN Semi-Private Torrent Tracker for ANIME", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "TV"}, URLs: []string{"https://animelayer.ru/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "category-id", Type: "select", Label: "Category", Default: "anime"},
 	}},
-	{ID: "best-torrents", Name: "Best-Torrents", Description: "Best-Torrents is a POLISH Semi-Private PAY2DL Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://best-torrents.com/"}, Settings: []Field{
+	{ID: "best-torrents", Name: "Best-Torrents", Description: "Best-Torrents is a POLISH Semi-Private PAY2DL Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://best-torrents.com/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 	}},
@@ -346,21 +346,21 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "comicat", Name: "comicat", Description: "comicat is a CHINESE Semi-Private tracker for Anime / Hentai / Manga", Language: "zh-CN", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Other", "TV"}, URLs: []string{"https://www.comicat.org/"}, Settings: []Field{}},
-	{ID: "darkiworld-api", Name: "DarkiWorld (API)", Description: "DarkiWorld is a FRENCH Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://darkiworld16.com/", "https://darkiworld.com/"}, Settings: []Field{
+	{ID: "comicat", Name: "comicat", Description: "comicat is a CHINESE Semi-Private tracker for Anime / Hentai / Manga", Language: "zh-CN", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Other"}, URLs: []string{"https://www.comicat.org/"}, Settings: []Field{}},
+	{ID: "darkiworld-api", Name: "DarkiWorld (API)", Description: "DarkiWorld is a FRENCH Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://darkiworld16.com/", "https://darkiworld.com/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or generate your API Key by logging in to <a href=\"https://darkiworld.com/account-settings\" target=\"_blank\">DarkiWorld Account Settings</a>, scrolling down to <b>Torznab / *arr integration</b>, and clicking <b>Generate my Torznab API key</b>."},
 		{Name: "multilang", Type: "checkbox", Label: "Replace MULTi by another language in release name", Default: "false"},
 		{Name: "multilanguage", Type: "select", Label: "Replace MULTi by this language", Default: "FRENCH"},
 		{Name: "vostfr", Type: "checkbox", Label: "Replace VOSTFR and SUBFRENCH with ENGLISH", Default: "false"},
 	}},
-	{ID: "deildu", Name: "Deildu", Description: "Deildu is an ICELANDIC Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "is-IS", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://deildu.net/"}, Settings: []Field{
+	{ID: "deildu", Name: "Deildu", Description: "Deildu is an ICELANDIC Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "is-IS", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://deildu.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "added"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "devil-torrents", Name: "Devil-Torrents", Description: "Devil-Torrents is a POLISH Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://devil-torrents.pl/"}, Settings: []Field{
+	{ID: "devil-torrents", Name: "Devil-Torrents", Description: "Devil-Torrents is a POLISH Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://devil-torrents.pl/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "multilang", Type: "checkbox", Label: "Replace MULTi by another language in release name", Default: "false"},
@@ -386,14 +386,14 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Торрентов на страницу</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 	}},
-	{ID: "electro-torrent", Name: "Electro-Torrent", Description: "Electro-Torrent is a POLISH Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://electro-torrent.pl/"}, Settings: []Field{
+	{ID: "electro-torrent", Name: "Electro-Torrent", Description: "Electro-Torrent is a POLISH Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://electro-torrent.pl/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "multilang", Type: "checkbox", Label: "Replace MULTi by another language in release name", Default: "false"},
 		{Name: "multilanguage", Type: "select", Label: "Replace MULTi by this language", Default: "POLISH"},
 		{Name: "info_limit", Type: "info", Label: "Download Limit", Default: "Electro-Torrent has a limit on downloads. If downloads <b>fail</b> then you have exceeded your limit. Try again after a few hours."},
 	}},
-	{ID: "ex-torrenty", Name: "Ex-torrenty", Description: "Ex-torrenty is a POLISH Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://ex-torrenty.org/"}, Settings: []Field{
+	{ID: "ex-torrenty", Name: "Ex-torrenty", Description: "Ex-torrenty is a POLISH Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://ex-torrenty.org/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "useragent", Type: "text", Label: "User-Agent"},
@@ -401,7 +401,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "multilang", Type: "checkbox", Label: "Replace MULTi by another language in release name", Default: "false"},
 		{Name: "multilanguage", Type: "select", Label: "Replace MULTi by this language", Default: "POLISH"},
 	}},
-	{ID: "exkinoray", Name: "ExKinoRay", Description: "ExKinoRay is a RUSSIAN Semi-Private Torrent Tracker for MOVIES / TV", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://exkinoray.ru/"}, Settings: []Field{
+	{ID: "exkinoray", Name: "ExKinoRay", Description: "ExKinoRay is a RUSSIAN Semi-Private Torrent Tracker for MOVIES / TV", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://exkinoray.ru/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "stripcyrillic", Type: "checkbox", Label: "Strip Cyrillic Letters", Default: "false"},
@@ -413,14 +413,14 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 	}},
-	{ID: "fenyarnyek-tracker", Name: "Fenyarnyek-Tracker", Description: "Fenyarnyek-Tracker is a HUNGARIAN Semi-Private site for TV / MOVIES / GENERAL", Language: "hu-HU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"http://tracker.fenyarnyek.com/"}, Settings: []Field{
+	{ID: "fenyarnyek-tracker", Name: "Fenyarnyek-Tracker", Description: "Fenyarnyek-Tracker is a HUNGARIAN Semi-Private site for TV / MOVIES / GENERAL", Language: "hu-HU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"http://tracker.fenyarnyek.com/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "3"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "2"},
 		{Name: "info", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "file-tracker", Name: "File-Tracker", Description: "File Tracker is a RUSSIAN Semi-Private Torrent Tracker for MOVIES / GENERAL", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://file-tracker.net/"}, Settings: []Field{
+	{ID: "file-tracker", Name: "File-Tracker", Description: "File Tracker is a RUSSIAN Semi-Private Torrent Tracker for MOVIES / GENERAL", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://file-tracker.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "uploader", Type: "text", Label: "Search by Uploader"},
@@ -431,7 +431,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "1"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "2"},
 	}},
-	{ID: "gay-torrents", Name: "Gay-Torrents.net", Description: "Gay-Torrents.net is a Private Torrent Tracker for GAY 3X", Language: "en-US", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.gay-torrents.net/"}, Settings: []Field{
+	{ID: "gay-torrents", Name: "Gay-Torrents.net", Description: "Gay-Torrents.net is a Private Torrent Tracker for GAY 3X", Language: "en-US", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.gay-torrents.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -447,7 +447,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "2"},
 		{Name: "info", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "hdgalaktik", Name: "HDGalaKtik", Description: "HDGalaKtik is a RUSSIAN Semi-Private tracker for MOVIES / TV / GENERAL", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.trackerpmr.com/", "https://freetmd.com/", "https://kinoradiomagia.tv/"}, Settings: []Field{
+	{ID: "hdgalaktik", Name: "HDGalaKtik", Description: "HDGalaKtik is a RUSSIAN Semi-Private tracker for MOVIES / TV / GENERAL", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.trackerpmr.com/", "https://freetmd.com/", "https://kinoradiomagia.tv/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "stripcyrillic", Type: "checkbox", Label: "Strip Cyrillic Letters", Default: "false"},
@@ -457,7 +457,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "helltorrents", Name: "HellTorrents", Description: "HellTorrents is a POLISH Semi-Private PAY2DL Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://helltorrents.com/"}, Settings: []Field{
+	{ID: "helltorrents", Name: "HellTorrents", Description: "HellTorrents is a POLISH Semi-Private PAY2DL Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://helltorrents.com/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "multilang", Type: "checkbox", Label: "Replace MULTi by another language in release name", Default: "false"},
@@ -474,7 +474,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "ilcorsaroblu", Name: "Il Corsaro Blu", Description: "il CorSaRo Blu is an ITALIAN Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "it-IT", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://ilcorsaroblu.org/"}, Settings: []Field{
+	{ID: "ilcorsaroblu", Name: "Il Corsaro Blu", Description: "il CorSaRo Blu is an ITALIAN Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "it-IT", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://ilcorsaroblu.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Filter freeleech only", Default: "false"},
@@ -483,7 +483,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "2"},
 		{Name: "info", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "ildragonero", Name: "ilDraGoNeRo", Description: "ilDraGoNeRo is an ITALIAN Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "it-IT", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://ildragonero2.info/"}, Settings: []Field{
+	{ID: "ildragonero", Name: "ilDraGoNeRo", Description: "ilDraGoNeRo is an ITALIAN Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "it-IT", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://ildragonero2.info/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "info_delay", Type: "info", Label: "Delay between searches", Default: "This forum enforces a 15s delay between searches. If no results are returned for a search, wait for 15s and try again."},
@@ -496,7 +496,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "4"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "kinozal", Name: "Kinozal", Description: "Kinozal is a RUSSIAN Semi-Private Torrent Tracker for MOVIES / TV / MUSIC. This indexer uses torrents.", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://kinozal.tv/", "https://kinozal.guru/"}, Settings: []Field{
+	{ID: "kinozal", Name: "Kinozal", Description: "Kinozal is a RUSSIAN Semi-Private Torrent Tracker for MOVIES / TV / MUSIC. This indexer uses torrents.", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://kinozal.tv/", "https://kinozal.guru/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -506,7 +506,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "0"},
 		{Name: "info_torrent", Type: "info", Label: "Torrents", Default: "This tracker limits the number of torrents a user can download each day without paying. This indexer uses <b>torrent files</b> with the user's passkey, so any download/upload is recorded. If you receive errors when downloading torrent files, you may have reached this limit. To bypass the limit with magnet links, use <b>Kinozal (M)</b>."},
 	}},
-	{ID: "kinozal-magnet", Name: "Kinozal (M)", Description: "Kinozal is a RUSSIAN Semi-Private Torrent Tracker for MOVIES / TV / MUSIC. This indexer uses magnet links.", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://kinozal.tv/", "https://kinozal.guru/"}, Settings: []Field{
+	{ID: "kinozal-magnet", Name: "Kinozal (M)", Description: "Kinozal is a RUSSIAN Semi-Private Torrent Tracker for MOVIES / TV / MUSIC. This indexer uses magnet links.", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://kinozal.tv/", "https://kinozal.guru/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -524,7 +524,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "2"},
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 	}},
-	{ID: "mazepa", Name: "Mazepa", Description: "Mazepa is an UKRAINIAN Semi-Private Torrent Tracker for Videos with Ukrainian soundtracks", Language: "uk-UA", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://mazepa.to/"}, Settings: []Field{
+	{ID: "mazepa", Name: "Mazepa", Description: "Mazepa is an UKRAINIAN Semi-Private Torrent Tracker for Videos with Ukrainian soundtracks", Language: "uk-UA", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://mazepa.to/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "stripcyrillic", Type: "checkbox", Label: "Strip Cyrillic Letters", Default: "false"},
@@ -537,7 +537,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "date"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "DESC"},
 	}},
-	{ID: "miobt", Name: "MioBT", Description: "MioBT is a CHINESE Semi-Private torrent index", Language: "zh-CN", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "TV"}, URLs: []string{"https://miobt.com/", "https://kisssub.org/"}, Settings: []Field{}},
+	{ID: "miobt", Name: "MioBT", Description: "MioBT is a CHINESE Semi-Private torrent index", Language: "zh-CN", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "TV"}, URLs: []string{"https://miobt.com/", "https://kisssub.org/"}, Settings: []Field{}},
 	{ID: "musebootlegs", Name: "MuseBootlegs", Description: "MuseBootlegs (MB) is a Semi-Private Torrent Tracker for MUSE MUSIC / BOOTLEGS", Language: "en-US", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Other"}, URLs: []string{"https://musebootlegs.com/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
@@ -581,7 +581,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "If the account is not used regularly within 2 years, the system will automatically delete the account."},
 	}},
-	{ID: "new-team", Name: "New-Team", Description: "New-Team is a RUSSIAN Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://new-team.org/"}, Settings: []Field{
+	{ID: "new-team", Name: "New-Team", Description: "New-Team is a RUSSIAN Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://new-team.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "1"},
@@ -596,7 +596,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "1"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "2"},
 	}},
-	{ID: "noname-clubl", Name: "NoNaMe ClubL", Description: "This is the NoNaMe Club indexer with Login enabled in the config.", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://nnmclub.to/"}, Settings: []Field{
+	{ID: "noname-clubl", Name: "NoNaMe ClubL", Description: "This is the NoNaMe Club indexer with Login enabled in the config.", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://nnmclub.to/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "stripcyrillic", Type: "checkbox", Label: "Strip Cyrillic Letters", Default: "false"},
@@ -606,7 +606,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "2"},
 		{Name: "info_row", Type: "info", Label: "Search settings", Default: "This Indexer requires specific columns to be active on your account search settings.<br>Login to the web site and ensure that only the <b>Автор</b> (Author) and <b>Форум</b> (Forum) checkboxes are ticked in the <b>Показывать колонку</b> (Show Columns) section of the <b>Настройки поиска Torrent</b> (Torrent Search Settings) page.<br>Having other columns active may prevent the Indexer processing/displaying results correctly."},
 	}},
-	{ID: "polskie-torrenty", Name: "Polskie-Torrenty", Description: "Polskie-Torrenty is a POLISH Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://polskie-torrenty.eu/"}, Settings: []Field{
+	{ID: "polskie-torrenty", Name: "Polskie-Torrenty", Description: "Polskie-Torrenty is a POLISH Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://polskie-torrenty.eu/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "multilang", Type: "checkbox", Label: "Replace MULTi by another language in release name", Default: "false"},
@@ -622,7 +622,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "1"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "2"},
 	}},
-	{ID: "postman-api", Name: "Postman (API)", Description: "Postman is a Semi-Private I2P Torrent Tracker for MOVIES / TV / GENERAL. This indexer uses the API for login.", Language: "en-US", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"http://tracker2.postman.i2p/"}, Settings: []Field{
+	{ID: "postman-api", Name: "Postman (API)", Description: "Postman is a Semi-Private I2P Torrent Tracker for MOVIES / TV / GENERAL. This indexer uses the API for login.", Language: "en-US", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"http://tracker2.postman.i2p/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"http://tracker2.postman.i2p/\" target=\"_blank\">Postman</a> account <i>Preferences</i> page."},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "1"},
@@ -638,7 +638,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_score", Type: "info", Label: "About sorting by score", Default: "In order to sort by score you first must have edited your <a href=\"https://pussytorrents.org/\" target=\"_blank\">PussyTorrents</a> account profile and changed <b>Results default sorting method</b> to <b>By Score</b>."},
 	}},
-	{ID: "rainbowtracker", Name: "Rainbow Tracker", Description: "Rainbow Tracker is a RUSSIAN Semi-Private Torrent Tracker for LGBTQ MOVIES / TV", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Movies", "Other", "TV", "XXX"}, URLs: []string{"https://gaytracker.ru/"}, Settings: []Field{
+	{ID: "rainbowtracker", Name: "Rainbow Tracker", Description: "Rainbow Tracker is a RUSSIAN Semi-Private Torrent Tracker for LGBTQ MOVIES / TV", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://gaytracker.ru/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "stripcyrillic", Type: "checkbox", Label: "Strip Cyrillic Letters", Default: "false"},
@@ -661,7 +661,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "1"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "2"},
 	}},
-	{ID: "riperam", Name: "RiperAM", Description: "RiperAM is a RUSSIAN Semi-Private Torrent Tracker for MOVIES / TV", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://riper.online/"}, Settings: []Field{
+	{ID: "riperam", Name: "RiperAM", Description: "RiperAM is a RUSSIAN Semi-Private Torrent Tracker for MOVIES / TV", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://riper.online/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "stripcyrillic", Type: "checkbox", Label: "Strip Cyrillic Letters", Default: "false"},
@@ -685,7 +685,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "4"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "rustorka", Name: "Rustorka", Description: "Rustorka is a RUSSIAN Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://rustorka.com/"}, Settings: []Field{
+	{ID: "rustorka", Name: "Rustorka", Description: "Rustorka is a RUSSIAN Semi-Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "ru-RU", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://rustorka.com/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "stripcyrillic", Type: "checkbox", Label: "Strip Cyrillic Letters", Default: "false"},
@@ -742,7 +742,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "_"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "unionfansub", Name: "Union Fansub", Description: "Union Fansub is a SPANISH Semi-Private torrent site focused on ANIME", Language: "es-ES", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Audio", "Books", "Movies", "TV"}, URLs: []string{"https://torrent.unionfansub.com/"}, Settings: []Field{
+	{ID: "unionfansub", Name: "Union Fansub", Description: "Union Fansub is a SPANISH Semi-Private torrent site focused on ANIME", Language: "es-ES", Protocol: "torrent", Privacy: "semi-private", Categories: []string{"Anime", "Audio", "Books", "Movies", "TV"}, URLs: []string{"https://torrent.unionfansub.com/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "4"},
@@ -764,7 +764,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "The tracker has a system for deleting inactive accounts after 6 months from your last visit to the tracker."},
 	}},
-	{ID: "13city", Name: "13City", Description: "13City is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "TV"}, URLs: []string{"https://13city.org/"}, Settings: []Field{
+	{ID: "13city", Name: "13City", Description: "13City is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "TV"}, URLs: []string{"https://13city.org/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -773,7 +773,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>If there is no valid traffic within 7 days of registration (participation in the calculation of sharing rate), the account will be blocked</li><li>After the level is reduced to \"Peasant\", if the sharing rate is not improved within 7 days, the account will be blocked</li><li>Long-term non-login:<ul>- UnParked account: 60 consecutive days of non-login → banned</ul><ul>- Parked account: 180 consecutive days of non-login → banned</ul><ul>- Nexus Master and above levels are not subject to long-term non-login ban restrictions</ul></li></ol>"},
 	}},
-	{ID: "1ptbar", Name: "1ptbar", Description: "1ptbar is a CHINESE Private Torrent Tracker for MOVIES / TV / E-LEARNING", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://1ptba.com/"}, Settings: []Field{
+	{ID: "1ptbar", Name: "1ptbar", Description: "1ptbar is a CHINESE Private Torrent Tracker for MOVIES / TV / E-LEARNING", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://1ptba.com/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -784,7 +784,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Cherish your user account. Inactive accounts would be deleted based on the following rules:<ol><li>Veteran User or above would never be deleted.</li><li>Elite User or above would never be deleted if parked (at User CP).</li><li>Parked accounts would be deleted if users have not logged in for more than 400 days in a row.</li><li>Unparked accounts would be deleted if users have not logged in for more than 150 days in a row.</li><li>Accounts with both uploaded and downloaded amount being 0 would be deleted if users have not logged in for more than 100 days in a row.</li></ol>"},
 		{Name: "info_special", Type: "info", Label: "Special Categories", Default: "Only <b>Power User</b> or above can view Special section. Searching for XXX categories by users below this class will result in search errors."},
 	}},
-	{ID: "3changtrai", Name: "3ChangTrai", Description: "3ChangTrai (3CT) is a VIETNAMESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "vi-VN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://3changtrai.com/"}, Settings: []Field{
+	{ID: "3changtrai", Name: "3ChangTrai", Description: "3ChangTrai (3CT) is a VIETNAMESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "vi-VN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://3changtrai.com/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -811,7 +811,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "time"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "52pt", Name: "52PT", Description: "52PT is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://52pt.site/"}, Settings: []Field{
+	{ID: "52pt", Name: "52PT", Description: "52PT is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://52pt.site/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -828,7 +828,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "t"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "d"},
 	}},
-	{ID: "abnormal-api", Name: "Abnormal (API)", Description: "ABNormal (ABN) is a FRENCH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Books", "Movies", "Other", "TV"}, URLs: []string{"https://abn.lol/"}, Settings: []Field{
+	{ID: "abnormal-api", Name: "Abnormal (API)", Description: "ABNormal (ABN) is a FRENCH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://abn.lol/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find your API key on your <a href=\"https://abn.lol/User/Parameters\" target=\"_blank\">Parameters</a> page. The API key is read-only and never expires."},
 		{Name: "apiurl", Type: "text", Label: "API URL", Default: "api.abn.lol"},
@@ -861,7 +861,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "You will be immediately banned if you have not logged in for more than 6 weeks."},
 	}},
-	{ID: "afun", Name: "AFUN", Description: "AFUN is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://www.ptlover.cc/"}, Settings: []Field{
+	{ID: "afun", Name: "AFUN", Description: "AFUN is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://www.ptlover.cc/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -870,7 +870,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Cherish your user account. Inactive accounts will be deleted based on the following rules:<ol><li>Veteran User or above will never be deleted.</li><li>Elite User or above will never be deleted if parked (at User CP).</li><li>Parked accounts will be deleted if users have not logged in for more than 400 days in a row.</li><li>Unparked accounts will be deleted if users have not logged in for more than 150 days in a row.</li><li>Accounts with both uploaded and downloaded amount being 0 will be deleted if users have not logged in for more than 100 days in a row.</li></ol>"},
 	}},
-	{ID: "agsvpt", Name: "AGSVPT", Description: "AGSVPT (Arctic Global Seed Vault) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.agsvpt.com/", "https://pt.agsvpt.cn/"}, Settings: []Field{
+	{ID: "agsvpt", Name: "AGSVPT", Description: "AGSVPT (Arctic Global Seed Vault) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.agsvpt.com/", "https://pt.agsvpt.cn/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -898,7 +898,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "You must log in to the Aither web site with your browser once every90 days to prevent your account from getting disabled."},
 	}},
-	{ID: "alingpt", Name: "alingPT", Description: "alingPT is a CHINESE Private Torrent Tracker for MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Movies", "TV"}, URLs: []string{"https://pt.aling.de/"}, Settings: []Field{
+	{ID: "alingpt", Name: "alingPT", Description: "alingPT is a CHINESE Private Torrent Tracker for MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Movies", "TV"}, URLs: []string{"https://pt.aling.de/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -907,7 +907,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Accounts parked will not be deleted</li><li>Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 200 consecutive days</li><li>Users who have no traffic (i.e. upload/download data are both 0) will be deleted if they do not log in for 60 consecutive days.</li></ol>"},
 	}},
-	{ID: "amigosshare", Name: "Amigos Share Club", Description: "Amigos Share Club (ASC) is a BRAZILIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pt-BR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://cliente.amigos-share.club/"}, Settings: []Field{
+	{ID: "amigosshare", Name: "Amigos Share Club", Description: "Amigos Share Club (ASC) is a BRAZILIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pt-BR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://cliente.amigos-share.club/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "info_results", Type: "info", Label: "Search results", Default: "Set <b>Exibição De Torrents</b> to <b>Lista</b> in your <b>Minhas Configurações</b>.<br />Using <b>Capas</b> is not supported and will return 0 results."},
@@ -916,7 +916,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Inactive accounts, that is, without access for 90 days (3 months), will be automatically deleted by the system; with no possibility of reactivation."},
 	}},
-	{ID: "animetorrentsro", Name: "AnimeTorrents.ro", Description: "AnimeTorrents.ro (Anime Torrents Romania) is a ROMANIAN Private Torrent Tracker for ANIME / MANGA", Language: "ro-RO", Protocol: "torrent", Privacy: "private", Categories: []string{"Books", "Movies", "TV"}, URLs: []string{"https://animetorrents.io/"}, Settings: []Field{
+	{ID: "animetorrentsro", Name: "AnimeTorrents.ro", Description: "AnimeTorrents.ro (Anime Torrents Romania) is a ROMANIAN Private Torrent Tracker for ANIME / MANGA", Language: "ro-RO", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Books", "Movies"}, URLs: []string{"https://animetorrents.io/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -926,7 +926,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Inactive accounts under VIP and without parked are automatically deleted after about a year."},
 	}},
-	{ID: "animeworld-api", Name: "AnimeWorld (API)", Description: "AnimeWorld (AW) is a GERMAN Private Torrent Tracker for ANIME / MANGA / HENTAI", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://animeworld.cx/"}, Settings: []Field{
+	{ID: "animeworld-api", Name: "AnimeWorld (API)", Description: "AnimeWorld (AW) is a GERMAN Private Torrent Tracker for ANIME / MANGA / HENTAI", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://animeworld.cx/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://animeworld.cx/\" target=\"_blank\">AnimeWorld</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -941,7 +941,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Key by accessing your <a href=\"https://anthelion.me/\" target=\"_blank\">Anthelion</a> account <i>Settings</i> page and scrolling down to the <b>API Key</b> section.<br>Tick the <b>Search</b> and <b>Download</b> checkboxes and click the <b>save profile</b> button to generate the key."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Activity is defined as actually using your account, including the snatch/grab/seeding of torrents. You are also required to sign-in to the web frontend of Anthelion at least once per 3mo (90 days) (Note, using autodl/ARR does not satisfy this)."},
 	}},
-	{ID: "arabafenice", Name: "ArabaFenice", Description: "Araba Fenice (Phoenix) is an ITALIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "it-IT", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.arabafenice.me/"}, Settings: []Field{
+	{ID: "arabafenice", Name: "ArabaFenice", Description: "Araba Fenice (Phoenix) is an ITALIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "it-IT", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.arabafenice.me/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "3"},
@@ -957,14 +957,14 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "The maximum number of days you can stay away from the site is 40 days, and only if you suspend the account, you will get a grace period of 180 days, but you must contact the administration in advance so that this is added to your personal account and you are not exposed to expulsion."},
 	}},
-	{ID: "arabp2p", Name: "ArabP2P", Description: "ArabP2P is an ARABIC Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "ar-AE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.arabp2p.net/"}, Settings: []Field{
+	{ID: "arabp2p", Name: "ArabP2P", Description: "ArabP2P is an ARABIC Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "ar-AE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.arabp2p.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "3"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "2"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "You must log in periodically. If the member is absent from the website for a period of 3 months, the account will be deleted without prior warning."},
 	}},
-	{ID: "arabscene", Name: "ArabScene", Description: "ArabScene is an ARABIC Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "ar-AE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://arabscene.me/"}, Settings: []Field{
+	{ID: "arabscene", Name: "ArabScene", Description: "ArabScene is an ARABIC Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "ar-AE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://arabscene.me/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "added"},
@@ -980,7 +980,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Your account will be automatically deleted from the database after 90 days of inactivity. If you return or visit the site with your account before that amount of time passes, then the inactivity timer will reset and your account will be fine for another 90 days.<br>Keep in mind that 'activity' is considered a visit to any page and that torrent traffic is not counted as account activity. In order to reset the inactivity timer all you have to do is visit a single page while logged in with your account. If your account is deleted for inactivity, please do not ask the site staff to un-delete it for you. The deletion is performed automatically by the server and, as such, your account cannot be recovered after it has been deleted."},
 	}},
-	{ID: "asiandvdclub", Name: "AsianDVDClub", Description: "AsianDVDClub (ADC) is a Private Torrent Tracker for ASIAN DVD and BluRay", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://asiandvdclub.org/"}, Settings: []Field{
+	{ID: "asiandvdclub", Name: "AsianDVDClub", Description: "AsianDVDClub (ADC) is a Private Torrent Tracker for ASIAN DVD and BluRay", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://asiandvdclub.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1028,14 +1028,14 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "backups", Name: "Back-ups", Description: "Back-Ups is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://back-ups.me/"}, Settings: []Field{
+	{ID: "backups", Name: "Back-ups", Description: "Back-Ups is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://back-ups.me/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Filter freeleech only", Default: "false"},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>40</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "To keep records updated regularly, all inactive accounts will be deleted after 60 days of inactivity."},
 	}},
-	{ID: "baozipt", Name: "baoziPT", Description: "baoziPT is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://p.t-baozi.cc/"}, Settings: []Field{
+	{ID: "baozipt", Name: "baoziPT", Description: "baoziPT is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://p.t-baozi.cc/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1050,7 +1050,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "4"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "bestcore", Name: "Best-Core", Description: "Best-Core is a HUNGARIAN Private Tracker for MOVIES / TV / GENERAL", Language: "hu-HU", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://best-core.info/"}, Settings: []Field{
+	{ID: "bestcore", Name: "Best-Core", Description: "Best-Core is a HUNGARIAN Private Tracker for MOVIES / TV / GENERAL", Language: "hu-HU", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://best-core.info/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search FreeLeech only", Default: "false"},
@@ -1066,7 +1066,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "orderby", Type: "select", Label: "Sort requested from site", Default: "added"},
 		{Name: "order", Type: "select", Label: "Order requested from site", Default: "DESC"},
 	}},
-	{ID: "bigbbs", Name: "BigBBS", Description: "BigBBS is a POLISH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://bigbbs.eu/"}, Settings: []Field{
+	{ID: "bigbbs", Name: "BigBBS", Description: "BigBBS is a POLISH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://bigbbs.eu/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Filter freeleech only", Default: "false"},
@@ -1082,7 +1082,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrentek száma egy oldalon</b> setting to <b>100</b> on your account profile. The default is <i>30</i>."},
 	}},
-	{ID: "bitbazis", Name: "Bit-Bázis", Description: "Bit-Bázis is a HUNGARIAN Private Tracker for MOVIES / TV", Language: "hu-HU", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://bitbazis.net/"}, Settings: []Field{
+	{ID: "bitbazis", Name: "Bit-Bázis", Description: "Bit-Bázis is a HUNGARIAN Private Tracker for MOVIES / TV", Language: "hu-HU", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://bitbazis.net/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Filter freeleech only", Default: "false"},
@@ -1091,7 +1091,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrentek száma egy oldalon:</b> setting to <b>50</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "If the user does not access the site for 1 month, he will receive an e-mail notification. If you stay away for 9 months, your account will be suspended and deleted. After the 9-month absence, the user cannot register again."},
 	}},
-	{ID: "bitded", Name: "Bitded", Description: "Bitded is a THAI Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "th-TH", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.dedbit.com/"}, Settings: []Field{
+	{ID: "bitded", Name: "Bitded", Description: "Bitded is a THAI Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "th-TH", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.dedbit.com/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1113,7 +1113,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "DESC"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "If you do not visit the site for 1 year, you will be banned for inactivity. The permanent deletion of your account after the ban is 2 years."},
 	}},
-	{ID: "bitpalace", Name: "Bitpalace", Description: "Bitpalace is a HUNGARIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "hu-HU", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://bitpalace.cc/"}, Settings: []Field{
+	{ID: "bitpalace", Name: "Bitpalace", Description: "Bitpalace is a HUNGARIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "hu-HU", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://bitpalace.cc/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Filter freeleech only", Default: "false"},
@@ -1128,7 +1128,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "You must log in to the site at least once a month; otherwise, your account will be suspended."},
 	}},
-	{ID: "Bittorrentfiles", Name: "Bittorrentfiles", Description: "Bittorrentfiles is a Private GERMAN Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://bittorrentfiles.me/"}, Settings: []Field{
+	{ID: "Bittorrentfiles", Name: "Bittorrentfiles", Description: "Bittorrentfiles is a Private GERMAN Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://bittorrentfiles.me/"}, Settings: []Field{
 		{Name: "user", Type: "text", Label: "Username"},
 		{Name: "pass", Type: "password", Label: "Password"},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1152,7 +1152,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
 	}},
-	{ID: "bluebirdhd", Name: "BlueBird", Description: "BlueBird is a RUSSIAN Private Torrent Tracker for HD MOVIES", Language: "ru-RU", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://bluebird-hd.org/"}, Settings: []Field{
+	{ID: "bluebirdhd", Name: "BlueBird", Description: "BlueBird is a RUSSIAN Private Torrent Tracker for HD MOVIES", Language: "ru-RU", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://bluebird-hd.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1182,7 +1182,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Your membership requires that you stay active at Blutopia. To not get disabled, you are required to login to the site at least once every 30 days or be actively seeding at least 1 torrent."},
 	}},
-	{ID: "borgzelle", Name: "Borgzelle", Description: "Borgzelle is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://borgzelle.borg/"}, Settings: []Field{
+	{ID: "borgzelle", Name: "Borgzelle", Description: "Borgzelle is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://borgzelle.borg/"}, Settings: []Field{
 		{Name: "info_sitelink", Type: "info", Label: "About Site Link", Default: "If the Site Link domain returns a DNS error then you have not yet been assimilated."},
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
@@ -1197,14 +1197,14 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
 		{Name: "info_download", Type: "info", Label: "Download Restrictions", Default: "You must have uploaded at least 10GB before you are able to access all torrent sizes. Until then, you are restricted to torrents no larger than 2.5GB."},
 	}},
-	{ID: "brasiltracker", Name: "BrasilTracker", Description: "BrasilTracker is a BRAZILIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pt-BR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://brasiltracker.org/"}, Settings: []Field{
+	{ID: "brasiltracker", Name: "BrasilTracker", Description: "BrasilTracker is a BRAZILIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pt-BR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://brasiltracker.org/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "time"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "btnext", Name: "BTNext", Description: "BTNext (BTNT) is a PORTUGUESE Private Torrent Tracker for 0DAY / GENERAL", Language: "pt-PT", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://tracker.btnext.com/"}, Settings: []Field{
+	{ID: "btnext", Name: "BTNext", Description: "BTNext (BTNT) is a PORTUGUESE Private Torrent Tracker for 0DAY / GENERAL", Language: "pt-PT", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://tracker.btnext.com/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "info", Type: "info", Label: "Layout", Default: "<ol><li>Only the English Classic profile is supported.</li><li>Make sure to set the <b>Torrent Listing (Lista de Torrents)</b> option in your profile to <b>Classic (Clássico)</b></li><li>Using the <i>Moderna</i> theme will prevent results.</li></ol>"},
@@ -1212,7 +1212,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_results", Type: "info", Label: "Search results", Default: "If you get 0 results check the log for error: <b>An error has occurred!You can't view this page unless you read all your unread messages</b>, then access the site with your browser and <b>mark as read</b> all PMs."},
 	}},
-	{ID: "btschool", Name: "BTSCHOOL", Description: "BTSCHOOL is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.btschool.club/"}, Settings: []Field{
+	{ID: "btschool", Name: "BTSCHOOL", Description: "BTSCHOOL is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.btschool.club/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1220,14 +1220,14 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Cherish your user account. Inactive accounts would be deleted based on the following rules:<ol><li>Extreme User or above would never be deleted.</li><li>Veteran User or above would never be deleted if parked (at User CP).</li><li>Parked accounts would be deleted if users have not logged in for more than 365 days in a row.</li><li>Unparked accounts would be deleted if users have not logged in for more than 150 days in a row.</li><li>Accounts with both uploaded and downloaded amount being 0 would be deleted if users have not logged in for more than 30 days in a row.</li></ol>"},
 	}},
-	{ID: "bwtorrents", Name: "BwTorrents", Description: "BwTorrents is an INDIAN Private Torrent Tracker for MOVIES / TV", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://bwtorrents.tv/", "https://www.bwtorrents.pro/", "https://bwtorrents.cc/", "https://bwtorrents.live/"}, Settings: []Field{
+	{ID: "bwtorrents", Name: "BwTorrents", Description: "BwTorrents is an INDIAN Private Torrent Tracker for MOVIES / TV", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://bwtorrents.tv/", "https://www.bwtorrents.pro/", "https://bwtorrents.cc/", "https://bwtorrents.live/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account activity:<ol><li>Zero activity accounts (0 bytes download and 0 bytes upload) are automatically deleted after 30 days</li><li>Inactive accounts under VIP and without parked are automatically deleted after 40 days.</li></ol>"},
 	}},
-	{ID: "byrbt", Name: "BYRBT", Description: "BYRBT is a CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://byr.pt/"}, Settings: []Field{
+	{ID: "byrbt", Name: "BYRBT", Description: "BYRBT is a CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://byr.pt/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1237,7 +1237,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_ipv6", Type: "info", Label: "IPv6 only", Default: "This site only accepts IPv6 addresses. If you are using IPv4 you will get a DNS Lookup Error."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Newly registered users who have not generated any traffic within 14 days (that is, the upload/download data are both 0) will be deleted</li><li>Users with a user level of Peasant that have failed to successfully improve their sharing rate within 14 days will be deleted.</li></ol>"},
 	}},
-	{ID: "c411", Name: "C411", Description: "C411 (Community 411) is a FRENCH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://c411.org/"}, Settings: []Field{
+	{ID: "c411", Name: "C411", Description: "C411 (Community 411) is a FRENCH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://c411.org/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "API Key", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "You can find or generate a new API Key by accessing the <a href=\"https://c411.org/user/integrations\" target=\"_blank\">C411 Intégrations API</a> page."},
 		{Name: "multilang", Type: "checkbox", Label: "Replace MULTi by another language in release name", Default: "false"},
@@ -1245,7 +1245,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "vostfr", Type: "checkbox", Label: "Replace VOSTFR and SUBFRENCH with ENGLISH", Default: "false"},
 		{Name: "info_3x", Type: "info", Label: "Including 3X", Default: "IF you want to see 3x torrents access your <a href=\"https://c411.org/user/settings\" target=\"_blank\">C411 Paramètres</a> page and tick the <b>Afficher le contenu XXX</b> checkbox."},
 	}},
-	{ID: "cspt", Name: "Caishen (财神)", Description: "Caishen (财神) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://cspt.top/"}, Settings: []Field{
+	{ID: "cspt", Name: "Caishen (财神)", Description: "Caishen (财神) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://cspt.top/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1254,7 +1254,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite User and above will not have their account deleted after parking (in the control panel)</li><li> Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 150 consecutive days</li><li>Users with no traffic (i.e. upload/download data is 0) will be deleted if they have not logged in for more than 100 consecutive days.</li></ol>"},
 	}},
-	{ID: "cangbaoge", Name: "cangbaoge (CBG)", Description: "cangbaoge (CBG) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "TV"}, URLs: []string{"https://cangbao.ge/"}, Settings: []Field{
+	{ID: "cangbaoge", Name: "cangbaoge (CBG)", Description: "cangbaoge (CBG) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "TV"}, URLs: []string{"https://cangbao.ge/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1263,7 +1263,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite User and above will not have their account deleted after parking (in the control panel)</li><li>Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 150 consecutive days</li><li>Users who have no traffic (i.e. upload/download data are both 0) will be deleted if they do not log in for 100 consecutive days.</li></ol>"},
 	}},
-	{ID: "capybarabr", Name: "CapybaraBR (API)", Description: "CapybaraBR is a BRAZILIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pt-BR", Protocol: "torrent", Privacy: "private", Categories: []string{"Books", "Movies", "Other", "TV"}, URLs: []string{"https://capybarabr.com/"}, Settings: []Field{
+	{ID: "capybarabr", Name: "CapybaraBR (API)", Description: "CapybaraBR is a BRAZILIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pt-BR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://capybarabr.com/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://capybarabr.com/\" target=\"_blank\">CapybaraBR</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1272,7 +1272,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "The system automatically makes an account inactive when not logged in for a period of 90 days. So just log in within this time so that it is not inactivated."},
 	}},
-	{ID: "carphunter", Name: "Carp-Hunter", Description: "Carp-Hunter is a HUNGARIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "hu-HU", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://carp-hunter.hu/"}, Settings: []Field{
+	{ID: "carphunter", Name: "Carp-Hunter", Description: "Carp-Hunter is a HUNGARIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "hu-HU", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://carp-hunter.hu/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1286,7 +1286,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "5"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "carpt", Name: "CarPT", Description: "CarPT is a CHINESE Private Torrent Tracker for HD MOVIES / TV / MUSIC", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://carpt.net/"}, Settings: []Field{
+	{ID: "carpt", Name: "CarPT", Description: "CarPT is a CHINESE Private Torrent Tracker for HD MOVIES / TV / MUSIC", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://carpt.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -1322,7 +1322,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "time"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "chdbits", Name: "CHDBits", Description: "CHDBits is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://ptchdbits.co/", "https://chdbits.co/"}, Settings: []Field{
+	{ID: "chdbits", Name: "CHDBits", Description: "CHDBits is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://ptchdbits.co/", "https://chdbits.co/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1331,7 +1331,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "4"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "chilebt-api", Name: "ChileBT (API)", Description: "ChileBT is a CHILEAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "es-CL", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://chilebt.com/"}, Settings: []Field{
+	{ID: "chilebt-api", Name: "ChileBT (API)", Description: "ChileBT is a CHILEAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "es-CL", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://chilebt.com/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://chilebt.com/\" target=\"_blank\">ChileBT</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1343,7 +1343,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 	}},
-	{ID: "cinemamovies", Name: "CinemaMovieS_ZT", Description: "CinemaMovieS_ZT is a POLISH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://cinemamovies.pl/"}, Settings: []Field{
+	{ID: "cinemamovies", Name: "CinemaMovieS_ZT", Description: "CinemaMovieS_ZT is a POLISH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://cinemamovies.pl/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1371,7 +1371,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "You must download or upload data within 30 days of joining, or your account may be pruned for lurking."},
 	}},
-	{ID: "coastalcrew", Name: "Coastal-Music-Crew", Description: "Coastal-Music-Crew (C-M-C) is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://coastal-crew.bounceme.net/"}, Settings: []Field{
+	{ID: "coastalcrew", Name: "Coastal-Music-Crew", Description: "Coastal-Music-Crew (C-M-C) is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://coastal-crew.bounceme.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "added"},
@@ -1392,7 +1392,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Your membership requires that you stay active at Blutopia. To not get disabled, you are required to login to the site at least once every 30 days or be actively seeding at least 1 torrent."},
 	}},
-	{ID: "crabpt", Name: "CrabPT (蟹黄堡)", Description: "CrabPT (蟹黄堡) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://crabpt.vip/"}, Settings: []Field{
+	{ID: "crabpt", Name: "CrabPT (蟹黄堡)", Description: "CrabPT (蟹黄堡) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://crabpt.vip/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -1435,7 +1435,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "New members must generate some torrent activity (upload, download, or cross-seed) in their account within the first 30 days of joining, otherwise their account will be automatically disabled."},
 	}},
-	{ID: "cyanbug", Name: "cyanbug (大青虫)", Description: "cyanbug (大青虫) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://cyanbug.net/"}, Settings: []Field{
+	{ID: "cyanbug", Name: "cyanbug (大青虫)", Description: "cyanbug (大青虫) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://cyanbug.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -1446,7 +1446,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite User and above will not have their account deleted after parking (in the control panel)</li><li> Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 150 consecutive days</li><li>Users who have no traffic (i.e. upload/download data are both 0) will be deleted if they do not log in for 100 consecutive days.</li></ol>"},
 	}},
-	{ID: "darkpeers-api", Name: "Darkpeers (API)", Description: "Darkpeers is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://darkpeers.org/"}, Settings: []Field{
+	{ID: "darkpeers-api", Name: "Darkpeers (API)", Description: "Darkpeers is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://darkpeers.org/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://darkpeers.org/\" target=\"_blank\">Darkpeers</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1455,7 +1455,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Users must log in or be seeding for their account to be considered active. If the account is not active for a consecutive 90 days, the account will be deactivated. After a consecutive 120 days, the account will be pruned."},
 	}},
-	{ID: "dasunerwartete", Name: "Das Unerwartete", Description: "Das Unerwartete (D-U) is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://dasunerwartete.biz/"}, Settings: []Field{
+	{ID: "dasunerwartete", Name: "Das Unerwartete", Description: "Das Unerwartete (D-U) is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://dasunerwartete.biz/"}, Settings: []Field{
 		{Name: "info_password", Type: "info", Label: "About Password Expiry", Default: "D-U has an <b>20 week Password Expiry</b> regime. So if the Indexer has stopped working then the first thing you should do is check if your password has expired by login in at <a href=\"https://dasunerwartete.biz/login.php\" target=\"_blank\">Das Unerwartete</a>, and if necessary use the <b>Passwort anfordern</b> (<i>Request password</i>) button to renew it."},
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
@@ -1464,13 +1464,13 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Anzahl der Torrents beim Durchsuchen:</b> setting to <b>60</b> on your Control Panel. The default is <i>15</i>."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Inactive accounts will be deactivated after 7 weeks and deleted after another 3 weeks."},
 	}},
-	{ID: "dasunerwartete-api", Name: "Das Unerwartete (API)", Description: "Das Unerwartete (D-U) is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL. This is the API version.", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://dasunerwartete.biz/"}, Settings: []Field{
+	{ID: "dasunerwartete-api", Name: "Das Unerwartete (API)", Description: "Das Unerwartete (D-U) is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL. This is the API version.", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://dasunerwartete.biz/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find your API Key by accessing your <a href=\"https://dasunerwartete.biz/\" target=\"_blank\">Das Unerwartete</a> profile page and look for the <b>API-Key:</b> tag."},
 		{Name: "onlyupload", Type: "checkbox", Label: "Search OnlyUpload", Default: "false"},
 		{Name: "info_free", Type: "info", Label: "About OnlyUpload at D-U", Default: "OnlyUpload are torrents where download is not counted but upload is. Good for building your Ratio up. (On the Jackett dashboard search results these are tagged as Freeleech)."},
 	}},
-	{ID: "datascene-api", Name: "DataScene (API)", Description: "DataScene (DS) is a ROMANIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://datascene.xyz/"}, Settings: []Field{
+	{ID: "datascene-api", Name: "DataScene (API)", Description: "DataScene (DS) is a ROMANIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://datascene.xyz/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://datascene.xyz/\" target=\"_blank\">DataScene</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1509,7 +1509,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 	}},
-	{ID: "discfan", Name: "DiscFan", Description: "DiscFan is a CHINESE Private Torrent Tracker for MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "TV"}, URLs: []string{"https://discfan.net/"}, Settings: []Field{
+	{ID: "discfan", Name: "DiscFan", Description: "DiscFan is a CHINESE Private Torrent Tracker for MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "TV"}, URLs: []string{"https://discfan.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1526,7 +1526,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Accounts without activity in the first 28 days will be deleted automatically by the system."},
 	}},
-	{ID: "drugari", Name: "Drugari", Description: "Drugari is a CROATIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "hr-HR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"http://drugari.org/"}, Settings: []Field{
+	{ID: "drugari", Name: "Drugari", Description: "Drugari is a CROATIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "hr-HR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"http://drugari.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Filter freeleech only", Default: "false"},
@@ -1544,7 +1544,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_free", Type: "info", Label: "About OnlyUpload at DS.R", Default: "OnlyUpload are torrents where download is not counted but upload is. Good for building your Ratio up. (On the Jackett dashboard search results these are tagged as Freeleech)."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Inactive accounts will be deactivated after 7 weeks and deleted after another 3 weeks."},
 	}},
-	{ID: "dubhe", Name: "dubhe (天枢)", Description: "dubhe (天枢) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://dubhe.site/"}, Settings: []Field{
+	{ID: "dubhe", Name: "dubhe (天枢)", Description: "dubhe (天枢) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://dubhe.site/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1597,7 +1597,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "4"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "explosiv-world", Name: "Explosiv-World", Description: "Explosiv-World (E-W) is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://explosiv-world.biz/"}, Settings: []Field{
+	{ID: "explosiv-world", Name: "Explosiv-World", Description: "Explosiv-World (E-W) is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://explosiv-world.biz/"}, Settings: []Field{
 		{Name: "info_password", Type: "info", Label: "About Password Expiry", Default: "E-W has an <b>8 week Password Expiry</b> regime. So if the Indexer has stopped working then the first thing you should do is check if your password has expired by login in at <a href=\"https://explosiv-world.biz/login.php\" target=\"_blank\">Explosiv-World</a>, and if necessary use the <b>Passwort anfordern</b> (<i>Request password</i>) button to renew it."},
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
@@ -1628,13 +1628,13 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "2"},
 		{Name: "info", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile. Default is <i>20</i>."},
 	}},
-	{ID: "fanoin", Name: "FANO.IN", Description: "Fano.in is a LATVIAN Private Torrent Tracker for 0DAY / GENERAL", Language: "lv-LV", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.fano.in/"}, Settings: []Field{
+	{ID: "fanoin", Name: "FANO.IN", Description: "Fano.in is a LATVIAN Private Torrent Tracker for 0DAY / GENERAL", Language: "lv-LV", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.fano.in/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "4"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "fappaizuri", Name: "Fappaizuri", Description: "Fappaizuri is a Private Torrent Tracker for HENTAI / JAV", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Books", "Other", "TV", "XXX"}, URLs: []string{"https://www.fappaizuri.me/"}, Settings: []Field{
+	{ID: "fappaizuri", Name: "Fappaizuri", Description: "Fappaizuri is a Private Torrent Tracker for HENTAI / JAV", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Books", "Other", "XXX"}, URLs: []string{"https://www.fappaizuri.me/"}, Settings: []Field{
 		{Name: "info_2fa", Type: "info", Label: "About 2FA", Default: "If you want to enable 2FA then use the Fappaizuri2FA indexer instead."},
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
@@ -1644,7 +1644,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 	}},
-	{ID: "fappaizuri2fa", Name: "Fappaizuri2FA", Description: "Fappaizuri is a Private Torrent Tracker for HENTAI / JAV. This indexer uses cookie login for 2FA.", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Books", "Other", "TV", "XXX"}, URLs: []string{"https://www.fappaizuri.me/"}, Settings: []Field{
+	{ID: "fappaizuri2fa", Name: "Fappaizuri2FA", Description: "Fappaizuri is a Private Torrent Tracker for HENTAI / JAV. This indexer uses cookie login for 2FA.", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Books", "Other", "XXX"}, URLs: []string{"https://www.fappaizuri.me/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1653,7 +1653,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 	}},
-	{ID: "fearnopeer", Name: "FearNoPeer", Description: "FearNoPear is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://fearnopeer.com/"}, Settings: []Field{
+	{ID: "fearnopeer", Name: "FearNoPeer", Description: "FearNoPear is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://fearnopeer.com/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://fearnopeer.com/\" target=\"_blank\">FearNoPeer</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1686,7 +1686,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "order_by", Type: "select", Label: "Sort requested from site", Default: "id"},
 		{Name: "order_dir", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "freefarm", Name: "Free Farm (自由农场)", Description: "Free Farm (自由农场) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://pt.0ff.cc/"}, Settings: []Field{
+	{ID: "freefarm", Name: "Free Farm (自由农场)", Description: "Free Farm (自由农场) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://pt.0ff.cc/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1702,6 +1702,14 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Inactive users will be removed in 180 days, users that haven't downloaded/uploaded anything will be removed in 90 days after registration. You can park your account in your Profile to prevent it from being deleted because of inactivity if you go away on for example a vacation. When the account has been parked limits are put on the account, for example you cannot use the tracker and browse some of the pages."},
 	}},
+	{ID: "funzone-api", Name: "funZone (API)", Description: "funZone is a ROMANIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "ro-RO", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://myfunzone.org/"}, Settings: []Field{
+		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
+		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://myfunzone.org/\" target=\"_blank\">funZone</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
+		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
+		{Name: "single_file_release_use_filename", Type: "checkbox", Label: "Use filename as title for single file releases", Default: "true"},
+		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "created_at"},
+		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
+	}},
 	{ID: "futuretorrent", Name: "FutureTorrent", Description: "FutureTorrent is an ITALIAN Private PAY2DL Torrent Tracker for MOVIES / TV / GENERAL", Language: "it-IT", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://futuretorrent.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
@@ -1709,14 +1717,14 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>40</b> on your account profile."},
 	}},
-	{ID: "fuzer", Name: "Fuzer", Description: "Fuzer (FZ) is an ISRAELI Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "he-IL", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.fuzer.xyz/"}, Settings: []Field{
+	{ID: "fuzer", Name: "Fuzer", Description: "Fuzer (FZ) is an ISRAELI Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "he-IL", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.fuzer.xyz/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "dateadded"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "g3minitr4ck3r-api", Name: "G3MINI TR4CK3R (API)", Description: "G3MINI TR4CK3R is a FRENCH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://gemini-tracker.org/"}, Settings: []Field{
+	{ID: "g3minitr4ck3r-api", Name: "G3MINI TR4CK3R (API)", Description: "G3MINI TR4CK3R is a FRENCH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://gemini-tracker.org/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://gemini-tracker.org/\" target=\"_blank\">G3MINI TR4CK3R</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1780,14 +1788,14 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Rules for deletion:<ol><li>Users who have registered at least 4 weeks ago and have uploaded 0 bytes will be deleted</li><li>Users who have not accessed the site for 1 year will be permanently deleted</li><li>Users who have not accessed the site for 4 weeks will be deleted.</li></ol>"},
 	}},
-	{ID: "gimmepeers", Name: "GimmePeers", Description: "GimmePeers (formerly ILT) is a Private PAY2DL Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.gimmepeers.com/"}, Settings: []Field{
+	{ID: "gimmepeers", Name: "GimmePeers", Description: "GimmePeers (formerly ILT) is a Private PAY2DL Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.gimmepeers.com/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Filter freeleech only", Default: "false"},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "4"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "girotorrent", Name: "Girotorrent", Description: "Girotorrent is an ITALIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "it-IT", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://girotorrent.org/"}, Settings: []Field{
+	{ID: "girotorrent", Name: "Girotorrent", Description: "Girotorrent is an ITALIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "it-IT", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://girotorrent.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Filter freeleech only", Default: "false"},
@@ -1795,7 +1803,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "2"},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile. The default is <i>15</i>."},
 	}},
-	{ID: "haidan", Name: "HaiDan", Description: "HaiDan is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://www.haidan.cc/"}, Settings: []Field{
+	{ID: "haidan", Name: "HaiDan", Description: "HaiDan is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://www.haidan.cc/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1833,7 +1841,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "SS and IF members must either login or register any seeding activity in a rolling window of 180 days to retain their account. Failure to do so will result in their account being disabled by the site automatically."},
 	}},
-	{ID: "hddolby", Name: "HD Dolby", Description: "HD Dolby is a CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://www.hddolby.com/"}, Settings: []Field{
+	{ID: "hddolby", Name: "HD Dolby", Description: "HD Dolby is a CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://www.hddolby.com/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1843,7 +1851,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>(Division Commander) Extreme User and above will be retained forever</li><li>(Brigadier Commander) Veteran Users and above will not be deleted after their account has been parked (in the Control Panel)</li><li>Users who have parked their accounts will be disabled if they do not log in for 180 consecutive days</li><li>Users with a non-parked account will have their account disabled if they do not log in for 90 consecutive days</li><li>Newly registered users who do not have traffic (i.e., upload and download data is 0) and do not log in for 5 consecutive days will be disabld.</li></ol>"},
 	}},
-	{ID: "hd-club", Name: "HD-CLUB", Description: "HD-CLUB is a CZECH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "cs-CZ", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://freecztorrent.eu/"}, Settings: []Field{
+	{ID: "hd-club", Name: "HD-CLUB", Description: "HD-CLUB is a CZECH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "cs-CZ", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://freecztorrent.eu/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1851,7 +1859,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "2"},
 		{Name: "info", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "hdforever", Name: "HD-Forever", Description: "HD-Forever (HD-F) is a FRENCH Private Torrent Tracker for HD MOVIES", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Movies", "TV"}, URLs: []string{"https://hdf.world/"}, Settings: []Field{
+	{ID: "hdforever", Name: "HD-Forever", Description: "HD-Forever (HD-F) is a FRENCH Private Torrent Tracker for HD MOVIES", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Movies", "TV"}, URLs: []string{"https://hdf.world/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1871,7 +1879,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "created_at"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "hdonly-api", Name: "HD-Only (API)", Description: "HD-Only (HD-O) is a FRENCH Private Torrent Tracker for HD MOVIES / TV", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://hd-only.org/"}, Settings: []Field{
+	{ID: "hdonly-api", Name: "HD-Only (API)", Description: "HD-Only (HD-O) is a FRENCH Private Torrent Tracker for HD MOVIES / TV", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://hd-only.org/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "API Key", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API Key", Default: "Find or Generate a new API Key by accessing your <a href=\"https://hd-only.org/\" target=\"_blank\">HD-Only</a> account <i>Access Settings</i> tab and copy the API Key."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1883,7 +1891,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "time"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "hdspace", Name: "HD-Space", Description: "HD-Space (HDS) is a Private Torrent Tracker for HD MOVIES / TV", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://hd-space.org/"}, Settings: []Field{
+	{ID: "hdspace", Name: "HD-Space", Description: "HD-Space (HDS) is a Private Torrent Tracker for HD MOVIES / TV", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://hd-space.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Filter freeleech only", Default: "false"},
@@ -1910,7 +1918,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Inactive accounts will be deleted as scheduled by Staff."},
 	}},
-	{ID: "hdarea", Name: "HDArea", Description: "HDArea (HDA) is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://hdarea.club/"}, Settings: []Field{
+	{ID: "hdarea", Name: "HDArea", Description: "HDArea (HDA) is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://hdarea.club/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1928,7 +1936,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Cherish your user account. Inactive accounts would be deleted based on the following rules:<ol><li>Veteran User or above would never be deleted.</li><li>Elite User or above would never be deleted if parked (at User CP).</li><li>Parked accounts would be deleted if users have not logged in for more than 400 days in a row.</li><li>Unparked accounts would be deleted if users have not logged in for more than 150 days in a row.</li><li>Accounts with both uploaded and downloaded amount being 0 would be deleted if users have not logged in for more than 100 days in a row.</li></ol>"},
 	}},
-	{ID: "hdc", Name: "HDCiTY", Description: "HDCiTY (HDC) is a CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://hdcity.city/", "https://hdcity.work/", "https://hdcity.leniter.org/"}, Settings: []Field{
+	{ID: "hdc", Name: "HDCiTY", Description: "HDCiTY (HDC) is a CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://hdcity.city/", "https://hdcity.work/", "https://hdcity.leniter.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1937,7 +1945,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_Results", Type: "info", Label: "Settings for Results", Default: "To use this indexer please set the following on your HDC account <b>profile</b>:<ul><li><i>Site Language:</i><b> English</b></li><li><i>Torrent List Profile:</i> <b>Default Modern [preview]</b></li><li><i>Time Type: </i><b>Time Added</b></li><li><i>Torrents per page:</i><b> 100</b></li></ul>"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Cherish your user account. Inactive accounts would be deleted based on the following rules:<ol><li>Veteran User or above would never be deleted.</li><li>Elite User or above would never be deleted if parked (at User CP).</li><li>Parked accounts would be deleted if users have not logged in for more than 180 days in a row.</li><li>Unparked accounts would be deleted if users have not logged in for more than 60 days in a row.</li><li>Accounts with both uploaded and downloaded amount being 0 would be deleted if users have not logged in for more than 30 days in a row.</li></ol>"},
 	}},
-	{ID: "hdclone", Name: "HDClone", Description: "HDClone is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.hdclone.top/"}, Settings: []Field{
+	{ID: "hdclone", Name: "HDClone", Description: "HDClone is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.hdclone.top/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -1948,7 +1956,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite User and above will not have their account deleted after parking (in the control panel)</li><li> Users with a parked account will be deleted if they do not log in for 80 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 60 consecutive days</li><li>Users who have no traffic (i.e. upload/download data are both 0) will be deleted if they do not log in for 10 consecutive days.</li></ol>"},
 	}},
-	{ID: "hdfans", Name: "HDFans", Description: "HDFans is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://hdfans.org/"}, Settings: []Field{
+	{ID: "hdfans", Name: "HDFans", Description: "HDFans is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://hdfans.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -1959,7 +1967,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Extreme User and above will be retained forever</li><li>Veteran User and above will not have their account deleted after parking (in the control panel)</li><li> Users with a parked account will be deleted if they do not log in for 180 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 90 consecutive days</li><li>Users who have no traffic (i.e. upload/download data are both 0) will be deleted if they do not log in for 15 consecutive days.</li></ol>"},
 	}},
-	{ID: "hdhome", Name: "HDHome", Description: "HDHome is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://hdhome.org/"}, Settings: []Field{
+	{ID: "hdhome", Name: "HDHome", Description: "HDHome is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://hdhome.org/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1967,7 +1975,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "4"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "hdkylin", Name: "HDKylin (麒麟)", Description: "HDKylin (麒麟) is a CHINESE Private tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://na.hdkylin.com/", "https://www.hdkyl.in/"}, Settings: []Field{
+	{ID: "hdkylin", Name: "HDKylin (麒麟)", Description: "HDKylin (麒麟) is a CHINESE Private tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://na.hdkylin.com/", "https://www.hdkyl.in/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -1976,17 +1984,17 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Retention rules:<ol><li>[Veteran User] and above will be retained forever.</li><li>[Elite User] and above will not be deleted after parking their accounts (in the Control Panel).</li><li>Users with a parked account will be deleted if they do not log in for 400 consecutive days.</li><li>Users with a non-parked account will be deleted if they do not log in for 150 consecutive days.</li><li>Users with no traffic (i.e. upload/download data are both 0) will have their accounts deleted if they do not log in for 40 consecutive days.</li></ol>"},
 	}},
-	{ID: "hdroute", Name: "HDRoute", Description: "HDRoute is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"http://hdroute.org/"}, Settings: []Field{
+	{ID: "hdroute", Name: "HDRoute", Description: "HDRoute is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"http://hdroute.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 	}},
-	{ID: "hdsky", Name: "HDSky", Description: "HDSky is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://hdsky.me/"}, Settings: []Field{
+	{ID: "hdsky", Name: "HDSky", Description: "HDSky is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://hdsky.me/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "hdtime", Name: "HDtime", Description: "HDtime is a CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://hdtime.org/"}, Settings: []Field{
+	{ID: "hdtime", Name: "HDtime", Description: "HDtime is a CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://hdtime.org/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "useragent", Type: "text", Label: "User-Agent"},
@@ -2010,7 +2018,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Filter freeleech only", Default: "false"},
 	}},
-	{ID: "hdu", Name: "HDU", Description: "HDU is a CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.upxin.net/"}, Settings: []Field{
+	{ID: "hdu", Name: "HDU", Description: "HDU is a CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.upxin.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2019,7 +2027,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Cherish your user account. Inactive accounts would be deleted based on the following rules:<ol><li>Veteran User or above would never be deleted.</li><li>Elite User or above would never be deleted if parked (at User CP).</li><li>Parked accounts would be deleted if users have not logged in for more than 365 days in a row.</li><li>Unparked accounts would be deleted if users have not logged in for more than 120 days in a row.</li><li>Accounts with both uploaded and downloaded amount being 0 would be deleted if users have not logged in for more than 3 days in a row.</li></ol>"},
 	}},
-	{ID: "hdvideo", Name: "HDVideo", Description: "HDVideo is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "TV"}, URLs: []string{"https://hdvideo.top/"}, Settings: []Field{
+	{ID: "hdvideo", Name: "HDVideo", Description: "HDVideo is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "TV"}, URLs: []string{"https://hdvideo.top/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -2030,7 +2038,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Accounts inactive (i.e. not logged in for a long time) are automatically deleted."},
 	}},
-	{ID: "hdzero-api", Name: "HDZero (API)", Description: "HD Zero is a SPANISH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "es-ES", Protocol: "torrent", Privacy: "private", Categories: []string{"Movies", "Other", "TV"}, URLs: []string{"https://hdzero.org/"}, Settings: []Field{
+	{ID: "hdzero-api", Name: "HDZero (API)", Description: "HD Zero is a SPANISH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "es-ES", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Movies", "Other", "TV"}, URLs: []string{"https://hdzero.org/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://hdzero.org/\" target=\"_blank\">HD Zero</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2047,7 +2055,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "There is an automatic system for blocking inactive accounts. The system will block any account below Heb Prophet rank without activity for at least 90 days."},
 		{Name: "info_results", Type: "info", Label: "Search results", Default: "If you are getting the error <b>Login failed: Selector \"a[href*=\"/logout.php?auth=\"]\" didn't match</b> then first access the site with your browser and check that you are not being forced to change your password because it has expired after 180 days."},
 	}},
-	{ID: "hellashut", Name: "HellasHut", Description: "HellasHut is a GREEK Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "el-GR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://hellashut.net/"}, Settings: []Field{
+	{ID: "hellashut", Name: "HellasHut", Description: "HellasHut is a GREEK Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "el-GR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://hellashut.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2055,13 +2063,13 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Accounts inactive for more than 45 days are automatically deleted."},
 	}},
-	{ID: "hellashut-api", Name: "HellasHut (API)", Description: "HellasHut is a GREEK Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "el-GR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://hellashut.net/"}, Settings: []Field{
+	{ID: "hellashut-api", Name: "HellasHut (API)", Description: "HellasHut is a GREEK Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "el-GR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://hellashut.net/"}, Settings: []Field{
 		{Name: "passkey", Type: "text", Label: "PassKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your PassKey", Default: "Find your PassKey by accessing your <a href=\"https://hellashut.net/\" target=\"_blank\">HellasHut</a> profile on the <i>My Profile</i> page and scrolling down to the <b>PassKey</b> field."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Accounts inactive for more than 45 days are automatically deleted."},
 	}},
-	{ID: "hellenic-hd-api", Name: "HELLENIC-HD (API)", Description: "HELLENIC-HD is a GREEK Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "el-GR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://hellenic-hd.cc/"}, Settings: []Field{
+	{ID: "hellenic-hd-api", Name: "HELLENIC-HD (API)", Description: "HELLENIC-HD is a GREEK Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "el-GR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://hellenic-hd.cc/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://hellenic-hd.cc/\" target=\"_blank\">HELLENIC-HD</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2070,7 +2078,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Accounts that have not logged in for 60 days will be disabled, and may be deleted shortly afterwards."},
 	}},
-	{ID: "hhanclub", Name: "HHanClub", Description: "HHanClub is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://hhanclub.net/", "https://hhan.club/"}, Settings: []Field{
+	{ID: "hhanclub", Name: "HHanClub", Description: "HHanClub is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://hhanclub.net/", "https://hhan.club/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -2081,7 +2089,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Ultimate User and above will be retained forever</li><li>Veteran Users and above will not be deleted after parking (in the control panel)</li><li>Users with a parked account will be banned if they do not log in for 400 consecutive days</li><li>Users who do not log in for 30 consecutive days will be banned</li><li>Newly registered users with no traffic within 7 days, will be banned.</li></ol>"},
 	}},
-	{ID: "hhd-api", Name: "HHD (API)", Description: "HHD is a Private Torrent Tracker for MOVIES / TV / GAMES", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://homiehelpdesk.net/"}, Settings: []Field{
+	{ID: "hhd-api", Name: "HHD (API)", Description: "HHD is a Private Torrent Tracker for MOVIES / TV / GAMES", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://homiehelpdesk.net/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://homiehelpdesk.net/\" target=\"_blank\">HHD</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2090,7 +2098,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "To not get disabled, you are required to login to the site at least once every 30 days or be actively seeding at least 2 torrent."},
 	}},
-	{ID: "houseofdevil", Name: "House of Devil", Description: "House of Devil is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://h-o-d.org/"}, Settings: []Field{
+	{ID: "houseofdevil", Name: "House of Devil", Description: "House of Devil is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://h-o-d.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "pin", Type: "text", Label: "Pin"},
@@ -2110,7 +2118,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Inactive accounts will be deleted according to the following rules:<ol><li> Power Users and above will never have their accounts deleted.</li><li>Users and above will never have their accounts deleted if they park their accounts (See [User CP]).</li><li>Parked accounts will be deleted if they do not log in within 365 days.</li><li>Unparked accounts will be deleted if they do not log in within 240 days.</li><li>Inactive accounts downloading or uploading on the tracker will be deleted after 240 days of not logging in or after 120 days from the time of registration.</li></ol>"},
 	}},
-	{ID: "hudbt", Name: "HUDBT (蝴蝶)", Description: "HUDBT (蝴蝶) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://hudbt.hust.edu.cn/"}, Settings: []Field{
+	{ID: "hudbt", Name: "HUDBT (蝴蝶)", Description: "HUDBT (蝴蝶) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://hudbt.hust.edu.cn/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2163,7 +2171,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "The system bot will prune inactive users after 90 days of no activity. If you wish to keep your account be sure to login."},
 	}},
-	{ID: "infinityhd-api", Name: "InfinityHD (API)", Description: "InfinityHD is a Private Torrent Tracker for MOVIES / TV / ANIME", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Movies", "TV"}, URLs: []string{"https://infinityhd.net/"}, Settings: []Field{
+	{ID: "infinityhd-api", Name: "InfinityHD (API)", Description: "InfinityHD is a Private Torrent Tracker for MOVIES / TV / ANIME", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Movies", "TV"}, URLs: []string{"https://infinityhd.net/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://infinityhd.net/\" target=\"_blank\">InfinityHD</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2172,7 +2180,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Your account will be automatically disabled after 90 days of inactivity. After 120 days your account will be pruned and is permanently deleted."},
 	}},
-	{ID: "infire", Name: "Infire", Description: "Infire is a SLOVENIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "sl-SI", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://infire.si/"}, Settings: []Field{
+	{ID: "infire", Name: "Infire", Description: "Infire is a SLOVENIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "sl-SI", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://infire.si/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2206,7 +2214,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "If a user has not actively logged in for 30 days, the profile is automatically deactivated and receives the user class 'Disabled'.<br>After deactivation, the profile can be reactivated within 60 days – after which it will be permanently deleted."},
 	}},
-	{ID: "joyhd", Name: "JoyHD", Description: "JoyHD (JHD) is a CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://www.joyhd.net/"}, Settings: []Field{
+	{ID: "joyhd", Name: "JoyHD", Description: "JoyHD (JHD) is a CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://www.joyhd.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2221,7 +2229,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "s3"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "jptv4us-api", Name: "JPTV4us (API)", Description: "JPTV4us is a JAPANESE Private Torrent Tracker for MOVIES / TV / MUSIC / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://jptv4.us/"}, Settings: []Field{
+	{ID: "jptv4us-api", Name: "JPTV4us (API)", Description: "JPTV4us is a JAPANESE Private Torrent Tracker for MOVIES / TV / MUSIC / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://jptv4.us/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://jptv4.us/\" target=\"_blank\">JPTV4us</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2242,7 +2250,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
 	}},
-	{ID: "keepfriends", Name: "Keep Friends", Description: "Keep Friends (FRDS-PT)  is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.keepfrds.com/"}, Settings: []Field{
+	{ID: "keepfriends", Name: "Keep Friends", Description: "Keep Friends (FRDS-PT)  is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.keepfrds.com/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2262,7 +2270,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Inactive accounts (i.e. not logged in for a long time) are automatically deleted."},
 	}},
-	{ID: "korsar", Name: "Korsar", Description: "Korsar is a RUSSIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "ru-RU", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"http://filbi1976.org/"}, Settings: []Field{
+	{ID: "korsar", Name: "Korsar", Description: "Korsar is a RUSSIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "ru-RU", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"http://filbi1976.org/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "useragent", Type: "text", Label: "User-Agent"},
@@ -2270,7 +2278,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "t"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "d"},
 	}},
-	{ID: "krazyzone", Name: "KrazyZone", Description: "KrazyZone is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://krazyzone.net/"}, Settings: []Field{
+	{ID: "krazyzone", Name: "KrazyZone", Description: "KrazyZone is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://krazyzone.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2279,7 +2287,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_results", Type: "info", Label: "Search results", Default: "If you are getting <b>0 results</b> then access the site with your browser and <b>mark as read</b> all PMs."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Be active here, you must login at least once a month. Also, not downloading anything is considered being inactive (except if you're an uploader or VIP). Accounts that are inactive for 30 days are deleted unless you have told staff in advance."},
 	}},
-	{ID: "kufei", Name: "Kufei (库非)", Description: "Kufei (库非) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://kufei.org/"}, Settings: []Field{
+	{ID: "kufei", Name: "Kufei (库非)", Description: "Kufei (库非) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://kufei.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -2307,7 +2315,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "time"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "kunlun", Name: "Kunlun (昆仑)", Description: "Kunlun (昆仑) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://www.yhpp.cc/"}, Settings: []Field{
+	{ID: "kunlun", Name: "Kunlun (昆仑)", Description: "Kunlun (昆仑) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://www.yhpp.cc/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2316,14 +2324,14 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Cherish your user account. Inactive accounts would be deleted based on the following rules:<ol><li>Veteran User or above would never be deleted</li><li>Elite User or above would never be deleted if parked (at User CP)</li><li>Parked accounts would be deleted if users have not logged in for more than 400 days in a row</li><li>Un-parked accounts would be deleted if users have not logged in for more than 150 days in a row</li><li>Accounts with both uploaded and downloaded amount being 0 would be deleted if users have not logged in for more than 100 days in a row.</li></ol>"},
 	}},
-	{ID: "lacale-api", Name: "La Cale (API)", Description: "La Cale is a FRENCH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://la-cale.space/"}, Settings: []Field{
+	{ID: "lacale-api", Name: "La Cale (API)", Description: "La Cale is a FRENCH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://la-cale.space/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "API key", Required: true},
 		{Name: "info_apikey", Type: "info", Label: "About your API key", Default: "Find/Generate your API key on your <a href=\"https://la-cale.space/settings/api-keys\" target=\"_blank\">La Cale API keys</a>."},
 		{Name: "multilang", Type: "checkbox", Label: "Replace MULTi by another language in release name", Default: "false"},
 		{Name: "multilanguage", Type: "select", Label: "Replace MULTi by this language", Default: "FRENCH"},
 		{Name: "vostfr", Type: "checkbox", Label: "Replace VOSTFR and SUBFRENCH with ENGLISH", Default: "false"},
 	}},
-	{ID: "lajidui", Name: "lajidui", Description: "lajidui is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://pt.lajidui.top/"}, Settings: []Field{
+	{ID: "lajidui", Name: "lajidui", Description: "lajidui is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://pt.lajidui.top/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2332,7 +2340,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite User and above will not have their account deleted after parking (in the control panel)</li><li>Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 150 consecutive days</li><li>Users who have no traffic (i.e. upload/download data are both 0) will be deleted if they do not log in for 100 consecutive days.</li></ol>"},
 	}},
-	{ID: "lastdigitalunderground", Name: "Last Digital Underground", Description: "Last Digital Underground (LDU) is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://theldu.to/"}, Settings: []Field{
+	{ID: "lastdigitalunderground", Name: "Last Digital Underground", Description: "Last Digital Underground (LDU) is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://theldu.to/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://theldu.to/\" target=\"_blank\">Last Digital Underground</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2341,7 +2349,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "You must log in once every 60 days. You must download at least 1 item within your first month."},
 	}},
-	{ID: "lastfiles", Name: "LastFiles", Description: "LastFiles (LF) is a ROMANIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "ro-RO", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://lastfiles.ro/", "https://www.last-torrents.org/"}, Settings: []Field{
+	{ID: "lastfiles", Name: "LastFiles", Description: "LastFiles (LF) is a ROMANIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "ro-RO", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://lastfiles.ro/", "https://www.last-torrents.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2349,7 +2357,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 	}},
-	{ID: "lat-team-api", Name: "Lat-Team (API)", Description: "Lat-Team is a SPANISH Private Torrent Tracker for MOVIES / TV", Language: "es-MX", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://lat-team.com/"}, Settings: []Field{
+	{ID: "lat-team-api", Name: "Lat-Team (API)", Description: "Lat-Team is a SPANISH Private Torrent Tracker for MOVIES / TV", Language: "es-MX", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://lat-team.com/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://lat-team.com/\" target=\"_blank\">Lat-Team</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2366,14 +2374,14 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_results", Type: "info", Label: "Search results", Default: "If you are getting the error <b>Found no results while trying to browse this tracker</b> then first access the site with your browser and check that you are not being forced to change your password because it has expired after 180 days."},
 	}},
-	{ID: "leech24", Name: "leech24", Description: "leech24 is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://leech24.net/"}, Settings: []Field{
+	{ID: "leech24", Name: "leech24", Description: "leech24 is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://leech24.net/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "id"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "lemonhd-net", Name: "LemonHD.net", Description: "LemonHD.net is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://lemonhd.net/"}, Settings: []Field{
+	{ID: "lemonhd-net", Name: "LemonHD.net", Description: "LemonHD.net is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://lemonhd.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2382,7 +2390,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Cherish your user account. Inactive accounts would be deleted based on the following rules:<ol><li>Veteran User or above would never be deleted.</li><li>Elite User or above would never be deleted if parked (at User CP).</li><li>Parked accounts would be deleted if users have not logged in for more than 400 days in a row.</li><li>Unparked accounts would be deleted if users have not logged in for more than 150 days in a row.</li><li>Accounts with both uploaded and downloaded amount being 0 would be deleted if users have not logged in for more than 100 days in a row.</li></ol>"},
 	}},
-	{ID: "lesaloon", Name: "LeSaloon", Description: "Le Saloon is a FRENCH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://lesaloonv2-0.lol/", "https://lesaloonv2-0.net/"}, Settings: []Field{
+	{ID: "lesaloon", Name: "LeSaloon", Description: "Le Saloon is a FRENCH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://lesaloonv2-0.lol/", "https://lesaloonv2-0.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2405,7 +2413,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "If you do not visit the site for 90 days, the system may delete it due to inactivity."},
 	}},
-	{ID: "linkomanija", Name: "LinkoManija", Description: "LinkoManija is an LITHUANIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "lt-LT", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.linkomanija.net/"}, Settings: []Field{
+	{ID: "linkomanija", Name: "LinkoManija", Description: "LinkoManija is an LITHUANIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "lt-LT", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.linkomanija.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2414,7 +2422,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrentų puslapyje</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Inactive users will be deleted after 90 days. The newly created account with 0 sent data will be deleted after 28 days."},
 	}},
-	{ID: "locadora", Name: "Locadora (API)", Description: "Locadora is a BRAZILIAN Private Torrent Tracker for MOVIES / TV / ANIME", Language: "pt-BR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "TV"}, URLs: []string{"https://locadora.cc/"}, Settings: []Field{
+	{ID: "locadora", Name: "Locadora (API)", Description: "Locadora is a BRAZILIAN Private Torrent Tracker for MOVIES / TV / ANIME", Language: "pt-BR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "TV"}, URLs: []string{"https://locadora.cc/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://locadora.cc/\" target=\"_blank\">Locadora</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2423,7 +2431,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Accounts that are inactive for 90 days are deactivated."},
 	}},
-	{ID: "longpt", Name: "LongPT", Description: "LongPT is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://longpt.org/"}, Settings: []Field{
+	{ID: "longpt", Name: "LongPT", Description: "LongPT is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://longpt.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -2448,7 +2456,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite User and above will not have their account deleted after parking (in the control panel)</li><li>Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 150 consecutive days</li><li>Users who have no traffic (i.e. upload/download data are both 0) will be deleted if they do not log in for 100 consecutive days.</li></ol>"},
 	}},
-	{ID: "lst", Name: "LST", Description: "LST is an ENGLISH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://lst.gg/"}, Settings: []Field{
+	{ID: "lst", Name: "LST", Description: "LST is an ENGLISH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://lst.gg/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://lst.gg/\" target=\"_blank\">LST</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2457,7 +2465,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Accounts get disabled after 90 days of no logins or any sort of activity. Accounts will also get soft deleted after 120 days."},
 	}},
-	{ID: "luckpt", Name: "LuckPT", Description: "LuckPT is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.luckpt.de/"}, Settings: []Field{
+	{ID: "luckpt", Name: "LuckPT", Description: "LuckPT is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.luckpt.de/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2475,7 +2483,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "<ul><li>To avoid your account being disabled, you must login at least once every 3 months (90 days). Accounts will be pruned three months after deactivation for inactivity.</li><li> Luminarr is a sharing community, not a collection service. You must actively participate by uploading or downloading content within 30 days of account creation. Accounts that show no activity within this period may be pruned.</li></ul>"},
 	}},
-	{ID: "madsrevolution", Name: "MaDs Revolution", Description: "MaDs Revolution is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://madsrevolution.net/"}, Settings: []Field{
+	{ID: "madsrevolution", Name: "MaDs Revolution", Description: "MaDs Revolution is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://madsrevolution.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2517,7 +2525,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "You must log in to the Malayabits web site with your browser once every 90 days to prevent your account from getting disabled."},
 	}},
-	{ID: "march", Name: "March", Description: "March is a CHINESE Private Torrent Tracker for MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://duckboobee.org/"}, Settings: []Field{
+	{ID: "march", Name: "March", Description: "March is a CHINESE Private Torrent Tracker for MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://duckboobee.org/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2537,7 +2545,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "If you do not log in to the site for 6 months, the system will automatically delete it!"},
 	}},
-	{ID: "mdan", Name: "MDAN", Description: "Mansão dos Animes (MDAN) is a BRAZILIAN Private Torrent Tracker for ANIME", Language: "pt-BR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "TV"}, URLs: []string{"https://bt.mdan.org/"}, Settings: []Field{
+	{ID: "mdan", Name: "MDAN", Description: "Mansão dos Animes (MDAN) is a BRAZILIAN Private Torrent Tracker for ANIME", Language: "pt-BR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies"}, URLs: []string{"https://bt.mdan.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2546,7 +2554,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents por página (Torrents per Page):</b> setting to <b>100</b> on your Perfil (Profile). The default is <i>30</i>."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Inactive accounts are automatically deleted."},
 	}},
-	{ID: "mesevilag", Name: "MeseVilág", Description: "MeseVilág (Fairytale World) is a HUNGARIAN Private Torrent Tracker for ANIMATED MOVIES / TV", Language: "hu-HU", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://mese-vilag.net/"}, Settings: []Field{
+	{ID: "mesevilag", Name: "MeseVilág", Description: "MeseVilág (Fairytale World) is a HUNGARIAN Private Torrent Tracker for ANIMATED MOVIES / TV", Language: "hu-HU", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://mese-vilag.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2554,7 +2562,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "metalguru", Name: "MetalGuru", Description: "MetalGuru is a Private Torrent Tracker for GENERAL with focus on MUSIC", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://metalguru.me/"}, Settings: []Field{
+	{ID: "metalguru", Name: "MetalGuru", Description: "MetalGuru is a Private Torrent Tracker for GENERAL with focus on MUSIC", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://metalguru.me/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2572,7 +2580,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "seeders"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "mnv", Name: "MNV", Description: "MNV (Max-New-Vision) is a Private GERMAN Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://mnvv2.info/"}, Settings: []Field{
+	{ID: "mnv", Name: "MNV", Description: "MNV (Max-New-Vision) is a Private GERMAN Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://mnvv2.info/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search FreeLeech only", Default: "false"},
@@ -2583,7 +2591,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile. The default is <i>10</i>."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Inactive accounts are automatically deactivated after 42 days."},
 	}},
-	{ID: "mojblink", Name: "MOJBLiNK", Description: "MOJBLiNK is a SLOVENIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "sl-SI", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.mojblink.si/"}, Settings: []Field{
+	{ID: "mojblink", Name: "MOJBLiNK", Description: "MOJBLiNK is a SLOVENIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "sl-SI", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.mojblink.si/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2601,7 +2609,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite User and above will not have their account deleted after parking (in the control panel)</li><li>Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 150 consecutive days</li><li>Users who have no traffic (i.e. upload/download data are both 0) will be deleted if they do not log in for 100 consecutive days.</li></ol>"},
 	}},
-	{ID: "monikadesign-api", Name: "MonikaDesign (API)", Description: "MonikaDesign is a CHINESE Private Torrent Tracker for MOVIES / TV / ANIME", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://monikadesign.uk/"}, Settings: []Field{
+	{ID: "monikadesign-api", Name: "MonikaDesign (API)", Description: "MonikaDesign is a CHINESE Private Torrent Tracker for MOVIES / TV / ANIME", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://monikadesign.uk/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://monikadesign.uk/\" target=\"_blank\">MonikaDesign</a> account <i>My Security</i> page and clicking on the <b>API Token</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2616,7 +2624,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "2"},
 		{Name: "info", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "muxuege", Name: "Muxuege", Description: "Muxuege is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://pt.muxuege.org/"}, Settings: []Field{
+	{ID: "muxuege", Name: "Muxuege", Description: "Muxuege is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://pt.muxuege.org/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2629,7 +2637,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 	}},
-	{ID: "nanyangpt", Name: "NanyangPT (南洋)", Description: "NanyangPT (南洋) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://nanyangpt.com/"}, Settings: []Field{
+	{ID: "nanyangpt", Name: "NanyangPT (南洋)", Description: "NanyangPT (南洋) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://nanyangpt.com/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2646,7 +2654,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrent oldalanként:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Anyone who does not access the site for 8 weeks from registration or has been more than 8 weeks since their last stay will be automatically suspended. Anyone who does not log in (stays inactive) for 12 weeks after registration or after their last visit will be removed automatically."},
 	}},
-	{ID: "newheaven", Name: "New Heaven", Description: "New Heaven is a GERMAN Private tracker for MOVIES / AUDIO / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://newheaven.nl/"}, Settings: []Field{
+	{ID: "newheaven", Name: "New Heaven", Description: "New Heaven is a GERMAN Private tracker for MOVIES / AUDIO / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://newheaven.nl/"}, Settings: []Field{
 		{Name: "info_general", Type: "info", Label: "Layout Manager Settings", Default: "Go to <b>Usercenter</b>-><b>Einstellungen</b>, scroll down to <b>Layout Manager</b> and ensure <b>Comments</b>-, <b>Files</b>- and <b>Snatcher</b>-Anzeige are set to <b>anzeigen</b>, so that the number of files, grabs, seeders and leechers can be correctly detected."},
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
@@ -2655,7 +2663,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "torrent_added"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "d"},
 	}},
-	{ID: "nexum-api", Name: "Nexum (API)", Description: "Nexum is a FRENCH Private Torrent Tracker for MOVIES / TV", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Movies", "TV"}, URLs: []string{"https://nexum-core.com/"}, Settings: []Field{
+	{ID: "nexum-api", Name: "Nexum (API)", Description: "Nexum is a FRENCH Private Torrent Tracker for MOVIES / TV", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Movies", "TV"}, URLs: []string{"https://nexum-core.com/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "API key", Required: true},
 		{Name: "info_apikey", Type: "info", Label: "About your API key", Default: "Find/Generate your API key on your <a href=\"https://nexum-core.com/settings\" target=\"_blank\">Nexum Paramètres</a> at the <b>Clé API </b> section."},
 		{Name: "multilang", Type: "checkbox", Label: "Replace MULTi by another language in release name", Default: "false"},
@@ -2673,7 +2681,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran Users users and above will be retained forever</li><li>Elite Users and above will not have their account deleted after parking (in the Control Panel)</li><li>Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be banned if they do not log in for 40 consecutive days</li><li>Users with no traffic (ie, upload/download data are both 0) will be banned if they do not log in for 7 consecutive days.</li></ol>"},
 	}},
-	{ID: "nirvana", Name: "Nirvana (API)", Description: "Nirvana is a Private RUSSIAN Tracker for MOVIES / TV", Language: "ru-RU", Protocol: "torrent", Privacy: "private", Categories: []string{"Movies", "Other", "TV"}, URLs: []string{"https://nirvana.li/"}, Settings: []Field{
+	{ID: "nirvana", Name: "Nirvana (API)", Description: "Nirvana is a Private RUSSIAN Tracker for MOVIES / TV", Language: "ru-RU", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Movies", "Other", "TV"}, URLs: []string{"https://nirvana.li/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://nirvana.li/\" target=\"_blank\">Nirvana</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2682,7 +2690,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Inactive users are regularly deleted. To keep an account, you must visit the site at least once a season."},
 	}},
-	{ID: "njtupt", Name: "njtupt (浦园)", Description: "njtupt (浦园) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://njtupt.top/"}, Settings: []Field{
+	{ID: "njtupt", Name: "njtupt (浦园)", Description: "njtupt (浦园) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://njtupt.top/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -2727,14 +2735,14 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Your membership requires that you stay active at NordicQuality. To not get disabled, you are required to login to the site at least once every 90 days."},
 	}},
-	{ID: "nostradamus", Name: "Nostradamus", Description: "Nostradamus is a FRENCH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://nostradamus.foo/"}, Settings: []Field{
+	{ID: "nostradamus", Name: "Nostradamus", Description: "Nostradamus is a FRENCH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://nostradamus.foo/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "API Key", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API Key", Default: "You can find your API Key by accessing the <a href=\"https://nostradamus.foo/api-access\" target=\"_blank\">Nostradamus API access</a> page and scrolling down to the <b>API Credentials</b> section."},
 		{Name: "multilang", Type: "checkbox", Label: "Replace MULTi by another language in release name", Default: "false"},
 		{Name: "multilanguage", Type: "select", Label: "Replace MULTi by this language", Default: "FRENCH"},
 		{Name: "vostfr", Type: "checkbox", Label: "Replace VOSTFR and SUBFRENCH with ENGLISH", Default: "false"},
 	}},
-	{ID: "novahd", Name: "NovaHD", Description: "NovaHD is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.novahd.top/", "https://tracker.novahd.top/"}, Settings: []Field{
+	{ID: "novahd", Name: "NovaHD", Description: "NovaHD is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.novahd.top/", "https://tracker.novahd.top/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2743,7 +2751,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite User and above will not have their account deleted after parking (in the control panel)</li><li>Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 150 consecutive days</li><li>Users who have no traffic (i.e. upload/download data are both 0) will be deleted if they do not log in for 100 consecutive days.</li></ol>"},
 	}},
-	{ID: "okpt", Name: "OKPT", Description: "OKPT is a CHINESE Private Torrent Tracker for MOVIES / TV / MUSIC / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.okpt.net/"}, Settings: []Field{
+	{ID: "okpt", Name: "OKPT", Description: "OKPT is a CHINESE Private Torrent Tracker for MOVIES / TV / MUSIC / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.okpt.net/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2752,7 +2760,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ul><li>Ultimate User and above will keep the account forever</li><li>Veteran User level accounts will not be disabled if they are parked (control panel)</li><li>Unparked accounts will be banned if they have not logged in for 60 days</li><li>Users below Veteran User level will be banned if they have not logged in for more than 300 days</li><li>Users who have not generated any traffic in 30 days (i.e. upload/download are 0) will be banned</li><li>Banned accounts will be deleted if they have not logged in for more than 365 days</li></ul>"},
 	}},
-	{ID: "oldgreektracker", Name: "Old Greek Tracker (OGT)", Description: "Old Greek Tracker (OGT) is a GREEK Private Torrent Tracker for PRE-2020 MOVIES / TV / GENERAL", Language: "el-GR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://oldgreektracker.xyz/"}, Settings: []Field{
+	{ID: "oldgreektracker", Name: "Old Greek Tracker (OGT)", Description: "Old Greek Tracker (OGT) is a GREEK Private Torrent Tracker for PRE-2020 MOVIES / TV / GENERAL", Language: "el-GR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://oldgreektracker.xyz/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Filter freeleech only", Default: "false"},
@@ -2787,7 +2795,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile. Default is 50."},
 	}},
-	{ID: "oshenpt", Name: "OshenPT", Description: "OshenPT is a CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://www.oshen.win/"}, Settings: []Field{
+	{ID: "oshenpt", Name: "OshenPT", Description: "OshenPT is a CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://www.oshen.win/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -2798,7 +2806,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Cherish your user account. Inactive accounts would be deleted based on the following rules:<ol><li>Veteran User or above would never be deleted</li><li>Elite User or above would never be deleted if parked (at User CP)</li><li>Parked accounts would be deleted if users have not logged in for more than 400 days in a row</li><li>Un-parked accounts would be deleted if users have not logged in for more than 150 days in a row</li><li>Accounts with both uploaded and downloaded amount being 0 would be deleted if users have not logged in for more than 100 days in a row.</li></ol>"},
 	}},
-	{ID: "ourbits", Name: "OurBits", Description: "OurBits (HDPter) is a CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "TV"}, URLs: []string{"https://ourbits.club/"}, Settings: []Field{
+	{ID: "ourbits", Name: "OurBits", Description: "OurBits (HDPter) is a CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "TV"}, URLs: []string{"https://ourbits.club/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2807,7 +2815,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Cherish your user account. Inactive accounts would be deleted based on the following rules:<ol><li>Veteran User or above would never be deleted</li><li>Elite User or above would never be deleted if parked (at User CP)</li><li>Parked accounts would be deleted if users have not logged in for more than 400 days in a row</li><li>Un-parked accounts would be deleted if users have not logged in for more than 150 days in a row</li><li>Accounts with both uploaded and downloaded amount being 0 would be deleted if users have not logged in for more than 7 days in a row.</li></ol>"},
 	}},
-	{ID: "p2pbg", Name: "P2PBG", Description: "P2PBG is a BULGARIAN Private PAY2DL Torrent Tracker for 0DAY / GENERAL", Language: "bg-BG", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.p2pbg.com/"}, Settings: []Field{
+	{ID: "p2pbg", Name: "P2PBG", Description: "P2PBG is a BULGARIAN Private PAY2DL Torrent Tracker for 0DAY / GENERAL", Language: "bg-BG", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.p2pbg.com/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "info_magnets", Type: "info", Label: "About Magnets", Default: "IF you do not see Magnets in the results then this means that you are not a <b>Super User</b> or <b>VIP</b>.<br />You will need to visit the <a href=\"https://www.p2pbg.com/marketplace\" target=\"_blank\">MarketPlace</a>."},
@@ -2815,7 +2823,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "data"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "DESC"},
 	}},
-	{ID: "panda", Name: "Panda", Description: "Panda is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://pandapt.net/"}, Settings: []Field{
+	{ID: "panda", Name: "Panda", Description: "Panda is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://pandapt.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -2826,7 +2834,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Inactive accounts would be deleted based on the following rules:<ol><li>Nexus Master or above would never be deleted.</li><li>Veteran User or above would never be deleted if parked (at User CP).</li><li>Parked accounts would be deleted if users have not logged in for more than 400 days in a row.</li><li>Un-parked accounts would be deleted if users have not logged in for more than 150 days in a row.</li><li>Accounts with both uploaded and downloaded amount being 0 would be deleted if users have not logged in for more than 100 days in a row.</li></ol>"},
 	}},
-	{ID: "parabellumhd-api", Name: "ParabellumHD (API)", Description: "ParabellumHD is a SPANISH Private Torrent Tracker for HEVC & AV1-encoded MOVIES / TV", Language: "es-ES", Protocol: "torrent", Privacy: "private", Categories: []string{"Movies", "Other", "TV"}, URLs: []string{"https://parabellumhd.cx/"}, Settings: []Field{
+	{ID: "parabellumhd-api", Name: "ParabellumHD (API)", Description: "ParabellumHD is a SPANISH Private Torrent Tracker for HEVC & AV1-encoded MOVIES / TV", Language: "es-ES", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Movies", "Other", "TV"}, URLs: []string{"https://parabellumhd.cx/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://parabellumhd.cx/\" target=\"_blank\">ParabellumHD</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2834,7 +2842,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "created_at"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "party-tracker", Name: "Party-Tracker", Description: "Party-Tracker is a HUNGARIAN private tracker for MOVIES / TV / GENERAL", Language: "hu-HU", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://party-tracker.info/"}, Settings: []Field{
+	{ID: "party-tracker", Name: "Party-Tracker", Description: "Party-Tracker is a HUNGARIAN private tracker for MOVIES / TV / GENERAL", Language: "hu-HU", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://party-tracker.info/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search FreeLeech only", Default: "false"},
@@ -2851,7 +2859,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Accounts inactive for more than 42 days are automatically deleted."},
 	}},
-	{ID: "peersfm", Name: "Peers.FM", Description: "Peers.FM is a RUSSIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "ru-RU", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://peers.fm/"}, Settings: []Field{
+	{ID: "peersfm", Name: "Peers.FM", Description: "Peers.FM is a RUSSIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "ru-RU", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://peers.fm/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2868,7 +2876,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "time"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "pignetwork", Name: "PigNetwork (猪猪网)", Description: "PigNetwork (猪猪网) is a CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://piggo.me/"}, Settings: []Field{
+	{ID: "pignetwork", Name: "PigNetwork (猪猪网)", Description: "PigNetwork (猪猪网) is a CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://piggo.me/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2912,7 +2920,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "created_at"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "polishtorrent", Name: "Polish Torrent (API)", Description: "Polish Torrent (PTT) is a POLISH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://polishtorrent.top/"}, Settings: []Field{
+	{ID: "polishtorrent", Name: "Polish Torrent (API)", Description: "Polish Torrent (PTT) is a POLISH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://polishtorrent.top/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://polishtorrent.top/\" target=\"_blank\">Polish Torrent</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2936,7 +2944,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_grid", Type: "info", Label: "GRID view", Default: "This indexer does not support the GRID view on the torrent search page. Change the <b>Grid View</b> setting to <b>OFF</b> on your User Settings. If set to <i>ON</i> will cause no results to be returned."},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page</b> setting to <b>100</b> on your User Settings. The default is <i>25</i>."},
 	}},
-	{ID: "portugas-api", Name: "Portugas (API)", Description: "Portugas is a PORTUGUESE Private Torrent Tracker for 0DAY / GENERAL", Language: "pt-PT", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://portugas.org/"}, Settings: []Field{
+	{ID: "portugas-api", Name: "Portugas (API)", Description: "Portugas is a PORTUGUESE Private Torrent Tracker for 0DAY / GENERAL", Language: "pt-PT", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://portugas.org/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://portugas.org/\" target=\"_blank\">Portugas</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2952,7 +2960,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "down"},
 		{Name: "info_activity", Type: "info", Label: "How long does my account stay if it is inactive?", Default: "12 weeks exactly. You will need to log in before that amount of time has elapsed to keep your account active."},
 	}},
-	{ID: "ptgtk", Name: "PT GTK", Description: "PT GTK is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://pt.gtkpw.xyz/"}, Settings: []Field{
+	{ID: "ptgtk", Name: "PT GTK", Description: "PT GTK is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://pt.gtkpw.xyz/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -2963,7 +2971,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Cherish your user account. Inactive accounts would be deleted based on the following rules:<ol><li>Veteran User or above would never be deleted</li><li>Elite User or above would never be deleted if parked (at User CP)</li><li>Parked accounts would be deleted if users have not logged in for more than 400 days in a row</li><li>Un-parked accounts would be deleted if users have not logged in for more than 150 days in a row</li><li>Accounts with both uploaded and downloaded amount being 0 would be deleted if users have not logged in for more than 100 days in a row.</li></ol>"},
 	}},
-	{ID: "ptcafe", Name: "PTCafe (咖啡)", Description: "PTCafe (咖啡) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://ptcafe.club/"}, Settings: []Field{
+	{ID: "ptcafe", Name: "PTCafe (咖啡)", Description: "PTCafe (咖啡) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://ptcafe.club/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -2974,7 +2982,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Retention rules:<ol><li>[Veteran User] and above will be retained forever.</li><li>[Elite User] and above will not be deleted after their accounts are blocked.</li><li>Users with a parked account will be banned if they do not log in for 365 consecutive days.</li><li>Users with a non-parked account will be banned if they do not log in for 180 consecutive days.</li><li>Newly registered accounts will be banned by the system if they have no traffic within 14 days.</li></ol>"},
 	}},
-	{ID: "ptcc", Name: "PTCC (我的PT)", Description: "PTCC (我的PT) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "TV"}, URLs: []string{"https://cc.mypt.cc/"}, Settings: []Field{
+	{ID: "ptcc", Name: "PTCC (我的PT)", Description: "PTCC (我的PT) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "TV"}, URLs: []string{"https://cc.mypt.cc/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -2983,7 +2991,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite User and above will not have their account deleted after parking (in the control panel)</li><li> Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 150 consecutive days</li><li>Users with no traffic (i.e. upload/download data is 0) will be deleted if they have not logged in for more than 100 consecutive days.</li></ol>"},
 	}},
-	{ID: "pterclub", Name: "PTerClub (PT之友俱乐部)", Description: "PTerClub (PT之友俱乐部) is a CHINESE Private Torrent Tracker for HD MUSIC VIDEOS / MOVIES / TV  / ANIME", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://pterclub.net/"}, Settings: []Field{
+	{ID: "pterclub", Name: "PTerClub (PT之友俱乐部)", Description: "PTerClub (PT之友俱乐部) is a CHINESE Private Torrent Tracker for HD MUSIC VIDEOS / MOVIES / TV  / ANIME", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://pterclub.net/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "useragent", Type: "text", Label: "User-Agent"},
@@ -2994,7 +3002,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>All accounts will be permanently protected and will not be deleted; however, due to site security, some users will be temporarily banned due to activity rules</li><li>New users with no traffic changes will be disabled after 7 days of registration (not the actual download volume)</li><li>Those who download free torrents without generating any upload volume, or simply auxiliary torrents that generate magic power without any uploads will still be banned</li><li>Users with a non-parked account will be disabled if they do not log in for 60 consecutive days</li><li>Users with a parked account will be disabled if they do not log in for 180 consecutive days</li><li>Angora/Veteran User and above will not be disabled after parking</li><li>Sichuan Jianzhou Cat/Nexus Master users and above will be retained forever.</li></ol>"},
 	}},
-	{ID: "ptfans", Name: "PTFans", Description: "PTFans is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://ptfans.cc/"}, Settings: []Field{
+	{ID: "ptfans", Name: "PTFans", Description: "PTFans is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://ptfans.cc/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3003,7 +3011,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite User and above will not have their account deleted after parking (in the control panel)</li><li> Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 150 consecutive days</li><li>Users who have no traffic (i.e. upload/download data are both 0) will be deleted if they do not log in for 100 consecutive days.</li></ol>"},
 	}},
-	{ID: "ptfiles", Name: "PTFiles", Description: "PTFiles (PTF) is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://ptfiles.net/"}, Settings: []Field{
+	{ID: "ptfiles", Name: "PTFiles", Description: "PTFiles (PTF) is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://ptfiles.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3011,13 +3019,13 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "You must login to the site at least every 119 days. If you get to the 120th day without logging in, your account will be Deleted/Pruned automatically by the system."},
 	}},
-	{ID: "pthome", Name: "PThome", Description: "PTHome is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.pthome.net/"}, Settings: []Field{
+	{ID: "pthome", Name: "PThome", Description: "PTHome is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.pthome.net/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "ptlao", Name: "PTLAO", Description: "PTLAO is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://ptlao.top/"}, Settings: []Field{
+	{ID: "ptlao", Name: "PTLAO", Description: "PTLAO is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://ptlao.top/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3026,7 +3034,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite Users and above will not be deleted after parking (in the control panel)</li><li>Users with a parked account will be banned if they do not log in for 300 consecutive days</li><li>Users who do not log in for 150 consecutive days will be banned</li><li>Newly registered users with no traffic within 30 days, will be banned.</li></ol>"},
 	}},
-	{ID: "ptlgs", Name: "PTLGS", Description: "PTLGS is a CHINESE Private Torrent Tracker for MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://ptlgs.org/"}, Settings: []Field{
+	{ID: "ptlgs", Name: "PTLGS", Description: "PTLGS is a CHINESE Private Torrent Tracker for MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://ptlgs.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -3037,7 +3045,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>All users' accounts will be retained forever, and data will be retained forever</li><li>Newly registered accounts without traffic (i.e., upload/download data are 0) will be automatically frozen by the system if they do not log in for 7 consecutive days</li><li>Accounts that have been inactive for more than 30 days will be automatically banned by the system</li><li>determination method: When there is an unread announcement, it is necessary to manually confirm that the announcement has been read to be considered active; When there are no unread announcements, you need to visit the homepage to be active.</li></ol>"},
 	}},
-	{ID: "ptsbao", Name: "PTSBAO (烧包)", Description: "PTSBAO (烧包) is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://ptsbao.club/"}, Settings: []Field{
+	{ID: "ptsbao", Name: "PTSBAO (烧包)", Description: "PTSBAO (烧包) is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://ptsbao.club/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3045,7 +3053,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "ptskit", Name: "PTSKIT", Description: "PTSKIT is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.ptskit.org/"}, Settings: []Field{
+	{ID: "ptskit", Name: "PTSKIT", Description: "PTSKIT is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.ptskit.org/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3054,7 +3062,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite User and above will not have their account deleted after parking (in the control panel)</li><li> Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 150 consecutive days</li><li>Users who have no traffic (i.e. upload/download data are both 0) will be deleted if they do not log in for 100 consecutive days.</li></ol>"},
 	}},
-	{ID: "pttey", Name: "PTTey", Description: "PTTey is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.tey.cc/"}, Settings: []Field{
+	{ID: "pttey", Name: "PTTey", Description: "PTTey is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.tey.cc/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3063,7 +3071,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Cherish your user account. Inactive accounts would be deleted based on the following rules:<ol><li>Veteran User or above would never be deleted.</li><li>Elite User or above would never be deleted if parked (at User CP).</li><li>Parked accounts would be deleted if users have not logged in for more than 400 days in a row.</li><li>Unparked accounts would be deleted if users have not logged in for more than 150 days in a row.</li><li>Accounts with both uploaded and downloaded amount being 0 would be deleted if users have not logged in for more than 100 days in a row.</li></ol>"},
 	}},
-	{ID: "pttime", Name: "PTTime", Description: "PTTime is a ratioless CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.pttime.org/"}, Settings: []Field{
+	{ID: "pttime", Name: "PTTime", Description: "PTTime is a ratioless CHINESE Private Torrent Tracker for HD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.pttime.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3072,7 +3080,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite User and above will not have their account deleted after parking (in the control panel).</li><li>Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 150 consecutive days</li><li>Users who have no traffic (i.e. upload/download data are both 0) will be deleted if they do not log in for 100 consecutive days.</li></ol>"},
 	}},
-	{ID: "ptying", Name: "PTYING (樱花)", Description: "PTYING (樱花) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.ying.us.kg/"}, Settings: []Field{
+	{ID: "ptying", Name: "PTYING (樱花)", Description: "PTYING (樱花) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.ying.us.kg/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -3083,7 +3091,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite User and above will not have their account deleted after parking (in the control panel)</li><li>Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 150 consecutive days</li></ol>"},
 	}},
-	{ID: "ptzone", Name: "PTzone", Description: "PTzone is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://ptzone.xyz/"}, Settings: []Field{
+	{ID: "ptzone", Name: "PTzone", Description: "PTzone is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://ptzone.xyz/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3092,7 +3100,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite User and above will not have their account deleted after parking (in the control panel)</li><li>Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 150 consecutive days</li><li>Users who have no traffic (i.e. upload/download data are both 0) will be deleted if they do not log in for 100 consecutive days.</li></ol>"},
 	}},
-	{ID: "ptitzmx", Name: "PT分享站 (itzmx)", Description: "PT分享站 (itzmx) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://pt.itzmx.com/"}, Settings: []Field{
+	{ID: "ptitzmx", Name: "PT分享站 (itzmx)", Description: "PT分享站 (itzmx) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://pt.itzmx.com/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3109,7 +3117,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrentek száma egy oldalon</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "puntotorrent", Name: "PuntoTorrent", Description: "PuntoTorrent is a SPANISH Private Torrent Tracker for 0DAY / GENERAL", Language: "es-ES", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://xbt.puntotorrent.com/"}, Settings: []Field{
+	{ID: "puntotorrent", Name: "PuntoTorrent", Description: "PuntoTorrent is a SPANISH Private Torrent Tracker for 0DAY / GENERAL", Language: "es-ES", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://xbt.puntotorrent.com/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3117,7 +3125,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "2"},
 		{Name: "info", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "putao", Name: "PuTao (葡萄)", Description: "PuTao (葡萄) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.sjtu.edu.cn/"}, Settings: []Field{
+	{ID: "putao", Name: "PuTao (葡萄)", Description: "PuTao (葡萄) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.sjtu.edu.cn/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3134,7 +3142,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "4"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "qingwa", Name: "Qingwa (青蛙)", Description: "Qingwa (青蛙) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://www.qingwapt.com/"}, Settings: []Field{
+	{ID: "qingwa", Name: "Qingwa (青蛙)", Description: "Qingwa (青蛙) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://www.qingwapt.com/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3166,7 +3174,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "date_desc"},
 	}},
-	{ID: "railgunpt", Name: "RailgunPT", Description: "RailgunPT is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://bilibili.download/"}, Settings: []Field{
+	{ID: "railgunpt", Name: "RailgunPT", Description: "RailgunPT is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://bilibili.download/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -3177,7 +3185,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Users Level 5 and above will be retained forever</li><li>Users of Level 4 and above will not have their account deleted after parking (in the control panel)</li><li> Users with a parked account will be deleted if they do not log in for 300 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 120 consecutive days</li><li>Users with no traffic (i.e. upload/download data is 0) within 30 days after registration will have their accounts deleted.</li></ol>"},
 	}},
-	{ID: "rain", Name: "Rain (雨)", Description: "Rain (雨) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://raingfh.top/"}, Settings: []Field{
+	{ID: "rain", Name: "Rain (雨)", Description: "Rain (雨) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://raingfh.top/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3195,7 +3203,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "You must log in to the website or the tracker must register activity from your Announce URL once every 90 days or your account will be disabled."},
 	}},
-	{ID: "redstartorrent", Name: "Red Star Torrent", Description: "Red Star Torrent (RST) is a POLISH Private Torrent Tracker for MOVIES / TV", Language: "pl-PL", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"http://rstorrent.org.pl/"}, Settings: []Field{
+	{ID: "redstartorrent", Name: "Red Star Torrent", Description: "Red Star Torrent (RST) is a POLISH Private Torrent Tracker for MOVIES / TV", Language: "pl-PL", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"http://rstorrent.org.pl/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 	}},
@@ -3243,7 +3251,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "created_at"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "rousi-pro", Name: "Rousi.pro", Description: "Rousi.pro is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://rousi.pro/"}, Settings: []Field{
+	{ID: "rousi-pro", Name: "Rousi.pro", Description: "Rousi.pro is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://rousi.pro/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "API key", Required: true},
 		{Name: "info_apikey", Type: "info", Label: "About your API key", Default: "<ol><li>Login to this tracker with your browser</li><li>Open the <b>DevTools</b> panel by pressing <b>F12</b></li><li>Select the <b>Network</b> tab</li><li>Click on the <b>Fetch/XHR</b> button (Chrome Browser) or <b>XHR</b> button (FireFox)</li><li>Perform any search on the web site</li><li>Click on the first <i>search?query=</i> entry</li><li>Select the <b>Headers</b> tab on the Right panel</li><li>Find <b>'cookie:'</b> in the <b>Request Headers</b> section</li><li><b>Select</b> and <b>Copy</b> the API key from the <b>Authorization</b> string <i>(everything after 'Authorization: Bearer ')</i> and <b>Paste</b> here.</li></ol>"},
 		{Name: "passkey", Type: "text", Label: "Passkey", Required: true},
@@ -3252,7 +3260,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "DESC"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules (Inactive Accounts):<ol><li>Not logged in for more than 30 days: Send email reminders</li><li>Not logged in for more than 60 days: 5000 Mana points are deducted daily</li><li>After the mana value is deducted to 0: the account is banned</li><li>If the user expects to be unable to log in for a period of time, they can pay in advance 150,000 mana to protect account for 60 days</li></ol>"},
 	}},
-	{ID: "samaritano", Name: "SAMARITANO (API)", Description: "SAMARITANO is a BRAZILIAN Private tracker for MOVIES / TV / GENERAL", Language: "pt-BR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://samaritano.cc/"}, Settings: []Field{
+	{ID: "samaritano", Name: "SAMARITANO (API)", Description: "SAMARITANO is a BRAZILIAN Private tracker for MOVIES / TV / GENERAL", Language: "pt-BR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://samaritano.cc/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://samaritano.cc/\" target=\"_blank\">SAMARITANO</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3261,7 +3269,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Your account will be considered inactive if you have not logged in to the site for more than 90 days. After 30 days of inactivity (i.e. 30 days without logging in), your account will be removed from the tracker. Please note: The groups that suffer from inactivity are: User and Leech."},
 	}},
-	{ID: "sbpt", Name: "SBPT", Description: "SBPT is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://sbpt.link/"}, Settings: []Field{
+	{ID: "sbpt", Name: "SBPT", Description: "SBPT is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://sbpt.link/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -3272,7 +3280,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User or above will be retained forever</li><li> Elite User or abovee will not have their account deleted after parking (in the control panel)</li><li> Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 365 consecutive days</li><li>Users with no traffic (i.e. upload/download data is 0) will be deleted if they do not log in for 60 consecutive days.</li></ol>"},
 	}},
-	{ID: "scenerush", Name: "SceneRush", Description: "SceneRush is a PORTUGUESE Private Torrent Tracker for 0DAY / GENERAL", Language: "pt-PT", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.scene-rush.pt/", "https://www.scene-rush.com/"}, Settings: []Field{
+	{ID: "scenerush", Name: "SceneRush", Description: "SceneRush is a PORTUGUESE Private Torrent Tracker for 0DAY / GENERAL", Language: "pt-PT", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.scene-rush.pt/", "https://www.scene-rush.com/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3280,7 +3288,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "4"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "scenetime-api", Name: "SceneTime (API)", Description: "SceneTime is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.scenetime.com/"}, Settings: []Field{
+	{ID: "scenetime-api", Name: "SceneTime (API)", Description: "SceneTime is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.scenetime.com/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "API Key", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "You can find your API Key by accessing the <a href=\"https://scenetime.com/rss.php\" target=\"_blank\">SceneTime RSS</a> page, scrolling down to the <b>Torznab API</b> section, and copying the <b>API Key</b>."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3292,7 +3300,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Typically, (unparked) accounts are deleted after one year from last access. With account parking, the maximum period of inactivity is 2 years, after which the account will be deleted."},
 	}},
-	{ID: "seedpool-api", Name: "seedpool (API)", Description: "seedpool is a Private Torrent Tracker for 0-DAY MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://seedpool.org/"}, Settings: []Field{
+	{ID: "seedpool-api", Name: "seedpool (API)", Description: "seedpool is a Private Torrent Tracker for 0-DAY MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://seedpool.org/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://seedpool.org/\" target=\"_blank\">seedpool</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3301,7 +3309,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "created_at"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "sewerpt", Name: "SewerPT", Description: "SewerPT (下水道) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://sewerpt.com/"}, Settings: []Field{
+	{ID: "sewerpt", Name: "SewerPT", Description: "SewerPT (下水道) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://sewerpt.com/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -3321,7 +3329,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Inactive Account mean No trafic Up/Down, these  will be wiped very fast."},
 	}},
-	{ID: "shakaw", Name: "ShaKaw", Description: "ShaKaw is a BRAZILIAN Private Torrent Tracker for ANIME", Language: "pt-BR", Protocol: "torrent", Privacy: "private", Categories: []string{"Books", "Movies", "TV"}, URLs: []string{"https://tracker.shakaw.com.br/"}, Settings: []Field{
+	{ID: "shakaw", Name: "ShaKaw", Description: "ShaKaw is a BRAZILIAN Private Torrent Tracker for ANIME", Language: "pt-BR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Books", "Movies", "TV"}, URLs: []string{"https://tracker.shakaw.com.br/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3335,7 +3343,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "After 60 days of no activity, your account will be automatically deleted."},
 	}},
-	{ID: "siambit", Name: "SiamBIT", Description: "SiamBIT is a THAI PAY2DL Private Torrent Tracker for GENERAL", Language: "th-TH", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://bearbit.org/"}, Settings: []Field{
+	{ID: "siambit", Name: "SiamBIT", Description: "SiamBIT is a THAI PAY2DL Private Torrent Tracker for GENERAL", Language: "th-TH", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://bearbit.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Filter freeleech only", Default: "false"},
@@ -3369,12 +3377,12 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "created_at"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "snowpt", Name: "SnowPT", Description: "SnowPT (SSPT) is a CHINESE Private Torrent Tracker for ANIME", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"TV"}, URLs: []string{"https://skyeysnow.com/"}, Settings: []Field{
+	{ID: "snowpt", Name: "SnowPT", Description: "SnowPT (SSPT) is a CHINESE Private Torrent Tracker for ANIME", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime"}, URLs: []string{"https://skyeysnow.com/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Filter freeleech only", Default: "false"},
 	}},
-	{ID: "soulvoice", Name: "SoulVoice (聆音Club)", Description: "SoulVoice (聆音Club) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.soulvoice.club/"}, Settings: []Field{
+	{ID: "soulvoice", Name: "SoulVoice (聆音Club)", Description: "SoulVoice (聆音Club) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.soulvoice.club/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -3391,7 +3399,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "added"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "spiritofrevolution", Name: "Spirit of Revolution", Description: "Spirit of Revolution is a GERMAN Time based Torrent Tracker for 0DAY", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://sor-next.org/"}, Settings: []Field{
+	{ID: "spiritofrevolution", Name: "Spirit of Revolution", Description: "Spirit of Revolution is a GERMAN Time based Torrent Tracker for 0DAY", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://sor-next.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "added"},
@@ -3414,7 +3422,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "sunnypt", Name: "SunnyPT", Description: "SunnyPT is a CHINESE Private Torrent Tracker for MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://sunnypt.top/"}, Settings: []Field{
+	{ID: "sunnypt", Name: "SunnyPT", Description: "SunnyPT is a CHINESE Private Torrent Tracker for MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://sunnypt.top/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -3434,7 +3442,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "If you have not logged in, via web browser, for 3 months, the account will be suspended. You can park your account in Settings which means that it will not be deleted for inactivity for at least 1 year."},
 	}},
-	{ID: "tangmen", Name: "Tangmen (唐门)", Description: "Tangmen (唐门) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "TV"}, URLs: []string{"https://tmpt.top/"}, Settings: []Field{
+	{ID: "tangmen", Name: "Tangmen (唐门)", Description: "Tangmen (唐门) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "TV"}, URLs: []string{"https://tmpt.top/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3443,7 +3451,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite User and above will not have their account deleted after parking (in the control panel)</li><li>Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 150 consecutive days</li><li>Users who have no traffic (i.e. upload/download data are both 0) will be deleted if they do not log in for 100 consecutive days.</li></ol>"},
 	}},
-	{ID: "tangpt", Name: "TangPT (躺平)", Description: "TangPT (躺平) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://www.tangpt.top/"}, Settings: []Field{
+	{ID: "tangpt", Name: "TangPT (躺平)", Description: "TangPT (躺平) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://www.tangpt.top/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3452,7 +3460,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Cherish your user account. Inactive accounts would be deleted based on the following rules:<ol><li>Veteran User or above would never be deleted</li><li>Elite User or above would never be deleted if parked (at User CP)</li><li>Parked accounts would be deleted if users have not logged in for more than 400 days in a row</li><li>Un-parked accounts would be deleted if users have not logged in for more than 150 days in a row</li><li>Accounts with both uploaded and downloaded amount being 0 would be deleted if users have not logged in for more than 100 days in a row.</li></ol>"},
 	}},
-	{ID: "tapochek", Name: "Tapochek", Description: "Tapochek is a RUSSIAN Private Torrent Tracker for 0DAY / GENERAL", Language: "ru-RU", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://tapochek.net/"}, Settings: []Field{
+	{ID: "tapochek", Name: "Tapochek", Description: "Tapochek is a RUSSIAN Private Torrent Tracker for 0DAY / GENERAL", Language: "ru-RU", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://tapochek.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "info_ymd", Type: "info", Label: "About the date", Default: "Before using this indexer please check on the Tapochek website that your account profile <b>Y-m-d</b> setting is <b>Y-m-d H:i</b>. If it is anything else then this indexer will generate a parse error and not return results."},
@@ -3471,7 +3479,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "To keep records updated reguarly, all inactive accounts will be deleted after 60 days of inactivity."},
 	}},
-	{ID: "teamctgame", Name: "Team CT Game", Description: "Team CT Game (TCTG) is a FRENCH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://tctg.pm/"}, Settings: []Field{
+	{ID: "teamctgame", Name: "Team CT Game", Description: "Team CT Game (TCTG) is a FRENCH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://tctg.pm/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3483,7 +3491,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Any account with an Uploaded and Downloaded amount of 0 will be deleted if users have not logged in for more than 30 days</li><li>Any account inactive for 60 days is automatically deleted</li><li>Any account On Vacation and inactive for 180 days is automatically deleted.</li></ol>"},
 	}},
-	{ID: "teamflix", Name: "TeamFlix", Description: "TeamFlix is a FRENCH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://tracker.teamflix.cc/"}, Settings: []Field{
+	{ID: "teamflix", Name: "TeamFlix", Description: "TeamFlix is a FRENCH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://tracker.teamflix.cc/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "APIKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your API key", Default: "Find or Generate a new API Token by accessing your <a href=\"https://tracker.teamflix.cc/\" target=\"_blank\">TeamFlix</a> account <i>My Settings</i> page and clicking on the <b>API Key</b> tab."},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3496,7 +3504,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Inactivity of an account for a period of 60 consecutive days will automatically deactivate your account."},
 	}},
-	{ID: "teamhd", Name: "TeamHD", Description: "TeamHD is a RUSSIAN Private Torrent Tracker for HD MOVIES / TV", Language: "ru-RU", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://teamhd.org/"}, Settings: []Field{
+	{ID: "teamhd", Name: "TeamHD", Description: "TeamHD is a RUSSIAN Private Torrent Tracker for HD MOVIES / TV", Language: "ru-RU", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://teamhd.org/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "useragent", Type: "text", Label: "User-Agent"},
@@ -3522,7 +3530,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info", Type: "info", Label: "Results Per Page", Default: "For best results, change the 'Torrents per page' setting to 100 on your profile."},
 	}},
-	{ID: "thebrothers", Name: "The Brothers", Description: "The Brothers is a Private GERMAN tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://the-brothers.bounceme.net/"}, Settings: []Field{
+	{ID: "thebrothers", Name: "The Brothers", Description: "The Brothers is a Private GERMAN tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://the-brothers.bounceme.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "pin", Type: "text", Label: "Pin"},
@@ -3530,7 +3538,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Anzahl der Torrents beim Durchsuchen</b> <i>Torrents per page:</i> setting to <b>60</b> on your account profile. The default is <i>15</i>."},
 	}},
-	{ID: "thecrazyones", Name: "The Crazy Ones", Description: "The Crazy Ones is a Private GERMAN Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://thecrazyones.hopto.org/"}, Settings: []Field{
+	{ID: "thecrazyones", Name: "The Crazy Ones", Description: "The Crazy Ones is a Private GERMAN Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://thecrazyones.hopto.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "pin", Type: "text", Label: "Pin"},
@@ -3547,7 +3555,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tcg", Type: "info", Label: "Message from the TCG staff", Default: "We wish to encourage all members to participate in the communities we are creating. We have worked with the Jackett maintainers to ensure that the security and longevity of our trackers continues, and as such some torrents are removed from the results in Jackett."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Unparked accounts that haven't visited (read: browsed) the site for 38 days (and are over 28 days old) are pruned. Parked accounts are pruned when 112 days have elapsed since the last recorded activity (read: browsed). Seeding activity does NOT count, you must BROWSE the site. Donators with a star (and ONLY donators with a star) are immune to auto-pruning. Power Users and above are also immune. We regularly clean out accounts with very low share ratios that are subject to the Ratio Watch system."},
 	}},
-	{ID: "thefallingangels", Name: "The Falling Angels", Description: "The Falling Angels (TFA) is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://tfa.tf/"}, Settings: []Field{
+	{ID: "thefallingangels", Name: "The Falling Angels", Description: "The Falling Angels (TFA) is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://tfa.tf/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "pin", Type: "text", Label: "Pin"},
@@ -3574,7 +3582,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tcg", Type: "info", Label: "Message from the TCG staff", Default: "We wish to encourage all members to participate in the communities we are creating. We have worked with the Jackett maintainers to ensure that the security and longevity of our trackers continues, and as such some torrents are removed from the results in Jackett."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Unparked accounts that haven't visited (read: browsed) the site for 38 days (and are over 28 days old) are pruned. Parked accounts are pruned when 112 days have elapsed since the last recorded activity (read: browsed). Seeding activity does NOT count, you must BROWSE the site. Donators with a star (and ONLY donators with a star) are immune to auto-pruning. Power Users and above are also immune. We regularly clean out accounts with very low share ratios that are subject to the Ratio Watch system."},
 	}},
-	{ID: "newretro", Name: "The New Retro", Description: "The New Retro is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://new-retro.eu/"}, Settings: []Field{
+	{ID: "newretro", Name: "The New Retro", Description: "The New Retro is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://new-retro.eu/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "pin", Type: "text", Label: "Pin"},
@@ -3609,7 +3617,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "'Pruning' account<ul><li>Your membership requires that you remain active at TOS.</li><li>To not be disabled, you must log in to the tracker at least once every 90 days or continuously see at least 1 torrent. If you haven't logged in for more than 90 days and you don't have any seed torrents as of midnight UTC, your account will be deactivated.</li><li>To be reactivated, you also have 30 days to log in and show that your account is back to normal.</li><li>Disabled account: 90 days of inactivity and no seed torrent.</li><li>'Pruned' account: Has been deactivated for 30 days , and 90 days of inactivity.</li></ul>"},
 	}},
-	{ID: "theparadiese", Name: "The Paradiese", Description: "The Paradiese is a GERMAN Private tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://theparadiese.hopto.org/"}, Settings: []Field{
+	{ID: "theparadiese", Name: "The Paradiese", Description: "The Paradiese is a GERMAN Private tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://theparadiese.hopto.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "pin", Type: "text", Label: "Pin"},
@@ -3646,7 +3654,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tcg", Type: "info", Label: "Message from the TCG staff", Default: "We wish to encourage all members to participate in the communities we are creating. We have worked with the Jackett maintainers to ensure that the security and longevity of our trackers continues, and as such some torrents are removed from the results in Jackett."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Unparked accounts that haven't visited (read: browsed) the site for 38 days (and are over 28 days old) are pruned. Parked accounts are pruned when 112 days have elapsed since the last recorded activity (read: browsed). Seeding activity does NOT count, you must BROWSE the site. Donators with a star (and ONLY donators with a star) are immune to auto-pruning. Power Users and above are also immune. We regularly clean out accounts with very low share ratios that are subject to the Ratio Watch system."},
 	}},
-	{ID: "thenewfun", Name: "The-New-Fun", Description: "The-New-Fun is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://the-new-fun.com/"}, Settings: []Field{
+	{ID: "thenewfun", Name: "The-New-Fun", Description: "The-New-Fun is a GERMAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://the-new-fun.com/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "onlyupload", Type: "checkbox", Label: "Filter OnlyUpload only", Default: "false"},
@@ -3664,7 +3672,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "created_at"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "tjupt", Name: "TJUPT (北洋园PT)", Description: "TJUPT (北洋园PT) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://tjupt.org/"}, Settings: []Field{
+	{ID: "tjupt", Name: "TJUPT (北洋园PT)", Description: "TJUPT (北洋园PT) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://tjupt.org/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3673,7 +3681,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Banning rules for account inactivity:<ol><li>Within 180 days, an account is considered active if it meets any of the following conditions: has checked in for at least 1 day; has published at least 1 seed, fun box or new forum topic (non-reply); actually uploaded increments > 5TiB and the seeding integral increment is > 30W</li><li>Users of Megatron level and above ignore the inactivity rules and will keep their accounts forever</li><li>Users with Sword Down the Mountain and above will not be disabled due to inactivity after parking their accounts in the control panel</li><li>Un-parked accounts below the level of Megatron will be disabled if they have been 'inactive' for 180 consecutive days (Effective from 2024).</li><li>Accounts parked below the level of Down the Mountain with a Sword will be disabled if they are 'inactive' for 300 consecutive days (Effective from 2024).</li></ol>"},
 	}},
-	{ID: "tlfbits", Name: "TLFBits", Description: "TLFBits is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.eastgame.org/"}, Settings: []Field{
+	{ID: "tlfbits", Name: "TLFBits", Description: "TLFBits is a CHINESE Private Torrent Tracker for HD MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.eastgame.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3681,7 +3689,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "tmghub", Name: "TmGHuB", Description: "TmGHuB (TH) is an INDIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://tmghub.org/"}, Settings: []Field{
+	{ID: "tmghub", Name: "TmGHuB", Description: "TmGHuB (TH) is an INDIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://tmghub.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile. Default is 30."},
@@ -3701,7 +3709,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "The inactivation system was created with the purpose of encouraging member participation. This way, after 7 days without accessing the website, 30 BONs will be deducted per day. If your account balance reaches 0 and you don't have any torrents being seeded, it will be automatically deactivated."},
 	}},
-	{ID: "tokyopt", Name: "TokyoPT", Description: "TokyoPT is a CHINESE Private Torrent Tracker for MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Movies", "Other", "TV"}, URLs: []string{"https://www.tokyopt.xyz/"}, Settings: []Field{
+	{ID: "tokyopt", Name: "TokyoPT", Description: "TokyoPT is a CHINESE Private Torrent Tracker for MOVIES / TV", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Movies", "Other"}, URLs: []string{"https://www.tokyopt.xyz/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3710,7 +3718,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite User and above will not have their account deleted after parking (in the control panel)</li><li>Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 150 consecutive days</li><li>Users who have no traffic (i.e. upload/download data are both 0) will be deleted if they do not log in for 100 consecutive days.</li></ol>"},
 	}},
-	{ID: "tormac", Name: "Tormac", Description: "Tormac is a RUSSIAN Private Torrent Tracker for MAC SOFTWARE", Language: "ru-RU", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://tormac.org/"}, Settings: []Field{
+	{ID: "tormac", Name: "Tormac", Description: "Tormac is a RUSSIAN Private Torrent Tracker for MAC SOFTWARE", Language: "ru-RU", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://tormac.org/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "stripcyrillic", Type: "checkbox", Label: "Strip Cyrillic Letters", Default: "false"},
@@ -3720,7 +3728,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "2"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Inactive accounts are automatically deleted after 90 days from the moment the system first detects inactivity.<br>A user is considered inactive if they meet one of the following conditions:<ul><li>Within 30 days of registration, they have not downloaded at least 1 torrent, resulting in Total Downloaded in their profile being 0</li><li>Their ratio is less than or equal to 0.3</li><li>They have fewer than 10 time bonuses</li></ul>Immunity from inactivity is automatically granted to users holding any title from the list or being a member of groups."},
 	}},
-	{ID: "tornado", Name: "Tornado", Description: "Tornado is a SLOVENIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "sl-SI", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.tornado.si/"}, Settings: []Field{
+	{ID: "tornado", Name: "Tornado", Description: "Tornado is a SLOVENIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "sl-SI", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.tornado.si/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Filter freeleech only", Default: "false"},
@@ -3728,7 +3736,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_results", Type: "info", Label: "Search results", Default: "If you are getting the error <b>Found no results while trying to browse this tracker</b> then first access the site with your browser and check that you are not being forced to change your password because it has expired after 180 days."},
 	}},
-	{ID: "torr9", Name: "Torr9", Description: "Torr9 is a FRENCH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://torr9.net/"}, Settings: []Field{
+	{ID: "torr9", Name: "Torr9", Description: "Torr9 is a FRENCH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://torr9.net/"}, Settings: []Field{
 		{Name: "passkey", Type: "text", Label: "PassKey", Required: true},
 		{Name: "info_key", Type: "info", Label: "About your PassKey", Default: "You can find the API PassKey by accessing your <a href=\"https://torr9.net/profile\" target=\"_blank\">Torr9 Profile</a> page and scrolling down to the <b>Passkey Tracker</b> section."},
 		{Name: "apiurl", Type: "text", Label: "API URL", Default: "api.torr9.net"},
@@ -3764,7 +3772,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_results", Type: "info", Label: "Search results", Default: "If you are getting the error: <b>An error has occurred!You can't view this page unless you read all your unread messages</b>, then access the site with your browser and <b>mark as read</b> all PMs."},
 	}},
-	{ID: "torrentlt", Name: "Torrent.LT", Description: "Torrent.LT is a LITHUANIAN Private Torrent Tracker for 0DAY / GENERAL", Language: "lt-LT", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://torrent.lt/"}, Settings: []Field{
+	{ID: "torrentlt", Name: "Torrent.LT", Description: "Torrent.LT is a LITHUANIAN Private Torrent Tracker for 0DAY / GENERAL", Language: "lt-LT", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://torrent.lt/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3772,7 +3780,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "0"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "torrentbd", Name: "TorrentBD", Description: "TorrentBD is a BANGLADESH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.torrentbd.net/", "https://www.torrentbd.org/"}, Settings: []Field{
+	{ID: "torrentbd", Name: "TorrentBD", Description: "TorrentBD is a BANGLADESH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.torrentbd.net/", "https://www.torrentbd.org/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "useragent", Type: "text", Label: "User-Agent"},
@@ -3788,7 +3796,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Cherish your user account. Inactive accounts would be deleted based on the following rules:<ol><li>Veteran User or above would never be deleted. updated @ 2020.03.19</li><li>Insane User or above would never be deleted if parked (at User CP)</li><li>Parked accounts would be disabled if users have not logged in for more than 365 days in a row. updated @ 2020.09.20</li><li>Un-parked accounts would be disabled if users have not logged in for more than 90 days in a row. updated @ 2020.09.20</li><li>Accounts with both uploaded and downloaded amount being 0 would be disabled if users have not logged in for more than 30 days in a row.</li></ol>"},
 	}},
-	{ID: "torrentdd", Name: "TorrentDD", Description: "TorrentDD (TodayBit) is a THAI Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "th-TH", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.torrentdd.com/"}, Settings: []Field{
+	{ID: "torrentdd", Name: "TorrentDD", Description: "TorrentDD (TodayBit) is a THAI Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "th-TH", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.torrentdd.com/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3803,19 +3811,19 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "created_at"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "torrenthr", Name: "TorrentHR", Description: "TorrentHR is a ratioless CROATIAN Private Torrent Tracker for 0DAY / GENERAL", Language: "hr-HR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.torrenthr.org/"}, Settings: []Field{
+	{ID: "torrenthr", Name: "TorrentHR", Description: "TorrentHR is a ratioless CROATIAN Private Torrent Tracker for 0DAY / GENERAL", Language: "hr-HR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.torrenthr.org/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "4"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "torrenting", Name: "Torrenting", Description: "Torrenting (TT) is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://torrenting.com/"}, Settings: []Field{
+	{ID: "torrenting", Name: "Torrenting", Description: "Torrenting (TT) is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://torrenting.com/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "All members are required to log into their account at least every 89 days or you will be deleted without warning."},
 	}},
-	{ID: "torrentleech", Name: "TorrentLeech", Description: "TorrentLeech (TL) is a Private Torrent Tracker for 0DAY / GENERAL. not here _ not scene", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.torrentleech.org/", "https://www.torrentleech.cc/", "https://www.torrentleech.me/", "https://www.tleechreload.org/", "https://www.tlgetin.cc/", "https://rss.torrentleech.cc/"}, Settings: []Field{
+	{ID: "torrentleech", Name: "TorrentLeech", Description: "TorrentLeech (TL) is a Private Torrent Tracker for 0DAY / GENERAL. not here _ not scene", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://www.torrentleech.org/", "https://www.torrentleech.cc/", "https://www.torrentleech.me/", "https://www.tleechreload.org/", "https://www.tlgetin.cc/", "https://rss.torrentleech.cc/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "alt2fatoken", Type: "text", Label: "Alt 2FA Token"},
@@ -3828,7 +3836,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_flaresolverr", Type: "text", Label: ""},
 	}},
-	{ID: "torrentleech-pl", Name: "Torrentleech.pl", Description: "Torrentleech.pl is a POLISH Private Torrent Tracker for 0DAY / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://torrentleech.pl/"}, Settings: []Field{
+	{ID: "torrentleech-pl", Name: "Torrentleech.pl", Description: "Torrentleech.pl is a POLISH Private Torrent Tracker for 0DAY / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://torrentleech.pl/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3849,7 +3857,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 	}},
-	{ID: "trackermk", Name: "TrackerMK", Description: "TrackerMK is a MACEDONIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "mk-MK", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://trackermk.com/"}, Settings: []Field{
+	{ID: "trackermk", Name: "TrackerMK", Description: "TrackerMK is a MACEDONIAN Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "mk-MK", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://trackermk.com/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Filter freeleech only", Default: "false"},
@@ -3857,7 +3865,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "To keep records updated reguarly, all inactive accounts will be deleted after 60 days of inactivity."},
 	}},
-	{ID: "trackerzero", Name: "TrackerZero", Description: "TrackerZero is an ITALIAN Private PAY2DL Torrent Tracker for MOVIES / TV / MUSIC / SOFTWARE", Language: "it-IT", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://trackerzero.it/"}, Settings: []Field{
+	{ID: "trackerzero", Name: "TrackerZero", Description: "TrackerZero is an ITALIAN Private PAY2DL Torrent Tracker for MOVIES / TV / MUSIC / SOFTWARE", Language: "it-IT", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://trackerzero.it/"}, Settings: []Field{
 		{Name: "apikey", Type: "text", Label: "API key", Required: true},
 		{Name: "info_apikey", Type: "info", Label: "About your API key", Default: "Find your API key by accessing your <a href=\"https://trackerzero.it/\" target=\"_blank\">TrackerZero</a> <i>Profile</i> page and scrolling down to the <b>img.trackerzero.it</b> section."},
 		{Name: "passkey", Type: "text", Label: "Passkey", Required: true},
@@ -3917,7 +3925,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "created_at"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "u2", Name: "U2", Description: "U2 (U2分享園@動漫花園) is a CHINESE Private Torrent Tracker for ANIME", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://u2.dmhy.org/"}, Settings: []Field{
+	{ID: "u2", Name: "U2", Description: "U2 (U2分享園@動漫花園) is a CHINESE Private Torrent Tracker for ANIME", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other"}, URLs: []string{"https://u2.dmhy.org/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3925,7 +3933,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "ubits", Name: "UBits", Description: "UBits is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://ubits.club/"}, Settings: []Field{
+	{ID: "ubits", Name: "UBits", Description: "UBits is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://ubits.club/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -3937,7 +3945,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite User and above will not have their account deleted after parking (in the control panel)</li><li>Userswith a parked account will be deleted if they do not log in for 180 consecutive days</li><li>Users with non-parked account will be deleted if they do not log in for 120 consecutive days</li><li>Users with no traffic (ie, upload/download data are both 0) will be deleted if they do not log in for 60 consecutive days.</li></ol>"},
 	}},
-	{ID: "ultrahd", Name: "UltraHD", Description: "UltraHD is a CHINESE Private Torrent Tracker for UHD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://ultrahd.net/"}, Settings: []Field{
+	{ID: "ultrahd", Name: "UltraHD", Description: "UltraHD is a CHINESE Private Torrent Tracker for UHD MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://ultrahd.net/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -3946,7 +3954,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Inactive accounts (i.e. not logged in for a long time) are automatically deleted."},
 	}},
-	{ID: "unlimitz", Name: "Unlimitz", Description: "Unlimitz is a THAI Private Torrent Tracker for GENERAL", Language: "th-TH", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.unlimitz.biz/"}, Settings: []Field{
+	{ID: "unlimitz", Name: "Unlimitz", Description: "Unlimitz is a THAI Private Torrent Tracker for GENERAL", Language: "th-TH", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://www.unlimitz.biz/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "staffpass", Type: "text", Label: "Staff Pass"},
@@ -3997,7 +4005,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "created_at"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "whiteangel", Name: "White Angel", Description: "White Angel is a HUNGARIAN Private Tracker for MOVIES / TV", Language: "hu-HU", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://white-angel.hu/"}, Settings: []Field{
+	{ID: "whiteangel", Name: "White Angel", Description: "White Angel is a HUNGARIAN Private Tracker for MOVIES / TV", Language: "hu-HU", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://white-angel.hu/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search FreeLeech only", Default: "false"},
@@ -4005,7 +4013,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrentek száma egy oldalon:</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "wintersakura", Name: "WinterSakura", Description: "WinterSakura is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://wintersakura.net/"}, Settings: []Field{
+	{ID: "wintersakura", Name: "WinterSakura", Description: "WinterSakura is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://wintersakura.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "2facode", Type: "text", Label: "2FA code"},
@@ -4015,7 +4023,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 	}},
-	{ID: "wihd", Name: "World-In-HD", Description: "World-In-HD is a Private Torrent Tracker. Your world in HD", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://world-in-hd.net/"}, Settings: []Field{
+	{ID: "wihd", Name: "World-In-HD", Description: "World-In-HD is a Private Torrent Tracker. Your world in HD", Language: "fr-FR", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://world-in-hd.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -4023,7 +4031,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "multilanguage", Type: "select", Label: "Replace MULTi by this language", Default: "FRENCH"},
 		{Name: "vostfr", Type: "checkbox", Label: "Replace VOSTFR and SUBFRENCH with ENGLISH", Default: "false"},
 	}},
-	{ID: "world-of-tomorrow", Name: "World-of-Tomorrow", Description: "World-of-Tomorrow is a GERMAN Private tracker", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://w-o-t.pro/"}, Settings: []Field{
+	{ID: "world-of-tomorrow", Name: "World-of-Tomorrow", Description: "World-of-Tomorrow is a GERMAN Private tracker", Language: "de-DE", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://w-o-t.pro/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "pin", Type: "text", Label: "Pin"},
@@ -4034,7 +4042,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "typeby", Type: "select", Label: "Order requested from site", Default: "DESC"},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "All accounts up to platinum users that are inactive for more than 8 weeks will be deleted!"},
 	}},
-	{ID: "xingwan", Name: "Xingwan (星湾)", Description: "Xingwan (星湾) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://xingwan.cc/"}, Settings: []Field{
+	{ID: "xingwan", Name: "Xingwan (星湾)", Description: "Xingwan (星湾) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV"}, URLs: []string{"https://xingwan.cc/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -4043,7 +4051,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite User and above will not have their account deleted after parking (in the control panel)</li><li>Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 150 consecutive days</li><li>Users who have no traffic (i.e. upload/download data are both 0) will be deleted if they do not log in for 100 consecutive days.</li></ol>"},
 	}},
-	{ID: "xingyung", Name: "Xingyung (星陨阁)", Description: "Xingyung (星陨阁) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.xingyungept.org/"}, Settings: []Field{
+	{ID: "xingyung", Name: "Xingyung (星陨阁)", Description: "Xingyung (星陨阁) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://pt.xingyungept.org/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -4052,7 +4060,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Account retention rules:<ol><li>Veteran User and above will be retained forever</li><li>Elite User and above will not have their account deleted after parking (in the control panel)</li><li>Users with a parked account will be deleted if they do not log in for 400 consecutive days</li><li>Users with a non-parked account will be deleted if they do not log in for 150 consecutive days</li><li>Users who have no traffic (i.e. upload/download data are both 0) will be deleted if they do not log in for 100 consecutive days.</li></ol>"},
 	}},
-	{ID: "xloli", Name: "xloli", Description: "xloli (ilolicon PT) is a CHINESE Private Torrent Tracker for LOLICON / MOVIES / 3X", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://mua.xloli.cc/"}, Settings: []Field{
+	{ID: "xloli", Name: "xloli", Description: "xloli (ilolicon PT) is a CHINESE Private Torrent Tracker for LOLICON / MOVIES / 3X", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://mua.xloli.cc/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -4061,7 +4069,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "info_tpp", Type: "info", Label: "Results Per Page", Default: "For best results, change the <b>Torrents per page:</b> setting to <b>100</b> on your account profile.</br>Choosing more may cause the web site to fail to deliver complete results."},
 		{Name: "info_activity", Type: "info", Label: "Account Inactivity", Default: "Cherish your user account. Inactive accounts would be deleted based on the following rules:<ol><li>Veteran User or above would never be deleted.</li><li>Elite User or above would never be deleted if parked (at User CP).</li><li>Parked accounts would be deleted if users have not logged in for more than 400 days in a row.</li><li>Unparked accounts would be deleted if users have not logged in for more than 150 days in a row.</li><li>Accounts with both uploaded and downloaded amount being 0 would be deleted if users have not logged in for more than 100 days in a row.</li></ol>"},
 	}},
-	{ID: "xtorrenty", Name: "xTorrenty", Description: "xTorrenty is a POLISH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://xtorrenty.org/"}, Settings: []Field{
+	{ID: "xtorrenty", Name: "xTorrenty", Description: "xTorrenty is a POLISH Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "pl-PL", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://xtorrenty.org/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "multilang", Type: "checkbox", Label: "Replace MULTi by another language in release name", Default: "false"},
@@ -4069,7 +4077,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "date"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "xtremebytes", Name: "Xtreme Bytes", Description: "Xtreme Bytes (TorrentSurf) is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://xtremebytes.net/"}, Settings: []Field{
+	{ID: "xtremebytes", Name: "Xtreme Bytes", Description: "Xtreme Bytes (TorrentSurf) is a Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "en-US", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Books", "Movies", "Other", "TV", "XXX"}, URLs: []string{"https://xtremebytes.net/"}, Settings: []Field{
 		{Name: "username", Type: "text", Label: "Username", Required: true},
 		{Name: "password", Type: "password", Label: "Password", Required: true},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
@@ -4112,7 +4120,7 @@ var builtinCatalog = []CatalogEntry{
 		{Name: "sort", Type: "select", Label: "Sort requested from site", Default: "created_at"},
 		{Name: "type", Type: "select", Label: "Order requested from site", Default: "desc"},
 	}},
-	{ID: "zmpt", Name: "ZmPT (织梦)", Description: "ZmPT (织梦) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Audio", "Movies", "Other", "TV"}, URLs: []string{"https://zmpt.cc/"}, Settings: []Field{
+	{ID: "zmpt", Name: "ZmPT (织梦)", Description: "ZmPT (织梦) is a CHINESE Private Torrent Tracker for MOVIES / TV / GENERAL", Language: "zh-CN", Protocol: "torrent", Privacy: "private", Categories: []string{"Anime", "Audio", "Movies", "Other", "TV"}, URLs: []string{"https://zmpt.cc/"}, Settings: []Field{
 		{Name: "cookie", Type: "text", Label: "Cookie", Required: true},
 		{Name: "info_cookie", Type: "text", Label: ""},
 		{Name: "freeleech", Type: "checkbox", Label: "Search freeleech only", Default: "false"},
