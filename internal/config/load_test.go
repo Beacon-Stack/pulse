@@ -164,3 +164,31 @@ func TestEnsureAPIKey_PropagatesStoreWriteError(t *testing.T) {
 		t.Fatal("expected error when store.Set fails")
 	}
 }
+
+func TestLoad_APIKeyFileOverridesInlineKey(t *testing.T) {
+	dir := t.TempDir()
+	cfgPath := writeFixture(t, dir, "config.yaml", testFixture) // api_key: "test-key"
+	keyFile := writeFixture(t, dir, "pulse.txt", "file-wins\n")
+
+	t.Setenv("PULSE_AUTH_API_KEY_FILE", keyFile)
+
+	cfg, err := Load(cfgPath)
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+
+	if got := cfg.Auth.APIKey.Value(); got != "file-wins" {
+		t.Fatalf("APIKey = %q; want %q (file should override the config-file value)", got, "file-wins")
+	}
+}
+
+func TestLoad_InvalidAPIKeyFilePath_Errors(t *testing.T) {
+	dir := t.TempDir()
+	cfgPath := writeFixture(t, dir, "config.yaml", testFixture)
+
+	t.Setenv("PULSE_AUTH_API_KEY_FILE", "/nonexistent/pulse-api-key")
+
+	if _, err := Load(cfgPath); err == nil {
+		t.Fatal("expected error when api_key_file path is invalid")
+	}
+}

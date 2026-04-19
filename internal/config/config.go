@@ -50,6 +50,11 @@ type LogConfig struct {
 // AuthConfig holds the Pulse API key used to authenticate requests.
 type AuthConfig struct {
 	APIKey Secret `mapstructure:"api_key"`
+
+	// APIKeyFile is a path to a file containing the API key, typically a
+	// Docker secret mounted at /run/secrets/*. When non-empty, its contents
+	// replace APIKey at load time and win over the DB config_entries row.
+	APIKeyFile string `mapstructure:"api_key_file"`
 }
 
 // Secret is a string value that is redacted when printed.

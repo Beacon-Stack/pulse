@@ -36,6 +36,7 @@ func Load(configPath string) (*Config, error) {
 	v.SetDefault("database.driver", "postgres")
 	v.SetDefault("database.dsn", "")
 	v.SetDefault("database.password_file", "")
+	v.SetDefault("auth.api_key_file", "")
 	v.SetDefault("log.level", "info")
 	v.SetDefault("log.format", "json")
 	v.SetDefault("flaresolverr.url", "")
@@ -77,6 +78,14 @@ func Load(configPath string) (*Config, error) {
 			return nil, fmt.Errorf("applying database password file: %w", err)
 		}
 		cfg.Database.DSN = Secret(merged)
+	}
+
+	if cfg.Auth.APIKeyFile != "" {
+		contents, err := secretfile.Read(cfg.Auth.APIKeyFile)
+		if err != nil {
+			return nil, fmt.Errorf("reading API key file: %w", err)
+		}
+		cfg.Auth.APIKey = Secret(contents)
 	}
 
 	if v.ConfigFileUsed() != "" {
