@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
@@ -82,33 +83,51 @@ func Load(configPath string) (*Config, error) {
 		cfg.ConfigFile = v.ConfigFileUsed()
 	}
 
-	// Auto-generate API key if not set, and persist it to the config file
-	// so it survives restarts.
-	if cfg.Auth.APIKey == "" {
-		key, err := generateAPIKey()
-		if err != nil {
-			return nil, fmt.Errorf("generating API key: %w", err)
-		}
-		cfg.Auth.APIKey = Secret(key)
+	// The API key is no longer auto-generated here. Load() may leave
+	// cfg.Auth.APIKey empty; the caller (main.go) resolves it against the
+	// DB via EnsureAPIKey after Postgres is up. The env var and config-file
+	// values (if set) still flow through and take priority.
+	return &cfg, nil
+}
 
-		// Ensure config directory exists and write/update the config file.
-		cfgFile := cfg.ConfigFile
-		if cfgFile == "" {
-			cfgFile = filepath.Join(dir, "config.yaml")
-			if err := os.MkdirAll(dir, 0o755); err != nil {
-				return nil, fmt.Errorf("creating config directory: %w", err)
-			}
-		}
-		v.Set("auth.api_key", key)
-		v.SetConfigFile(cfgFile)
-		if err := v.WriteConfig(); err != nil {
-			// Try SafeWriteConfig for first-time creation.
-			_ = v.SafeWriteConfig()
-		}
-		cfg.ConfigFile = cfgFile
+// EnsureAPIKey makes sure cfg.Auth.APIKey is set, persisting it in the
+// shared config_entries table so it survives container restarts. Called
+// from main after the DB is open and the config store is available.
+//
+// Priority (first match wins):
+//  1. cfg.Auth.APIKey already set — from PULSE_AUTH_API_KEY env var or a
+//     loaded config.yaml. Treated as an ops override; not written to DB.
+//  2. config_entries row at (namespace="auth", key="api_key"). Loaded and
+//     assigned.
+//  3. Generate a new key, INSERT it into config_entries, use it.
+//
+// Returns (generated=true) if a fresh key was created.
+func EnsureAPIKey(ctx context.Context, store APIKeyStore, cfg *Config) (generated bool, err error) {
+	if cfg.Auth.APIKey != "" {
+		return false, nil
 	}
 
-	return &cfg, nil
+	if existing, err := store.GetAPIKey(ctx); err == nil && existing != "" {
+		cfg.Auth.APIKey = Secret(existing)
+		return false, nil
+	}
+
+	key, err := generateAPIKey()
+	if err != nil {
+		return false, fmt.Errorf("generating API key: %w", err)
+	}
+	if err := store.SetAPIKey(ctx, key); err != nil {
+		return false, fmt.Errorf("persisting API key: %w", err)
+	}
+	cfg.Auth.APIKey = Secret(key)
+	return true, nil
+}
+
+// APIKeyStore is the narrow interface EnsureAPIKey needs from the shared
+// config store. Wired up in main.go by the cfgstore.Store implementation.
+type APIKeyStore interface {
+	GetAPIKey(ctx context.Context) (string, error)
+	SetAPIKey(ctx context.Context, value string) error
 }
 
 // WriteDefault writes a default config file to the given path.

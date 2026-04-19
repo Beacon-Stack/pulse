@@ -1,6 +1,8 @@
 package config
 
 import (
+	"context"
+	"errors"
 	"os"
 	"path/filepath"
 	"testing"
@@ -68,5 +70,97 @@ func TestLoad_InvalidPasswordFilePath_Errors(t *testing.T) {
 
 	if _, err := Load(cfgPath); err == nil {
 		t.Fatal("expected error when password file path is invalid")
+	}
+}
+
+// ── EnsureAPIKey ────────────────────────────────────────────────────────────
+
+// stubStore is a minimal APIKeyStore for exercising EnsureAPIKey without
+// standing up a real Postgres.
+type stubStore struct {
+	stored   string
+	setErr   error
+	setCalls int
+}
+
+func (s *stubStore) GetAPIKey(_ context.Context) (string, error) { return s.stored, nil }
+
+func (s *stubStore) SetAPIKey(_ context.Context, value string) error {
+	s.setCalls++
+	if s.setErr != nil {
+		return s.setErr
+	}
+	s.stored = value
+	return nil
+}
+
+func TestEnsureAPIKey_EnvOverrideWins(t *testing.T) {
+	cfg := &Config{}
+	cfg.Auth.APIKey = "env-provided"
+	store := &stubStore{stored: "stale-db-value"}
+
+	generated, err := EnsureAPIKey(context.Background(), store, cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if generated {
+		t.Error("should not generate when key already set")
+	}
+	if cfg.Auth.APIKey.Value() != "env-provided" {
+		t.Errorf("cfg.Auth.APIKey = %q; want env-provided", cfg.Auth.APIKey.Value())
+	}
+	if store.setCalls != 0 {
+		t.Error("should not write to DB when env override is in effect")
+	}
+}
+
+func TestEnsureAPIKey_LoadsFromDB(t *testing.T) {
+	cfg := &Config{}
+	store := &stubStore{stored: "persisted-key-from-db"}
+
+	generated, err := EnsureAPIKey(context.Background(), store, cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if generated {
+		t.Error("should not generate when DB has a key")
+	}
+	if cfg.Auth.APIKey.Value() != "persisted-key-from-db" {
+		t.Errorf("cfg.Auth.APIKey = %q; want persisted-key-from-db", cfg.Auth.APIKey.Value())
+	}
+	if store.setCalls != 0 {
+		t.Error("should not re-write the existing key")
+	}
+}
+
+func TestEnsureAPIKey_GeneratesAndStores(t *testing.T) {
+	cfg := &Config{}
+	store := &stubStore{}
+
+	generated, err := EnsureAPIKey(context.Background(), store, cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !generated {
+		t.Error("should generate when DB is empty")
+	}
+	if len(cfg.Auth.APIKey.Value()) != 64 {
+		t.Errorf("generated key length = %d; want 64 (hex-encoded 32 bytes)", len(cfg.Auth.APIKey.Value()))
+	}
+	if store.setCalls != 1 {
+		t.Errorf("SetAPIKey calls = %d; want 1", store.setCalls)
+	}
+	if store.stored != cfg.Auth.APIKey.Value() {
+		t.Errorf("DB value (%q) doesn't match cfg.Auth.APIKey (%q)", store.stored, cfg.Auth.APIKey.Value())
+	}
+}
+
+func TestEnsureAPIKey_PropagatesStoreWriteError(t *testing.T) {
+	cfg := &Config{}
+	store := &stubStore{setErr: errors.New("disk full")}
+
+	_, err := EnsureAPIKey(context.Background(), store, cfg)
+	if err == nil {
+		t.Fatal("expected error when store.Set fails")
 	}
 }

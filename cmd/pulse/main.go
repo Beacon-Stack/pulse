@@ -100,6 +100,18 @@ func main() {
 	configStore := cfgstore.NewStore(queries, bus, logger)
 	indexerMgr := indexer.NewManager(queries, bus, logger)
 
+	// Resolve the API key: env/file override first, else DB, else generate.
+	// Has to happen AFTER db.Migrate (config_entries table must exist) and
+	// BEFORE anything wires cfg.Auth.APIKey into the HTTP stack.
+	if generated, err := config.EnsureAPIKey(context.Background(), configStore, cfg); err != nil {
+		logger.Error("failed to resolve API key", "error", err)
+		os.Exit(1)
+	} else if generated {
+		logger.Info("generated new API key and stored it in the database")
+	} else {
+		logger.Info("loaded API key from database")
+	}
+
 	// Retroactively auto-assign existing indexers whenever a service registers
 	// (or re-registers). Without this hook, a service that comes online after
 	// indexers were added never gets those indexers until they're manually

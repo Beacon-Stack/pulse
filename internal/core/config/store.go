@@ -131,6 +131,25 @@ func (s *Store) DeleteNamespace(ctx context.Context, namespace string) error {
 	return s.q.DeleteConfigNamespace(ctx, namespace)
 }
 
+// GetAPIKey returns the persisted Pulse API key, or empty string if one
+// has never been stored. Typed wrapper around Get so the config package's
+// EnsureAPIKey helper can consume this store through a small interface.
+func (s *Store) GetAPIKey(ctx context.Context) (string, error) {
+	entry, err := s.Get(ctx, "auth", "api_key")
+	if err != nil {
+		// GetConfigEntry returns "not found" as an error — swallow that and
+		// return the empty-string sentinel. Other errors bubble up.
+		return "", nil
+	}
+	return entry.Value, nil
+}
+
+// SetAPIKey persists a new Pulse API key. Typed wrapper around Set.
+func (s *Store) SetAPIKey(ctx context.Context, value string) error {
+	_, err := s.Set(ctx, "auth", "api_key", value)
+	return err
+}
+
 // Subscribe registers a service as interested in a config namespace.
 func (s *Store) Subscribe(ctx context.Context, serviceID, namespace string) error {
 	return s.q.Subscribe(ctx, db.SubscribeParams{
