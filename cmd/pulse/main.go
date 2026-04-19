@@ -103,11 +103,14 @@ func main() {
 	// Resolve the API key: env/file override first, else DB, else generate.
 	// Has to happen AFTER db.Migrate (config_entries table must exist) and
 	// BEFORE anything wires cfg.Auth.APIKey into the HTTP stack.
+	preExisting := cfg.Auth.APIKey != ""
 	if generated, err := config.EnsureAPIKey(context.Background(), configStore, cfg); err != nil {
 		logger.Error("failed to resolve API key", "error", err)
 		os.Exit(1)
 	} else if generated {
 		logger.Info("generated new API key and stored it in the database")
+	} else if preExisting {
+		logger.Info("API key sourced from env/file override")
 	} else {
 		logger.Info("loaded API key from database")
 	}
