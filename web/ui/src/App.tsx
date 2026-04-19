@@ -58,7 +58,7 @@ export default function App() {
             </Routes>
           </ErrorBoundary>
           <Toaster
-            position="bottom-right"
+            position="bottom-left"
             toastOptions={{
               style: {
                 background: "var(--color-bg-elevated)",
