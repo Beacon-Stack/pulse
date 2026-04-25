@@ -1,66 +1,63 @@
-# Example Docker Compose for the Arr ecosystem with Pulse.
-# Services auto-discover each other through the central control plane.
+# ============================================================================
+# Pulse — standalone deployment
 #
-# Usage:
-#   docker compose up -d
-#   Open http://localhost:9696 for the Pulse UI
+# Runs Pulse on its own with a dedicated Postgres. No Pilot/Prism/Haul.
 #
-version: "3.9"
+# For the full Beacon Stack (Pulse + Pilot + Prism + Haul + VPN), see
+# https://github.com/beacon-stack/deploy
+#
+# Quick start:
+#   1. Edit the /path/to/... line and the password below.
+#   2. docker compose up -d
+#   3. Visit http://localhost:9696. Find your API key in Settings → System.
+# ============================================================================
 
 services:
+
+  pulse-postgres:
+    image: postgres:17-alpine
+    container_name: pulse-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pulse
+      POSTGRES_PASSWORD: change-me-please
+      POSTGRES_DB: pulse_db
+    volumes:
+      - pulse-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pulse"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
   pulse:
-    build: .
+    image: ghcr.io/beacon-stack/pulse:latest
     container_name: pulse
+    restart: unless-stopped
+    depends_on:
+      pulse-postgres:
+        condition: service_healthy
+    environment:
+      # Override the beacon-stack defaults baked into the image.
+      PULSE_DATABASE_DSN: "postgres://pulse:change-me-please@pulse-postgres:5432/pulse_db?sslmode=disable"
+      PULSE_DATABASE_PASSWORD_FILE: ""
+      PULSE_AUTH_API_KEY_FILE: ""
+      # Empty external URL falls back to the request host. Set this
+      # explicitly if you're exposing Pulse to other hosts (e.g.
+      # http://pulse.example.com:9696) so the indexer-proxy URLs it
+      # hands out point back to the right place.
+      PULSE_SERVER_EXTERNAL_URL: ""
+    volumes:
+      - /path/to/config:/config
     ports:
       - "9696:9696"
-    volumes:
-      - pulse-data:/app/data
-    environment:
-      - CONFIGURARR_LOG_LEVEL=info
-      - CONFIGURARR_LOG_FORMAT=text
-      - CONFIGURARR_FLARESOLVERR_URL=http://flaresolverr:8191
-    depends_on:
-      - flaresolverr
-    restart: unless-stopped
-
-  # ── FlareSolverr — Cloudflare bypass proxy ──────────────────────────────
-  flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr:latest
-    container_name: flaresolverr
-    ports:
-      - "8191:8191"
-    environment:
-      - LOG_LEVEL=info
-    restart: unless-stopped
-
-  # ── Example: qBittorrent download client ────────────────────────────────
-  # After startup, register it with Pulse:
-  #   curl -X POST http://pulse:9696/api/v1/services/register \
-  #     -H "X-Api-Key: YOUR_KEY" \
-  #     -H "Content-Type: application/json" \
-  #     -d '{
-  #       "name": "qbittorrent",
-  #       "type": "download-client",
-  #       "api_url": "http://qbittorrent:8080",
-  #       "health_url": "http://qbittorrent:8080/api/v2/app/version",
-  #       "capabilities": ["supports_torrent", "supports_categories", "supports_tags"]
-  #     }'
-  qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
-    container_name: qbittorrent
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/New_York
-      - WEBUI_PORT=8080
-    volumes:
-      - qbit-config:/config
-      - downloads:/downloads
-    ports:
-      - "8080:8080"
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9696/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
 volumes:
-  pulse-data:
-  qbit-config:
-  downloads:
+  pulse-pgdata:

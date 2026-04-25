@@ -15,7 +15,7 @@
 
 **Pulse** is the central service that every other Beacon application — [Pilot](https://github.com/beacon-stack/pilot), [Prism](https://github.com/beacon-stack/prism), [Haul](https://github.com/beacon-stack/haul) — registers with and pulls shared configuration from. If you run more than one Beacon service, Pulse is what stops you from editing the same indexer list, the same quality profile, and the same download-client credentials in every service separately.
 
-Pulse is optional for a single-service install. It becomes essential the moment you add the second one.
+Pulse runs fine on its own as a standalone service registry / shared config store. It comes into its own once a second Beacon service joins it.
 
 ## What Pulse does
 
@@ -55,21 +55,19 @@ Central tag registry with usage counts. Tags are used by indexer assignment, not
 
 ## Getting started
 
-### Docker Compose (recommended, as part of the Beacon stack)
+### Standalone
 
-Pulse is designed to run alongside the rest of the Beacon stack. The full `docker-compose.yml` with Postgres, Pulse, Pilot, Prism, and Haul lives in [`beacon-stack/deploy`](https://github.com/beacon-stack/deploy).
-
-### Standalone Docker
+A single-service compose that runs Pulse with its own dedicated Postgres lives at [`docker-compose.yml`](docker-compose.yml). Edit the `/path/to/...` line and the placeholder password, then:
 
 ```bash
-docker run -d \
-  --name pulse \
-  -p 9696:9696 \
-  -v /path/to/config:/config \
-  ghcr.io/beacon-stack/pulse:latest
+docker compose up -d
 ```
 
-Open `http://localhost:9696`.
+The web UI is at `http://localhost:9696`. Pulse generates an API key on first run; find it in Settings → System.
+
+### As part of the Beacon Stack
+
+For the full setup — Pulse + Pilot + Prism + Haul + VPN — see [`beacon-stack/deploy`](https://github.com/beacon-stack/deploy). Pulse stands on its own; once Pilot, Prism, or Haul join it, the centralized indexer / quality-profile / shared-config story comes online.
 
 ### Build from source
 

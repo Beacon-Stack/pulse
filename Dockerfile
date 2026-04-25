@@ -23,6 +23,19 @@ USER pulse
 
 EXPOSE 9696
 
-VOLUME ["/app/data"]
+VOLUME ["/config"]
+
+# Beacon-stack-shaped defaults — the published image expects to land in a
+# compose with a service named `postgres` and Docker secrets mounted under
+# /run/secrets/. For standalone use, override these via the container's
+# `environment:` block; env always beats Dockerfile ENV. See
+# docker-compose.yml for the standalone recipe.
+ENV PULSE_DATABASE_DRIVER=postgres \
+    PULSE_DATABASE_DSN="postgres://pulse@postgres:5432/pulse_db?sslmode=disable" \
+    PULSE_DATABASE_PASSWORD_FILE=/run/secrets/pulse.txt \
+    PULSE_AUTH_API_KEY_FILE=/run/secrets/pulse-api-key.txt \
+    PULSE_SERVER_EXTERNAL_URL=http://pulse:9696 \
+    PULSE_LOG_LEVEL=info \
+    TZ=UTC
 
 ENTRYPOINT ["./pulse"]
