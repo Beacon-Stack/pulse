@@ -41,7 +41,7 @@ func ExtractFieldHTML(row *goquery.Selection, field FieldBlock, ctx *TemplateCon
 
 	// Apply filters
 	if len(field.Filters) > 0 {
-		value = ApplyFilters(value, field.Filters)
+		value = ApplyFilters(value, field.Filters, ctx)
 	}
 
 	return value
@@ -65,7 +65,7 @@ func ExtractFieldJSON(jsonStr string, field FieldBlock, ctx *TemplateContext) st
 	}
 
 	if len(field.Filters) > 0 {
-		value = ApplyFilters(value, field.Filters)
+		value = ApplyFilters(value, field.Filters, ctx)
 	}
 
 	return value

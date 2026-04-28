@@ -10,48 +10,54 @@ import (
 )
 
 // ApplyFilters runs a sequence of filters on a value.
-func ApplyFilters(value string, filters []FilterDef) string {
+//
+// `ctx` is used to evaluate Go templates that appear in filter arguments
+// (Cardigann YAML routinely embeds `{{ if ... }}` directives in
+// re_replace replacement strings — see Nyaa.si's title_phase2 filter).
+// Pass nil to skip template evaluation when no context is available
+// (e.g. download-link extraction at result-build time).
+func ApplyFilters(value string, filters []FilterDef, ctx *TemplateContext) string {
 	for _, f := range filters {
-		value = applyFilter(value, f)
+		value = applyFilter(value, f, ctx)
 	}
 	return value
 }
 
-func applyFilter(value string, f FilterDef) string {
+func applyFilter(value string, f FilterDef, ctx *TemplateContext) string {
 	switch f.Name {
 	case "querystring":
-		return filterQuerystring(value, filterArgsString(f.Args))
+		return filterQuerystring(value, filterArgString(f.Args, ctx))
 	case "regexp":
-		return filterRegexp(value, filterArgsString(f.Args))
+		return filterRegexp(value, filterArgString(f.Args, ctx))
 	case "re_replace":
-		args := filterArgsSlice(f.Args)
+		args := filterArgSlice(f.Args, ctx)
 		if len(args) >= 2 {
 			return filterReReplace(value, args[0], args[1])
 		}
 		return value
 	case "replace":
-		args := filterArgsSlice(f.Args)
+		args := filterArgSlice(f.Args, ctx)
 		if len(args) >= 2 {
 			return filterReplace(value, args[0], args[1])
 		}
 		return value
 	case "split":
-		args := filterArgsSlice(f.Args)
+		args := filterArgSlice(f.Args, ctx)
 		if len(args) >= 2 {
 			idx, _ := strconv.Atoi(args[1])
 			return filterSplit(value, args[0], idx)
 		}
 		return value
 	case "trim":
-		arg := filterArgsString(f.Args)
+		arg := filterArgString(f.Args, ctx)
 		if arg != "" {
 			return strings.Trim(value, arg)
 		}
 		return strings.TrimSpace(value)
 	case "prepend":
-		return filterArgsString(f.Args) + value
+		return filterArgString(f.Args, ctx) + value
 	case "append":
-		return value + filterArgsString(f.Args)
+		return value + filterArgString(f.Args, ctx)
 	case "tolower":
 		return strings.ToLower(value)
 	case "toupper":
@@ -67,13 +73,13 @@ func applyFilter(value string, f FilterDef) string {
 	case "htmldecode":
 		return filterHTMLDecode(value)
 	case "dateparse":
-		return filterDateparse(value, filterArgsString(f.Args))
+		return filterDateparse(value, filterArgString(f.Args, ctx))
 	case "fuzzytime":
 		return filterFuzzytime(value)
 	case "timeago", "reltime":
 		return filterFuzzytime(value)
 	case "timeparse":
-		return filterDateparse(value, filterArgsString(f.Args))
+		return filterDateparse(value, filterArgString(f.Args, ctx))
 	case "strdump":
 		// Debug filter — passthrough
 		return value
@@ -245,7 +251,39 @@ func dotnetToGoFormat(format string) string {
 
 // ── Argument helpers ─────────────────────────────────────────────────────────
 
-func filterArgsString(args interface{}) string {
+// filterArgString extracts the first arg as a string and template-
+// evaluates it against ctx (when ctx is non-nil). Cardigann YAML routinely
+// puts Go templates inside filter args — without evaluation those
+// directives leak into the final value as literal text.
+func filterArgString(args interface{}, ctx *TemplateContext) string {
+	return evalArg(rawArgString(args), ctx)
+}
+
+// filterArgSlice does the same for argument lists.
+func filterArgSlice(args interface{}, ctx *TemplateContext) []string {
+	raw := rawArgSlice(args)
+	out := make([]string, len(raw))
+	for i, s := range raw {
+		out[i] = evalArg(s, ctx)
+	}
+	return out
+}
+
+// evalArg runs a single arg through the template engine when context
+// is available. Args without `{{` short-circuit; on eval error the
+// original string is returned (best-effort: Cardigann never raises
+// errors out of its filter pipeline).
+func evalArg(s string, ctx *TemplateContext) string {
+	if ctx == nil || !strings.Contains(s, "{{") {
+		return s
+	}
+	if out, err := EvalTemplate(s, ctx); err == nil {
+		return out
+	}
+	return s
+}
+
+func rawArgString(args interface{}) string {
 	switch v := args.(type) {
 	case string:
 		return v
@@ -261,7 +299,7 @@ func filterArgsString(args interface{}) string {
 	return ""
 }
 
-func filterArgsSlice(args interface{}) []string {
+func rawArgSlice(args interface{}) []string {
 	switch v := args.(type) {
 	case []interface{}:
 		out := make([]string, len(v))

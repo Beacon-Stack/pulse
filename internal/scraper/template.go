@@ -80,6 +80,14 @@ func coercingEq(a, b interface{}) bool {
 }
 
 // EvalTemplate evaluates a Go template string with the given context.
+//
+// `missingkey=zero` makes references to absent map keys render as the
+// element type's zero value (empty string for map[string]string) rather
+// than the literal "<no value>" Go's default produces. Cardigann YAML
+// frequently chains fields (e.g. Nyaa's title_phase1 → title_phase2 →
+// title) where intermediate fields legitimately have no value for some
+// rows; without this option the unrendered "<no value>" string leaks
+// into the final title and the consumer sees `<no value>` everywhere.
 func EvalTemplate(tmplStr string, ctx *TemplateContext) (string, error) {
 	if tmplStr == "" {
 		return "", nil
@@ -90,7 +98,7 @@ func EvalTemplate(tmplStr string, ctx *TemplateContext) (string, error) {
 		return tmplStr, nil
 	}
 
-	t, err := template.New("").Funcs(templateFuncs).Parse(tmplStr)
+	t, err := template.New("").Option("missingkey=zero").Funcs(templateFuncs).Parse(tmplStr)
 	if err != nil {
 		return "", err
 	}

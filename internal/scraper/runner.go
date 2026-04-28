@@ -1,13 +1,16 @@
 package scraper
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -49,15 +52,40 @@ func NewRunner(def *Definition, settings map[string]string, flaresolverr *FlareS
 		baseURL = strings.TrimRight(def.Links[0], "/")
 	}
 
-	// Merge settings with defaults from the definition
+	// Merge settings with defaults from the definition.
+	//
+	// Boolean defaults need special handling: Cardigann YAML uses
+	// `{{ if .Config.foo }}` expecting a bool false to skip the branch.
+	// Storing it as the string "false" makes Go's `if` treat it as truthy
+	// (any non-empty string is truthy), which selects the wrong template
+	// branch — this is what produced "<no value>" titles for Nyaa.si
+	// (the upstream YAML's title field has
+	// `{{ if .Config.sonarr_compatibility }}…{{ end }}` and the false
+	// default fell into the truthy branch). Map booleans to ""/`"true"`
+	// so the string is empty (falsy) when the bool is false.
+	//
+	// User-supplied values get the same coercion BUT only for settings
+	// declared as `type: checkbox` — Cardigann YAML also uses literal
+	// "0" as a valid filter/category ID, which we must not silently
+	// convert to "" (truthy, but resolves to wrong category).
+	checkboxFields := make(map[string]bool)
+	for _, s := range def.Settings {
+		if strings.EqualFold(s.Type, "checkbox") {
+			checkboxFields[s.Name] = true
+		}
+	}
 	merged := make(map[string]string)
 	for _, s := range def.Settings {
 		if s.Default != nil {
-			merged[s.Name] = fmt.Sprintf("%v", s.Default)
+			merged[s.Name] = configValueAsTemplateString(s.Default)
 		}
 	}
 	for k, v := range settings {
-		merged[k] = v
+		if checkboxFields[k] {
+			merged[k] = normalizeBoolString(v)
+		} else {
+			merged[k] = v
+		}
 	}
 	// Inject sitelink
 	merged["sitelink"] = baseURL + "/"
@@ -75,6 +103,75 @@ func NewRunner(def *Definition, settings map[string]string, flaresolverr *FlareS
 // Definition returns the underlying definition.
 func (r *Runner) Definition() *Definition {
 	return r.def
+}
+
+// configValueAsTemplateString coerces a YAML setting default to the string
+// form Go templates can branch on correctly. The non-obvious case is bool
+// false: fmt.Sprintf("%v", false) yields "false", which Go's `if` treats
+// as truthy (any non-empty string is truthy). Cardigann YAML expects
+// false to be falsy, so we emit "" for false and "true" for true.
+// Non-bool values pass through unchanged.
+func configValueAsTemplateString(v interface{}) string {
+	if b, ok := v.(bool); ok {
+		if b {
+			return "true"
+		}
+		return ""
+	}
+	return fmt.Sprintf("%v", v)
+}
+
+// normalizeBoolString folds the string forms a UI checkbox might serialize
+// ("false", "0", "no", "off") down to "" so they are falsy in Go templates.
+// "true"/"1"/"yes"/"on" pass through as "true". Anything else is left as-is
+// so non-checkbox config values (sort fields, category IDs, etc.) keep
+// their literal value.
+func normalizeBoolString(s string) string {
+	switch strings.ToLower(strings.TrimSpace(s)) {
+	case "false", "0", "no", "off":
+		return ""
+	case "true", "1", "yes", "on":
+		return "true"
+	}
+	return s
+}
+
+// buildQueryString assembles the URL query string from path-level inputs
+// merged on top of search-block-level inputs (Cardigann convention:
+// path inputs win on key collision). Each value is a Go template
+// evaluated against tmplCtx — Nyaa.si's `q: "{{ .Keywords }}"` is the
+// canonical example. Empty values are skipped so we don't send
+// `&strip_s01=` and the like when a checkbox is unset.
+//
+// Sorted iteration so the same inputs always produce the same URL —
+// makes scraper logs greppable and avoids spurious diffs in tests.
+func (r *Runner) buildQueryString(pathInputs map[string]string, tmplCtx *TemplateContext) string {
+	merged := make(map[string]string, len(r.def.Search.Inputs)+len(pathInputs))
+	for k, v := range r.def.Search.Inputs {
+		merged[k] = v
+	}
+	for k, v := range pathInputs {
+		merged[k] = v
+	}
+	if len(merged) == 0 {
+		return ""
+	}
+
+	keys := make([]string, 0, len(merged))
+	for k := range merged {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	var parts []string
+	for _, k := range keys {
+		evaluated, err := EvalTemplate(merged[k], tmplCtx)
+		if err != nil || evaluated == "" {
+			continue
+		}
+		parts = append(parts, url.QueryEscape(k)+"="+url.QueryEscape(evaluated))
+	}
+	return strings.Join(parts, "&")
 }
 
 // ResolveDownload fetches a detail page and extracts the actual download URL
@@ -167,9 +264,12 @@ func (r *Runner) extractDownloadFromHTML(html, baseURL string) (string, error) {
 			continue
 		}
 
-		// Apply filters if any
+		// Apply filters if any. tmplCtx is the same one used to evaluate
+		// the selector itself, so download-link filters that include
+		// {{ .Config.foo }} directives resolve against the user's
+		// settings.
 		if len(sel.Filters) > 0 {
-			link = ApplyFilters(link, sel.Filters)
+			link = ApplyFilters(link, sel.Filters, tmplCtx)
 		}
 
 		// Make absolute if relative
@@ -185,9 +285,12 @@ func (r *Runner) extractDownloadFromHTML(html, baseURL string) (string, error) {
 
 // Search executes a search and returns structured results.
 func (r *Runner) Search(ctx context.Context, query string, categories []int) ([]SearchResult, error) {
-	// Apply keyword filters
+	// Apply keyword filters. We need a context for template evaluation —
+	// keyword filters routinely conditionally rewrite the query based on
+	// user settings (e.g. Nyaa's strip_s01 / radarr_compatibility).
+	preCtx := NewTemplateContext(r.settings, query)
 	for _, f := range r.def.Search.KeywordsFilters {
-		query = applyFilter(query, f)
+		query = applyFilter(query, f, preCtx)
 	}
 
 	// Map requested Torznab categories to site category IDs
@@ -230,6 +333,19 @@ func (r *Runner) executePath(ctx context.Context, path SearchPath, tmplCtx *Temp
 		fullURL = evalPath
 	} else {
 		fullURL = r.baseURL + "/" + strings.TrimLeft(evalPath, "/")
+	}
+
+	// Append the query string built from path.Inputs and the
+	// search-block-level inputs (search.inputs in YAML). Cardigann's
+	// convention: path-level inputs override block-level inputs of the
+	// same name. Without this, Nyaa.si requests hit `/` with no `?q=…`,
+	// so the homepage comes back regardless of the search query.
+	if qs := r.buildQueryString(path.Inputs, tmplCtx); qs != "" {
+		sep := "?"
+		if strings.Contains(fullURL, "?") {
+			sep = "&"
+		}
+		fullURL += sep + qs
 	}
 
 	r.logger.Debug("scraper: fetching",
@@ -378,13 +494,19 @@ func (r *Runner) parseJSON(body string, tmplCtx *TemplateContext) ([]SearchResul
 	return results, nil
 }
 
+// resultPassMaxIterations caps how many times pass 2 may re-run when
+// chained .Result references (e.g. Nyaa's title_phase1 → title_phase2 →
+// title_phase3 → title) need multiple iterations to stabilize. Empirically
+// the longest chain in the Prowlarr-Indexers v11 set is ~6 hops; 16 is a
+// generous ceiling that still bounds pathological cycles.
+const resultPassMaxIterations = 16
+
 // extractRow extracts a SearchResult from an HTML row.
 func (r *Runner) extractRow(row *goquery.Selection, tmplCtx *TemplateContext) SearchResult {
-	// Extract all fields into the Result map so templates can reference them
 	fieldValues := make(map[string]string)
 
-	// Process fields in order — some fields reference others via .Result
-	// First pass: fields without .Result references
+	// Pass 1: fields without .Result references — they don't depend on
+	// any other field, so a single pass in any order is sufficient.
 	for name, field := range r.def.Search.Fields {
 		if !strings.Contains(field.Text, ".Result.") {
 			fieldValues[name] = ExtractFieldHTML(row, field, tmplCtx)
@@ -392,13 +514,29 @@ func (r *Runner) extractRow(row *goquery.Selection, tmplCtx *TemplateContext) Se
 	}
 	tmplCtx.Result = fieldValues
 
-	// Second pass: fields with .Result references
-	for name, field := range r.def.Search.Fields {
-		if strings.Contains(field.Text, ".Result.") {
-			fieldValues[name] = ExtractFieldHTML(row, field, tmplCtx)
+	// Pass 2: fields with .Result references — iterate to a fixed point.
+	// Cardigann YAML chains fields (e.g. Nyaa's title_phase1 →
+	// title_phase2 → title_phase3 → title), and Go's map iteration order
+	// is randomized, so a single pass can evaluate `title` before
+	// `title_phase2` and produce "<no value>" output. Iterating until no
+	// values change handles arbitrary DAG depths without us having to
+	// build a topo sort.
+	for iter := 0; iter < resultPassMaxIterations; iter++ {
+		changed := false
+		for name, field := range r.def.Search.Fields {
+			if !strings.Contains(field.Text, ".Result.") {
+				continue
+			}
+			newValue := ExtractFieldHTML(row, field, tmplCtx)
+			if fieldValues[name] != newValue {
+				fieldValues[name] = newValue
+				changed = true
+			}
+		}
+		if !changed {
+			break
 		}
 	}
-	tmplCtx.Result = fieldValues
 
 	return r.buildResult(fieldValues)
 }
@@ -414,12 +552,23 @@ func (r *Runner) extractJSONRow(jsonItem string, tmplCtx *TemplateContext) Searc
 	}
 	tmplCtx.Result = fieldValues
 
-	for name, field := range r.def.Search.Fields {
-		if strings.Contains(field.Text, ".Result.") {
-			fieldValues[name] = ExtractFieldJSON(jsonItem, field, tmplCtx)
+	// Same fixed-point iteration as the HTML path — see extractRow.
+	for iter := 0; iter < resultPassMaxIterations; iter++ {
+		changed := false
+		for name, field := range r.def.Search.Fields {
+			if !strings.Contains(field.Text, ".Result.") {
+				continue
+			}
+			newValue := ExtractFieldJSON(jsonItem, field, tmplCtx)
+			if fieldValues[name] != newValue {
+				fieldValues[name] = newValue
+				changed = true
+			}
+		}
+		if !changed {
+			break
 		}
 	}
-	tmplCtx.Result = fieldValues
 
 	return r.buildResult(fieldValues)
 }
@@ -571,10 +720,54 @@ func parseSize(s string) int64 {
 }
 
 // ParseDefinition parses raw YAML bytes into a Definition.
+//
+// Applies a small set of upstream-typo workarounds before YAML parse —
+// see normalizeCardigannQuirks. These exist because the Prowlarr-Indexers
+// repo occasionally ships YAML with subtle template-syntax typos that
+// Prowlarr's C# Cardigann implementation tolerates but Go's text/template
+// rejects. We patch them at load time rather than per-call so the rest
+// of the runner sees clean templates.
 func ParseDefinition(raw []byte) (*Definition, error) {
+	raw = normalizeCardigannQuirks(raw)
 	var def Definition
 	if err := yaml.Unmarshal(raw, &def); err != nil {
 		return nil, fmt.Errorf("parsing definition YAML: %w", err)
 	}
 	return &def, nil
+}
+
+// normalizeCardigannQuirks repairs known upstream Cardigann YAML typos
+// that Go's text/template can't tolerate. Each entry should be:
+//   - documented with the indexer where it was first observed
+//   - linked to the upstream YAML so we can drop the workaround once
+//     Prowlarr-Indexers fixes it
+//
+// Replacements happen on the raw YAML bytes BEFORE yaml.Unmarshal so all
+// downstream consumers (template parser, runner, tests) see the clean
+// version. They are intentionally narrow string substitutions — broader
+// regex normalization would risk corrupting valid templates that just
+// happen to look adjacent to a known typo.
+func normalizeCardigannQuirks(raw []byte) []byte {
+	type quirk struct {
+		from, to string
+		// note is for code archaeology — link the upstream definition
+		// where this typo lives so a future maintainer can verify it's
+		// still needed before deleting the rule.
+		note string
+	}
+	quirks := []quirk{
+		{
+			// 1337x v11 search path #2 (TV) has (eq … .False)) with one
+			// extra closing paren. Movies/Music/Other paths in the same
+			// file are correct.
+			// https://github.com/Prowlarr/Indexers/blob/master/definitions/v11/1337x.yml
+			from: ".False)) }}",
+			to:   ".False) }}",
+			note: "1337x.yml v11: TV-search path extra-paren typo",
+		},
+	}
+	for _, q := range quirks {
+		raw = bytes.ReplaceAll(raw, []byte(q.from), []byte(q.to))
+	}
+	return raw
 }
