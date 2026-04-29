@@ -316,21 +316,35 @@ func TestEvalTemplate_MissingKeyRendersEmpty(t *testing.T) {
 // ── Iterative pass 2 in extractRow ──────────────────────────────────────────
 
 // Pass 2 must reach a fixed point regardless of map iteration order.
-// Build the Nyaa-style chain explicitly and confirm the final field
-// resolves to the upstream value, not "<no value>".
+// Build a three-hop chain feeding into `title` (a SearchResult-bearing
+// field) and confirm the SUT's extractRow renders the upstream value
+// — not "<no value>" or the partial mid-chain value.
+//
+// The chain:
+//
+//	a     (selector ".a")              → "A_VALUE"
+//	b     (text "{{ .Result.a }}")     → "A_VALUE"
+//	title (text "{{ .Result.b }}-c")   → "A_VALUE-c"
+//
+// Go map iteration is randomized: in a single-pass implementation,
+// `title` may be processed before `b`, leaving .Result.b empty and
+// the rendered title "-c" (or "<no value>-c" without missingkey=zero).
+// The 100 trials below exercise enough random orderings to surface
+// the bug consistently if the iterative-fixed-point pass is broken.
+//
+// Verified by mutation (commit 09a9254/cdecd4b history):
+//   - Cap `resultPassMaxIterations` to 1 → fails (chain doesn't resolve)
+//   - Remove the iterative loop entirely (single pass) → fails
+//   - Drop missingkey=zero on EvalTemplate → renders "<no value>-c"
+//     (caught here AND by TestEvalTemplate_MissingKeyRendersEmpty)
 func TestExtractRow_ChainedResultFieldsResolveInOrderIndependent(t *testing.T) {
-	// Three fields, three hops:
-	//   a (selector-only) → b (text=`{{ .Result.a }}`) → c (text=`{{ .Result.b }}-c`)
-	// In a single-pass implementation, when c is iterated before b,
-	// .Result.b is missing → c becomes "-c" (or "<no value>-c" without
-	// missingkey=zero). The fix is to iterate pass 2 to a fixed point.
 	def := &Definition{
 		Search: SearchBlock{
 			Rows: RowsBlock{Selector: "div"},
 			Fields: map[string]FieldBlock{
-				"a": {SelectorBlock: SelectorBlock{Selector: ".a"}},
-				"b": {SelectorBlock: SelectorBlock{Text: "{{ .Result.a }}"}},
-				"c": {SelectorBlock: SelectorBlock{Text: "{{ .Result.b }}-c"}},
+				"a":     {SelectorBlock: SelectorBlock{Selector: ".a"}},
+				"b":     {SelectorBlock: SelectorBlock{Text: "{{ .Result.a }}"}},
+				"title": {SelectorBlock: SelectorBlock{Text: "{{ .Result.b }}-c"}},
 			},
 		},
 	}
@@ -338,44 +352,18 @@ func TestExtractRow_ChainedResultFieldsResolveInOrderIndependent(t *testing.T) {
 	html := `<div><span class="a">A_VALUE</span></div>`
 	doc, _ := goquery.NewDocumentFromReader(strings.NewReader(html))
 
-	ctx := NewTemplateContext(r.settings, "")
-
-	// Run extractRow many times — Go's map iteration is randomized, so
-	// across enough trials we exercise both bad and good orders. Every
-	// trial must produce the correct chain output.
-	for i := 0; i < 50; i++ {
+	const trials = 100
+	for i := 0; i < trials; i++ {
+		// Fresh ctx per trial so .Result from the prior trial's
+		// fixed-point loop can't carry forward and mask a regression.
+		ctx := NewTemplateContext(r.settings, "")
 		row := doc.Find("div").First()
+
 		result := r.extractRow(row, ctx)
-		// Fields aren't directly exposed on SearchResult; use a chain
-		// that lands in `title` so we can assert on the final value.
-		// Re-build the def with the chain feeding `title`:
-		_ = result
-		fieldValues := make(map[string]string)
-		// Replicate just to check fieldValues directly.
-		for name, field := range def.Search.Fields {
-			if !strings.Contains(field.Text, ".Result.") {
-				fieldValues[name] = ExtractFieldHTML(row, field, ctx)
-			}
-		}
-		ctx.Result = fieldValues
-		for iter := 0; iter < resultPassMaxIterations; iter++ {
-			changed := false
-			for name, field := range def.Search.Fields {
-				if !strings.Contains(field.Text, ".Result.") {
-					continue
-				}
-				newVal := ExtractFieldHTML(row, field, ctx)
-				if fieldValues[name] != newVal {
-					fieldValues[name] = newVal
-					changed = true
-				}
-			}
-			if !changed {
-				break
-			}
-		}
-		if got := fieldValues["c"]; got != "A_VALUE-c" {
-			t.Fatalf("trial %d: chained field c = %q, want %q (chain broke)", i, got, "A_VALUE-c")
+
+		if result.Title != "A_VALUE-c" {
+			t.Fatalf("trial %d: extractRow's iterative pass-2 broke the chain — Title = %q, want %q",
+				i, result.Title, "A_VALUE-c")
 		}
 	}
 }
