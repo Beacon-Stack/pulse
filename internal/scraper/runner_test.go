@@ -1,7 +1,10 @@
 package scraper
 
 import (
+	"context"
 	"log/slog"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 
@@ -222,6 +225,134 @@ func TestBuildQueryString_PathInputsOverrideBlockInputs(t *testing.T) {
 	want := "p=2&q=from_block"
 	if got != want {
 		t.Errorf("query string = %q, want %q", got, want)
+	}
+}
+
+// ── Runner.Search end-to-end ─────────────────────────────────────────────────
+
+// End-to-end test: composes the cdecd4b fixes (bool coercion,
+// missingkey=zero, iterative pass-2, filter-arg template eval, and
+// path.Inputs query-string building) through Runner.Search against a
+// real httptest backend. Each individual fix has its own unit test;
+// this is the contract that they all stay wired together so a
+// re-arrangement of the runner doesn't silently lose one of them.
+//
+// Failure modes this catches that the unit tests miss:
+//   - tmplCtx not propagated from Search→executePath→parseHTML→extractRow
+//   - search-block-level inputs lost on path execution
+//   - keyword filters applied to a different ctx than the row context
+//   - parseHTML/extractRow integration drift (e.g. SearchResult.Title
+//     populated but the FILTER on the title lost its template eval)
+func TestRunnerSearch_EndToEnd_ComposesAllFixes(t *testing.T) {
+	// Capture the request the runner makes so we can verify the
+	// query-string was built from path.Inputs.
+	var capturedRawQuery string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		capturedRawQuery = r.URL.RawQuery
+		w.Header().Set("Content-Type", "text/html")
+		// Two rows; one matches the keyword filter year-replace, one doesn't.
+		_, _ = w.Write([]byte(`
+<table>
+  <tr class="row">
+    <td class="title">Inception 2010 1080p [GROUP]</td>
+    <td class="seeds">42</td>
+  </tr>
+  <tr class="row">
+    <td class="title">Inception 2010 720p</td>
+    <td class="seeds">7</td>
+  </tr>
+</table>
+`))
+	}))
+	t.Cleanup(server.Close)
+
+	// The Definition exercises every cdecd4b fix in one chain:
+	//
+	//   - sonarr_compat is a bool false default → must coerce to ""
+	//     (truthy "false" string would route into the wrong if-branch
+	//     of `title` below).
+	//   - title_phase1 is selector-only → pass 1.
+	//   - title_phase2 references .Result.title_phase1 → pass 2,
+	//     must wait until phase1 is populated (random map order).
+	//   - title is `{{ if .Config.sonarr_compat }}…{{ else }}{{ .Result.title_phase2 }}{{ end }}`
+	//     — verifies bool coercion sends us into the ELSE branch and
+	//     the title_phase2 chain survives the iterative-pass-2 loop.
+	//   - title_phase2's filter has a template inside its args
+	//     (`{{ if .Config.uppercase_titles }}…{{ else }}…{{ end }}`)
+	//     — without filter-arg template eval the literal `{{ }}`
+	//     directives leak into the rendered title.
+	//   - search.inputs builds `?cat=tv` and path.inputs adds `?q=...`
+	//     — the captured RawQuery below verifies both were merged.
+	def := &Definition{
+		ID:    "test",
+		Name:  "Test Indexer",
+		Type:  "public",
+		Links: []string{server.URL},
+		Settings: []SettingField{
+			{Name: "sonarr_compat", Type: "checkbox", Default: false},
+			{Name: "uppercase_titles", Type: "checkbox", Default: false},
+		},
+		Search: SearchBlock{
+			Paths:  []SearchPath{{Path: "/search", Inputs: map[string]string{"q": "{{ .Keywords }}"}}},
+			Inputs: map[string]string{"cat": "tv"},
+			Rows:   RowsBlock{Selector: "tr.row"},
+			Fields: map[string]FieldBlock{
+				"title_phase1": {SelectorBlock: SelectorBlock{Selector: "td.title"}},
+				"title_phase2": {SelectorBlock: SelectorBlock{
+					Text: "{{ .Result.title_phase1 }}",
+					Filters: []FilterDef{{
+						Name: "re_replace",
+						Args: []interface{}{
+							` ?\[GROUP\]`,
+							"{{ if .Config.uppercase_titles }} [UPPER]{{ else }}{{ end }}",
+						},
+					}},
+				}},
+				"title": {SelectorBlock: SelectorBlock{
+					Text: "{{ if .Config.sonarr_compat }}SONARR_BRANCH{{ else }}{{ .Result.title_phase2 }}{{ end }}",
+				}},
+				"seeders": {SelectorBlock: SelectorBlock{Selector: "td.seeds"}},
+			},
+		},
+	}
+
+	r := NewRunner(def, nil, nil, slog.Default())
+	results, err := r.Search(context.Background(), "Inception 2010", nil)
+	if err != nil {
+		t.Fatalf("Search: %v", err)
+	}
+
+	// Two rows on the page → two results out.
+	if len(results) != 2 {
+		t.Fatalf("len(results) = %d, want 2 — body=%q", len(results), capturedRawQuery)
+	}
+
+	// path.Inputs + search.inputs must both reach the wire (sorted
+	// keys: cat, q). Bug #6 from cdecd4b.
+	wantQuery := "cat=tv&q=Inception+2010"
+	if capturedRawQuery != wantQuery {
+		t.Errorf("captured query = %q, want %q (path.Inputs + search.inputs not merged)", capturedRawQuery, wantQuery)
+	}
+
+	// Title must be the cleaned-up form: bool coercion routed into the
+	// ELSE branch (giving us .Result.title_phase2), the filter-arg
+	// template eval evaluated to "" (uppercase_titles=false), the
+	// re_replace dropped " [GROUP]", and the iterative pass-2 had to
+	// resolve title_phase1 → title_phase2 → title across random map
+	// order.
+	want0 := "Inception 2010 1080p"
+	want1 := "Inception 2010 720p"
+	if results[0].Title != want0 || results[1].Title != want1 {
+		t.Errorf("titles = [%q, %q], want [%q, %q]",
+			results[0].Title, results[1].Title, want0, want1)
+	}
+
+	// Seeders must round-trip from the simple selector field.
+	if results[0].Seeders != 42 {
+		t.Errorf("results[0].Seeders = %d, want 42", results[0].Seeders)
+	}
+	if results[1].Seeders != 7 {
+		t.Errorf("results[1].Seeders = %d, want 7", results[1].Seeders)
 	}
 }
 
