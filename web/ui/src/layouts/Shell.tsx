@@ -40,15 +40,38 @@ const settingsNav: NavItem[] = [
   { to: "/settings/app",    icon: Paintbrush,  label: "App Settings" },
 ];
 
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+// Viewport tiers, in order from narrowest to widest:
+//
+//   mobile   <768px   slide-out drawer + hamburger top bar
+//   compact  768–1100 sidebar force-collapsed to 60px icons-only
+//   wide     ≥1100px  sidebar honors the user's saved expanded/collapsed pref
+//
+// The compact tier exists because the right pane needs at least ~1024px
+// to render most settings forms and tables comfortably; a 240px sidebar
+// at 1024-1100px viewport leaves only ~700px and crushes the content.
+type ViewportMode = "mobile" | "compact" | "wide";
+
+function computeViewportMode(): ViewportMode {
+  if (typeof window === "undefined") return "wide";
+  if (window.innerWidth < 768) return "mobile";
+  if (window.innerWidth < 1100) return "compact";
+  return "wide";
+}
+
+function useViewportMode(): ViewportMode {
+  const [mode, setMode] = useState<ViewportMode>(computeViewportMode);
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)");
-    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
+    const handler = () => setMode(computeViewportMode());
+    const mqMobile = window.matchMedia("(max-width: 767px)");
+    const mqCompact = window.matchMedia("(max-width: 1099px)");
+    mqMobile.addEventListener("change", handler);
+    mqCompact.addEventListener("change", handler);
+    return () => {
+      mqMobile.removeEventListener("change", handler);
+      mqCompact.removeEventListener("change", handler);
+    };
   }, []);
-  return isMobile;
+  return mode;
 }
 
 function SidebarNavItem({
@@ -65,7 +88,10 @@ function SidebarNavItem({
     <NavLink
       to={item.to}
       end={item.to === "/"}
-      title={collapsed ? item.label : undefined}
+      // Always set the title so the full label is reachable on hover
+      // even when the rail shows the text — long labels can still
+      // ellipsis-clip at narrow widths and the tooltip is the recovery.
+      title={item.label}
       onClick={onClick}
       style={({ isActive }) => ({
         display: "flex",
@@ -87,7 +113,19 @@ function SidebarNavItem({
       })}
     >
       <Icon size={18} strokeWidth={1.5} style={{ flexShrink: 0 }} />
-      {!collapsed && <span>{item.label}</span>}
+      {!collapsed && (
+        <span
+          style={{
+            // Soft-clip with ellipsis instead of hard cut — without
+            // this, long labels rendered mid-word with no visual cue.
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            minWidth: 0,
+          }}
+        >
+          {item.label}
+        </span>
+      )}
     </NavLink>
   );
 }
@@ -122,11 +160,16 @@ function Sidebar({
   onCollapse,
   onClose,
   isMobile,
+  autoCollapsed,
 }: {
   collapsed: boolean;
   onCollapse: () => void;
   onClose: () => void;
   isMobile: boolean;
+  // autoCollapsed=true means the viewport forced compact mode. The
+  // toggle button is hidden in that case — manual override would
+  // bounce back on the next render anyway.
+  autoCollapsed?: boolean;
 }) {
   const width = isMobile ? 240 : collapsed ? 60 : 240;
 
@@ -236,7 +279,11 @@ function Sidebar({
 
         <div
           style={{
-            margin: "12px 4px 4px",
+            // Margins must collapse to 0 alongside height so the band
+            // disappears entirely when the sidebar is collapsed.
+            // Previously height shrank to 1px but the 16px of vertical
+            // margin remained, leaving a ghost gap.
+            margin: (!isMobile && collapsed) ? "0" : "12px 4px 4px",
             fontSize: "11px",
             fontWeight: 500,
             color: "var(--color-text-muted)",
@@ -244,9 +291,9 @@ function Sidebar({
             textTransform: "uppercase",
             whiteSpace: "nowrap",
             overflow: "hidden",
-            height: (!isMobile && collapsed) ? "1px" : "auto",
+            height: (!isMobile && collapsed) ? "0" : "auto",
             opacity: (!isMobile && collapsed) ? 0 : 1,
-            transition: "opacity 150ms ease",
+            transition: "opacity 150ms ease, height 150ms ease, margin 150ms ease",
           }}
         >
           Settings
@@ -273,7 +320,7 @@ function Sidebar({
         }}
       >
         <HealthDot collapsed={!isMobile && collapsed} />
-        {!isMobile && (
+        {!isMobile && !autoCollapsed && (
           <button
             onClick={onCollapse}
             style={{
@@ -317,19 +364,24 @@ export function Shell() {
 
   useEffect(() => { applyTheme(); }, []);
 
-  const [collapsed, setCollapsed] = useState(() => {
+  const [userCollapsed, setUserCollapsed] = useState(() => {
     return localStorage.getItem("sidebar-collapsed") === "true";
   });
   const [mobileOpen, setMobileOpen] = useState(false);
-  const isMobile = useIsMobile();
+  const mode = useViewportMode();
+  const isMobile = mode === "mobile";
+
+  // In compact mode (768–1100px) the sidebar is force-collapsed
+  // regardless of saved preference.
+  const collapsed = mode === "compact" ? true : userCollapsed;
 
   useEffect(() => {
     if (!isMobile) setMobileOpen(false);
   }, [isMobile]);
 
   useEffect(() => {
-    localStorage.setItem("sidebar-collapsed", String(collapsed));
-  }, [collapsed]);
+    localStorage.setItem("sidebar-collapsed", String(userCollapsed));
+  }, [userCollapsed]);
 
   const location = useLocation();
   useEffect(() => {
@@ -363,8 +415,9 @@ export function Shell() {
       >
         <Sidebar
           collapsed={collapsed}
-          onCollapse={() => setCollapsed((c) => !c)}
+          onCollapse={() => setUserCollapsed((c) => !c)}
           onClose={() => setMobileOpen(false)}
+          autoCollapsed={mode === "compact"}
           isMobile={isMobile}
         />
       </div>
