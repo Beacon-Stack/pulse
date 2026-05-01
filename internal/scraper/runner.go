@@ -586,7 +586,16 @@ func (r *Runner) buildResult(fields map[string]string) SearchResult {
 		download = r.baseURL + "/" + strings.TrimLeft(download, "/")
 	}
 
+	// Cardigann YAML defs in the wild use either `magneturi` or
+	// `magnet` for the magnet selector (Prowlarr's nyaasi.yml,
+	// sukebei.yml, tokyotoshokan.yml all use `magnet`). Accept both
+	// — without this, Nyaa torznab responses ship with no
+	// <enclosure> tag and grabbing fails downstream with "release …
+	// has no download URL".
 	magnetURI := fields["magneturi"]
+	if magnetURI == "" {
+		magnetURI = fields["magnet"]
+	}
 	if magnetURI == "" && strings.HasPrefix(download, "magnet:") {
 		magnetURI = download
 	}

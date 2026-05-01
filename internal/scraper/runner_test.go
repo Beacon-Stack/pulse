@@ -526,3 +526,72 @@ search.fields: {}
 		t.Errorf("path was not normalized inside ParseDefinition: %q", def.Search.Paths[0].Path)
 	}
 }
+
+// ── buildResult: magnet field key tolerance ──────────────────────────────────
+//
+// Real-world regression: Cardigann YAMLs use either `magneturi` or
+// `magnet` as the field name for the magnet selector. Prowlarr's
+// nyaasi.yml, sukebei.yml, and tokyotoshokan.yml all use `magnet`.
+// Without accepting both, magnet-only indexers ship search rows with
+// no MagnetURI → torznab response has no <enclosure> → grab fails
+// downstream with "release … has no download URL".
+
+func newRunnerForBuildResult() *Runner {
+	// Minimal Definition to satisfy buildResult's call to
+	// resolveCategoryID, which iterates def.Caps.CategoryMappings.
+	return &Runner{
+		baseURL: "https://nyaa.si",
+		def:     &Definition{},
+		logger:  slog.Default(),
+	}
+}
+
+func TestBuildResult_AcceptsMagnetUriKey(t *testing.T) {
+	r := newRunnerForBuildResult()
+	got := r.buildResult(map[string]string{
+		"magneturi": "magnet:?xt=urn:btih:abc123&dn=foo",
+	})
+	if got.MagnetURI != "magnet:?xt=urn:btih:abc123&dn=foo" {
+		t.Errorf("magneturi field not propagated; got MagnetURI=%q", got.MagnetURI)
+	}
+}
+
+func TestBuildResult_AcceptsMagnetKey(t *testing.T) {
+	// This is the JJK-on-Nyaa case: Prowlarr's nyaasi.yml emits
+	// `magnet:` (no "uri") and the runner used to look only at
+	// `magneturi`. Result: empty MagnetURI → empty <enclosure> →
+	// grab failure.
+	r := newRunnerForBuildResult()
+	got := r.buildResult(map[string]string{
+		"magnet": "magnet:?xt=urn:btih:def456&dn=bar",
+	})
+	if got.MagnetURI != "magnet:?xt=urn:btih:def456&dn=bar" {
+		t.Errorf("magnet field not propagated; got MagnetURI=%q", got.MagnetURI)
+	}
+}
+
+func TestBuildResult_MagnetUriWinsOverMagnet(t *testing.T) {
+	// If a YAML defines both (rare but possible), `magneturi` is the
+	// canonical Cardigann field and should win.
+	r := newRunnerForBuildResult()
+	got := r.buildResult(map[string]string{
+		"magneturi": "magnet:?canonical",
+		"magnet":    "magnet:?fallback",
+	})
+	if got.MagnetURI != "magnet:?canonical" {
+		t.Errorf("magneturi should override magnet; got MagnetURI=%q", got.MagnetURI)
+	}
+}
+
+func TestBuildResult_FallsBackToDownloadIfMagnet(t *testing.T) {
+	// Pre-existing behavior: when `download` itself contains a
+	// magnet: URI and no separate magnet field is set, lift it into
+	// MagnetURI. Pin it so the new fallback chain doesn't break it.
+	r := newRunnerForBuildResult()
+	got := r.buildResult(map[string]string{
+		"download": "magnet:?xt=urn:btih:zzz999",
+	})
+	if got.MagnetURI != "magnet:?xt=urn:btih:zzz999" {
+		t.Errorf("download magnet: not lifted; got MagnetURI=%q", got.MagnetURI)
+	}
+}
