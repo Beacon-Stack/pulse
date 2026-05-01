@@ -1,6 +1,7 @@
 import PageHeader from "@/components/PageHeader";
 import { useSystemStatus } from "@/api/system";
 import { card } from "@/lib/styles";
+import TableScroll from "@beacon-shared/TableScroll";
 
 export default function SystemPage() {
   const { data: status } = useSystemStatus();
@@ -10,6 +11,7 @@ export default function SystemPage() {
       <PageHeader title="System" description="System information and status." />
 
       <div style={{ ...card }}>
+        <TableScroll minWidth={300}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <tbody>
             {[
@@ -24,6 +26,7 @@ export default function SystemPage() {
             ))}
           </tbody>
         </table>
+        </TableScroll>
       </div>
     </div>
   );

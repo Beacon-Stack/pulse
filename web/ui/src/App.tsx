@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { ConfirmProvider } from "@beacon-shared/ConfirmDialog";
-import { Shell } from "@/layouts/Shell";
+import Shell from "@/layouts/Shell";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Dashboard from "@/pages/dashboard/Dashboard";
 import ServicesPage from "@/pages/services/ServicesPage";
@@ -59,6 +59,8 @@ export default function App() {
           </ErrorBoundary>
           <Toaster
             position="bottom-left"
+            visibleToasts={9}
+            duration={2500}
             toastOptions={{
               style: {
                 background: "var(--color-bg-elevated)",
