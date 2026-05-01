@@ -13,7 +13,14 @@ export default defineConfig({
       react: path.resolve(__dirname, "node_modules/react"),
       "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
     },
-    dedupe: ["react", "react-dom"],
+    // react-router and react-router-dom must be singletons so the Router
+    // context provided by BrowserRouter is the same instance the shared
+    // web-shared/Shell.tsx reads via useLocation/Link/NavLink. Without
+    // dedupe, Shell picks up a separate copy from web-shared/node_modules
+    // and throws "useLocation may be used only in the context of a
+    // <Router>". Using dedupe (not aliases) lets Vite resolve subpath
+    // exports like `react-router/dom` correctly.
+    dedupe: ["react", "react-dom", "react-router-dom", "react-router"],
   },
   build: {
     outDir: "../static",
