@@ -40,6 +40,9 @@ func Load(configPath string) (*Config, error) {
 	v.SetDefault("log.level", "info")
 	v.SetDefault("log.format", "json")
 	v.SetDefault("flaresolverr.url", "")
+	v.SetDefault("dashboard.docker_socket", "")
+	v.SetDefault("dashboard.gluetun_url", "")
+	v.SetDefault("dashboard.gluetun_container", "vpn")
 
 	// Env vars: PULSE_SERVER_PORT, etc.
 	v.SetEnvPrefix("PULSE")

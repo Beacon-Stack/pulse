@@ -16,6 +16,7 @@ import DownloadClientDetailPage from "@/pages/download-clients/DownloadClientDet
 import QualityProfilesPage from "@/pages/quality-profiles/QualityProfilesPage";
 import SharedSettingsPage from "@/pages/shared-settings/SharedSettingsPage";
 import SystemPage from "@/pages/settings/system/SystemPage";
+import LogsPage from "@/pages/settings/system/Logs";
 import AppSettingsPage from "@/pages/settings/app/AppSettingsPage";
 
 function RouteEB({ children }: { children: ReactNode }) {
@@ -52,6 +53,7 @@ export default function App() {
                 <Route path="shared-settings" element={<RouteEB><SharedSettingsPage /></RouteEB>} />
                 <Route path="settings">
                   <Route path="system" element={<RouteEB><SystemPage /></RouteEB>} />
+                  <Route path="system/logs" element={<RouteEB><LogsPage /></RouteEB>} />
                   <Route path="app" element={<RouteEB><AppSettingsPage /></RouteEB>} />
                 </Route>
               </Route>

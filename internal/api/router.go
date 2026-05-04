@@ -15,6 +15,7 @@ import (
 	v1 "github.com/beacon-stack/pulse/internal/api/v1"
 	"github.com/beacon-stack/pulse/internal/api/ws"
 	appconfig "github.com/beacon-stack/pulse/internal/config"
+	"github.com/beacon-stack/pulse/internal/core/dashboard"
 	"github.com/beacon-stack/pulse/internal/core/downloadclient"
 	"github.com/beacon-stack/pulse/internal/core/indexer"
 	"github.com/beacon-stack/pulse/internal/core/qualityprofile"
@@ -41,6 +42,7 @@ type RouterConfig struct {
 	SharedSettingsService *sharedsettings.Service
 	ScraperEngine        *scraper.Engine
 	Queries              db.Querier
+	DashboardAggregator  *dashboard.Aggregator
 	ExternalURL          string // e.g., "http://pulse:9696" — used for Torznab proxy URL rewriting
 	// LogSystem is the handle returned by log.New. When non-nil, the
 	// router exposes /api/v1/system/logs and /api/v1/system/log-level
@@ -119,7 +121,8 @@ func NewRouter(cfg RouterConfig) http.Handler {
 
 	// Register route groups.
 	v1.RegisterSystemRoutes(humaAPI, cfg.StartTime)
-
+	v1.RegisterRuntimeRoutes(humaAPI, cfg.StartTime)
+	v1.RegisterEnvRoutes(humaAPI)
 	if cfg.LogSystem != nil {
 		log.RegisterRoutesWithDocker(humaAPI, cfg.LogSystem, cfg.DockerLogs)
 	}
@@ -153,6 +156,10 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	}
 
 	v1.RegisterCatalogRoutes(humaAPI)
+
+	if cfg.DashboardAggregator != nil {
+		v1.RegisterDashboardRoutes(humaAPI, cfg.DashboardAggregator)
+	}
 
 	// Serve the embedded React SPA. Must come after all API routes
 	// so /api/* and /health take precedence.

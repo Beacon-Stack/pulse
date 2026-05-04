@@ -3,6 +3,7 @@ import {
   Activity,
   Cog,
   Download,
+  FileText,
   FolderCog,
   Gauge,
   LayoutDashboard,
@@ -27,6 +28,7 @@ const mainNav: NavItem[] = [
 
 const settingsNav: NavItem[] = [
   { to: "/settings/system", icon: Cog, label: "System" },
+  { to: "/settings/system/logs", icon: FileText, label: "Logs" },
   { to: "/settings/app", icon: Paintbrush, label: "App Settings" },
 ];
 
