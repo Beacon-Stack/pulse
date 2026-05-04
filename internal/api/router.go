@@ -23,6 +23,7 @@ import (
 	"github.com/beacon-stack/pulse/internal/core/tag"
 	db "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/scraper"
+	"github.com/beacon-stack/pulse/pkg/log"
 	"github.com/beacon-stack/pulse/web"
 )
 
@@ -41,6 +42,12 @@ type RouterConfig struct {
 	ScraperEngine        *scraper.Engine
 	Queries              db.Querier
 	ExternalURL          string // e.g., "http://pulse:9696" — used for Torznab proxy URL rewriting
+	// LogSystem is the handle returned by log.New. When non-nil, the
+	// router exposes /api/v1/system/logs and /api/v1/system/log-level
+	// for the in-app viewer. DockerLogs (optional) adds the
+	// /api/v1/system/logs/docker passthrough for full history.
+	LogSystem  *log.System
+	DockerLogs *log.DockerLogsReader
 }
 
 // NewRouter builds and returns the application HTTP handler.
@@ -112,6 +119,10 @@ func NewRouter(cfg RouterConfig) http.Handler {
 
 	// Register route groups.
 	v1.RegisterSystemRoutes(humaAPI, cfg.StartTime)
+
+	if cfg.LogSystem != nil {
+		log.RegisterRoutesWithDocker(humaAPI, cfg.LogSystem, cfg.DockerLogs)
+	}
 
 	if cfg.RegistryService != nil {
 		v1.RegisterServiceRoutes(humaAPI, cfg.RegistryService)
