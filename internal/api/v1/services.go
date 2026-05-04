@@ -23,6 +23,13 @@ type serviceBody struct {
 	Registered   string   `json:"registered"`
 	Capabilities []string `json:"capabilities"`
 	Metadata     string   `json:"metadata"`
+	// APIKey is the sibling service's own API key, captured at
+	// registration. Exposed in discovery so authenticated callers
+	// (services holding a valid Pulse API key) can make server-to-
+	// server calls into siblings without each user having to wire
+	// per-service credentials. The key is empty when the service
+	// registered without ServiceAPIKey set.
+	APIKey string `json:"api_key,omitempty"`
 }
 
 type registerInput struct {
@@ -64,6 +71,7 @@ func toServiceBody(s registry.ServiceInfo) serviceBody {
 		Registered:   s.Registered,
 		Capabilities: caps,
 		Metadata:     s.Metadata,
+		APIKey:       s.ApiKey,
 	}
 }
 
