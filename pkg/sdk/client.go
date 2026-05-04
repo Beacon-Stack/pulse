@@ -218,6 +218,12 @@ type Service struct {
 	LastSeen     string   `json:"last_seen"`
 	Registered   string   `json:"registered"`
 	Capabilities []string `json:"capabilities"`
+	// APIKey is the sibling's own API key, returned by Pulse's
+	// discovery endpoints so a service holding a valid Pulse API
+	// key can make authenticated server-to-server calls into peers
+	// without each user wiring per-service credentials. Empty when
+	// the service registered without ServiceAPIKey set.
+	APIKey string `json:"api_key,omitempty"`
 }
 
 // DiscoverByType returns all services of a given type (e.g. "download-client").
