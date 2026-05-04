@@ -30,6 +30,9 @@ import (
 	dbgen "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/events"
 	"github.com/beacon-stack/pulse/internal/scraper"
+	"github.com/beacon-stack/pulse/pkg/log"
+	"github.com/beacon-stack/pulse/pkg/log/plugins/file"
+	"github.com/beacon-stack/pulse/pkg/log/plugins/loki"
 )
 
 func main() {
@@ -44,26 +47,50 @@ func main() {
 	}
 
 	// ── Logger ───────────────────────────────────────────────────────────
-	var logLevel slog.Level
-	switch cfg.Log.Level {
-	case "debug":
-		logLevel = slog.LevelDebug
-	case "warn":
-		logLevel = slog.LevelWarn
-	case "error":
-		logLevel = slog.LevelError
-	default:
-		logLevel = slog.LevelInfo
+	// Shared module from pulse/pkg/log: gives us stdout JSON, the
+	// in-memory ring buffer behind /api/v1/system/logs, and pluggable
+	// sinks (Loki, file, …). The stdout handler is always on; plugins
+	// are opt-in via env vars below.
+	logger, logSystem := log.New(log.Config{
+		Service: "pulse",
+		Level:   cfg.Log.Level,
+		Format:  cfg.Log.Format,
+	})
+	slog.SetDefault(logger)
+	defer logSystem.Close(context.Background())
+
+	// Optional plugin sinks. Failures are logged + skipped (logger
+	// keeps working with just stdout) — a misconfigured Loki URL
+	// must not stop Pulse from booting.
+	if url := os.Getenv("BEACON_LOG_LOKI_URL"); url != "" {
+		p, err := loki.New(loki.Config{
+			Service:   "pulse",
+			URL:       url,
+			TenantID:  os.Getenv("BEACON_LOG_LOKI_TENANT"),
+			BasicUser: os.Getenv("BEACON_LOG_LOKI_USER"),
+			BasicPass: os.Getenv("BEACON_LOG_LOKI_PASS"),
+		})
+		if err != nil {
+			logger.Warn("loki plugin disabled", "error", err)
+		} else {
+			logSystem.Add(p)
+			logger.Info("log sink: loki", "url", url)
+		}
+	}
+	if path := os.Getenv("BEACON_LOG_FILE_PATH"); path != "" {
+		p, err := file.New(file.Config{Path: path})
+		if err != nil {
+			logger.Warn("file log plugin disabled", "error", err)
+		} else {
+			logSystem.Add(p)
+			logger.Info("log sink: file", "path", path)
+		}
 	}
 
-	var handler slog.Handler
-	opts := &slog.HandlerOptions{Level: logLevel}
-	if cfg.Log.Format == "text" {
-		handler = slog.NewTextHandler(os.Stdout, opts)
-	} else {
-		handler = slog.NewJSONHandler(os.Stdout, opts)
-	}
-	logger := slog.New(handler)
+	// Docker socket reader: the in-app /api/v1/system/logs/docker
+	// endpoint serves much more history than the ring buffer. Falls
+	// back gracefully when the socket isn't mounted.
+	dockerLogs := log.NewDockerLogsReader()
 
 	logger.Info("starting pulse",
 		"host", cfg.Server.Host,
@@ -269,6 +296,8 @@ func main() {
 		ScraperEngine:   scraperEngine,
 		Queries:         queries,
 		ExternalURL:     externalURL,
+		LogSystem:       logSystem,
+		DockerLogs:      dockerLogs,
 	})
 
 	addr := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
