@@ -9,9 +9,32 @@ type Config struct {
 	Log          LogConfig          `mapstructure:"log"`
 	Auth         AuthConfig         `mapstructure:"auth"`
 	FlareSolverr FlareSolverrConfig `mapstructure:"flaresolverr"`
+	Dashboard    DashboardConfig    `mapstructure:"dashboard"`
 
 	// ConfigFile is the path of the config file that was loaded, if any.
 	ConfigFile string `mapstructure:"-"`
+}
+
+// DashboardConfig opts the dashboard into Docker-stats and Gluetun
+// integrations. Both default off — the dashboard works without them, just
+// without container resource info or VPN status panels.
+type DashboardConfig struct {
+	// DockerSocket is the path to a mounted Docker socket. Empty disables
+	// container stats entirely. The socket is read-only on disk but still
+	// effectively grants root on most Docker builds — opt in only.
+	DockerSocket string `mapstructure:"docker_socket"`
+
+	// GluetunURL is the base URL of a Gluetun container's control server
+	// (e.g. "http://vpn:8000"). Empty disables the VPN panel.
+	GluetunURL string `mapstructure:"gluetun_url"`
+
+	// GluetunContainer is the docker container name for Gluetun. Defaults
+	// to "vpn" when unset, matching deploy/docker-compose.vpn.yml.
+	GluetunContainer string `mapstructure:"gluetun_container"`
+
+	// ContainerNames overrides the default service-name → container-name
+	// mapping for non-standard deployments (e.g. Haul → haul-prod).
+	ContainerNames map[string]string `mapstructure:"container_names"`
 }
 
 // FlareSolverrConfig holds optional FlareSolverr proxy settings.

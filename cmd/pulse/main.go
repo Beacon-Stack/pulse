@@ -19,6 +19,9 @@ import (
 	"github.com/beacon-stack/pulse/internal/api/ws"
 	"github.com/beacon-stack/pulse/internal/config"
 	cfgstore "github.com/beacon-stack/pulse/internal/core/config"
+	"github.com/beacon-stack/pulse/internal/core/dashboard"
+	"github.com/beacon-stack/pulse/internal/core/dockerstats"
+	"github.com/beacon-stack/pulse/internal/core/gluetun"
 	"github.com/beacon-stack/pulse/internal/core/health"
 	"github.com/beacon-stack/pulse/internal/core/indexer"
 	"github.com/beacon-stack/pulse/internal/core/registry"
@@ -282,6 +285,23 @@ func main() {
 	}
 
 	startTime := time.Now()
+
+	// Optional dashboard integrations — both default off and degrade gracefully.
+	dockerClient, err := dockerstats.NewClient(cfg.Dashboard.DockerSocket, cfg.Dashboard.ContainerNames)
+	if err != nil {
+		logger.Warn("dashboard: docker stats disabled", "error", err)
+	} else if dockerClient != nil {
+		logger.Info("dashboard: docker stats enabled", "socket", cfg.Dashboard.DockerSocket)
+	}
+	gluetunClient := gluetun.NewClient(cfg.Dashboard.GluetunURL, logger)
+	if gluetunClient != nil {
+		logger.Info("dashboard: gluetun integration enabled", "url", cfg.Dashboard.GluetunURL)
+	}
+	dashAgg := dashboard.New(registrySvc, dockerClient, gluetunClient)
+	if cfg.Dashboard.GluetunContainer != "" {
+		dashAgg.GluetunService = cfg.Dashboard.GluetunContainer
+	}
+
 	router := api.NewRouter(api.RouterConfig{
 		Auth:            cfg.Auth.APIKey,
 		Logger:          logger,
@@ -295,6 +315,7 @@ func main() {
 		WSHub:           wsHub,
 		ScraperEngine:   scraperEngine,
 		Queries:         queries,
+		DashboardAggregator: dashAgg,
 		ExternalURL:     externalURL,
 		LogSystem:       logSystem,
 		DockerLogs:      dockerLogs,
