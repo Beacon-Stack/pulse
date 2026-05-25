@@ -11,7 +11,6 @@ package qualityprofile
 // seed helpers below are the most leverage we can get without that.
 
 import (
-	"database/sql"
 	"encoding/json"
 	"strings"
 	"testing"
@@ -187,36 +186,5 @@ func TestDefaultProfiles_PinnedProfileNames(t *testing.T) {
 		if p.Name != want[i] {
 			t.Errorf("profile[%d].Name = %q, want %q", i, p.Name, want[i])
 		}
-	}
-}
-
-// ── nullStringFromPtr ────────────────────────────────────────────────────────
-
-func TestNullStringFromPtr_Nil(t *testing.T) {
-	got := nullStringFromPtr(nil)
-	if got.Valid {
-		t.Errorf("Valid = true, want false for nil input")
-	}
-	if got.String != "" {
-		t.Errorf("String = %q, want empty", got.String)
-	}
-}
-
-func TestNullStringFromPtr_NonNil(t *testing.T) {
-	s := "hello"
-	got := nullStringFromPtr(&s)
-	want := sql.NullString{String: "hello", Valid: true}
-	if got != want {
-		t.Errorf("got %+v, want %+v", got, want)
-	}
-}
-
-// Empty-string pointer is a real value that should round-trip as
-// Valid=true. Only nil pointers should produce Valid=false.
-func TestNullStringFromPtr_EmptyStringIsValid(t *testing.T) {
-	s := ""
-	got := nullStringFromPtr(&s)
-	if !got.Valid {
-		t.Errorf("Valid = false for empty-string pointer; want true (only nil should produce !Valid)")
 	}
 }

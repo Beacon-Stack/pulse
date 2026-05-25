@@ -12,7 +12,7 @@ import (
 const addCapability = `-- name: AddCapability :exec
 
 INSERT INTO service_capabilities (id, service_id, capability)
-VALUES ($1, $2, $3)
+VALUES (?, ?, ?)
 ON CONFLICT DO NOTHING
 `
 
@@ -29,7 +29,7 @@ func (q *Queries) AddCapability(ctx context.Context, arg AddCapabilityParams) er
 }
 
 const countServicesByType = `-- name: CountServicesByType :one
-SELECT COUNT(*) FROM services WHERE type = $1
+SELECT COUNT(*) FROM services WHERE type = ?
 `
 
 func (q *Queries) CountServicesByType(ctx context.Context, type_ string) (int64, error) {
@@ -41,7 +41,7 @@ func (q *Queries) CountServicesByType(ctx context.Context, type_ string) (int64,
 
 const createService = `-- name: CreateService :one
 INSERT INTO services (id, name, type, api_url, api_key, health_url, version, status, last_seen, registered, metadata)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 RETURNING id, name, type, api_url, api_key, health_url, version, status, last_seen, registered, metadata
 `
 
@@ -91,7 +91,7 @@ func (q *Queries) CreateService(ctx context.Context, arg CreateServiceParams) (S
 }
 
 const deleteCapabilities = `-- name: DeleteCapabilities :exec
-DELETE FROM service_capabilities WHERE service_id = $1
+DELETE FROM service_capabilities WHERE service_id = ?
 `
 
 func (q *Queries) DeleteCapabilities(ctx context.Context, serviceID string) error {
@@ -100,7 +100,7 @@ func (q *Queries) DeleteCapabilities(ctx context.Context, serviceID string) erro
 }
 
 const deleteService = `-- name: DeleteService :exec
-DELETE FROM services WHERE id = $1
+DELETE FROM services WHERE id = ?
 `
 
 func (q *Queries) DeleteService(ctx context.Context, id string) error {
@@ -109,7 +109,7 @@ func (q *Queries) DeleteService(ctx context.Context, id string) error {
 }
 
 const getService = `-- name: GetService :one
-SELECT id, name, type, api_url, api_key, health_url, version, status, last_seen, registered, metadata FROM services WHERE id = $1
+SELECT id, name, type, api_url, api_key, health_url, version, status, last_seen, registered, metadata FROM services WHERE id = ?
 `
 
 func (q *Queries) GetService(ctx context.Context, id string) (Service, error) {
@@ -132,7 +132,7 @@ func (q *Queries) GetService(ctx context.Context, id string) (Service, error) {
 }
 
 const getServiceByNameAndType = `-- name: GetServiceByNameAndType :one
-SELECT id, name, type, api_url, api_key, health_url, version, status, last_seen, registered, metadata FROM services WHERE name = $1 AND type = $2
+SELECT id, name, type, api_url, api_key, health_url, version, status, last_seen, registered, metadata FROM services WHERE name = ? AND type = ?
 `
 
 type GetServiceByNameAndTypeParams struct {
@@ -160,7 +160,7 @@ func (q *Queries) GetServiceByNameAndType(ctx context.Context, arg GetServiceByN
 }
 
 const listCapabilities = `-- name: ListCapabilities :many
-SELECT capability FROM service_capabilities WHERE service_id = $1
+SELECT capability FROM service_capabilities WHERE service_id = ?
 `
 
 func (q *Queries) ListCapabilities(ctx context.Context, serviceID string) ([]string, error) {
@@ -267,7 +267,7 @@ func (q *Queries) ListServices(ctx context.Context) ([]Service, error) {
 const listServicesByCapability = `-- name: ListServicesByCapability :many
 SELECT s.id, s.name, s.type, s.api_url, s.api_key, s.health_url, s.version, s.status, s.last_seen, s.registered, s.metadata FROM services s
 JOIN service_capabilities sc ON s.id = sc.service_id
-WHERE sc.capability = $1
+WHERE sc.capability = ?
 ORDER BY s.type ASC, s.name ASC
 `
 
@@ -307,7 +307,7 @@ func (q *Queries) ListServicesByCapability(ctx context.Context, capability strin
 }
 
 const listServicesByType = `-- name: ListServicesByType :many
-SELECT id, name, type, api_url, api_key, health_url, version, status, last_seen, registered, metadata FROM services WHERE type = $1 ORDER BY name ASC
+SELECT id, name, type, api_url, api_key, health_url, version, status, last_seen, registered, metadata FROM services WHERE type = ? ORDER BY name ASC
 `
 
 func (q *Queries) ListServicesByType(ctx context.Context, type_ string) ([]Service, error) {
@@ -347,14 +347,14 @@ func (q *Queries) ListServicesByType(ctx context.Context, type_ string) ([]Servi
 
 const updateService = `-- name: UpdateService :one
 UPDATE services SET
-    name       = $1,
-    api_url    = $2,
-    api_key    = $3,
-    health_url = $4,
-    version    = $5,
-    metadata   = $6,
-    last_seen  = $7
-WHERE id = $8
+    name       = ?,
+    api_url    = ?,
+    api_key    = ?,
+    health_url = ?,
+    version    = ?,
+    metadata   = ?,
+    last_seen  = ?
+WHERE id = ?
 RETURNING id, name, type, api_url, api_key, health_url, version, status, last_seen, registered, metadata
 `
 
@@ -398,7 +398,7 @@ func (q *Queries) UpdateService(ctx context.Context, arg UpdateServiceParams) (S
 }
 
 const updateServiceHeartbeat = `-- name: UpdateServiceHeartbeat :exec
-UPDATE services SET last_seen = $1, status = 'online' WHERE id = $2
+UPDATE services SET last_seen = ?, status = 'online' WHERE id = ?
 `
 
 type UpdateServiceHeartbeatParams struct {
@@ -412,7 +412,7 @@ func (q *Queries) UpdateServiceHeartbeat(ctx context.Context, arg UpdateServiceH
 }
 
 const updateServiceStatus = `-- name: UpdateServiceStatus :exec
-UPDATE services SET status = $1, last_seen = $2 WHERE id = $3
+UPDATE services SET status = ?, last_seen = ? WHERE id = ?
 `
 
 type UpdateServiceStatusParams struct {

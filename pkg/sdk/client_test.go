@@ -2,11 +2,10 @@ package sdk
 
 import (
 	"context"
-	"database/sql"
-	"os"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -19,8 +18,6 @@ import (
 	"github.com/beacon-stack/pulse/internal/db"
 	dbgen "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/events"
-
-	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 const testAPIKey = "test-api-key-12345"
@@ -28,29 +25,19 @@ const testAPIKey = "test-api-key-12345"
 func setupTestServer(t *testing.T) *httptest.Server {
 	t.Helper()
 
-	dsn := os.Getenv("TEST_DATABASE_DSN")
-	if dsn == "" {
-		t.Skip("TEST_DATABASE_DSN not set — skipping integration test")
-	}
-
-	sqlDB, err := sql.Open("pgx", dsn)
+	database, err := db.Open(appconfig.DatabaseConfig{Path: filepath.Join(t.TempDir(), "pulse-test.db")})
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { sqlDB.Close() })
+	t.Cleanup(func() { database.Close() })
 
-	if err := db.Migrate(sqlDB); err != nil {
+	if err := db.Migrate(database.SQL); err != nil {
 		t.Fatal(err)
-	}
-
-	// Clean all tables for test isolation.
-	for _, table := range []string{"indexer_tags", "service_tags", "tags", "config_subscriptions", "config_entries", "indexer_assignments", "indexers", "service_capabilities", "services", "filter_presets", "download_clients"} {
-		_, _ = sqlDB.Exec("DELETE FROM " + table)
 	}
 
 	logger := slog.Default()
 	bus := events.New(logger)
-	queries := dbgen.New(sqlDB)
+	queries := dbgen.New(database.SQL)
 
 	wsHub := ws.NewHub(logger, []byte(testAPIKey))
 	bus.Subscribe(wsHub.HandleEvent)

@@ -11,7 +11,7 @@ import (
 
 const createFilterPreset = `-- name: CreateFilterPreset :one
 INSERT INTO filter_presets (id, name, filters, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $5)
+VALUES (?, ?, ?, ?, ?)
 RETURNING id, name, filters, created_at, updated_at
 `
 
@@ -43,7 +43,7 @@ func (q *Queries) CreateFilterPreset(ctx context.Context, arg CreateFilterPreset
 }
 
 const deleteFilterPreset = `-- name: DeleteFilterPreset :exec
-DELETE FROM filter_presets WHERE id = $1
+DELETE FROM filter_presets WHERE id = ?
 `
 
 func (q *Queries) DeleteFilterPreset(ctx context.Context, id string) error {
@@ -52,7 +52,7 @@ func (q *Queries) DeleteFilterPreset(ctx context.Context, id string) error {
 }
 
 const deleteFilterPresetByName = `-- name: DeleteFilterPresetByName :exec
-DELETE FROM filter_presets WHERE name = $1
+DELETE FROM filter_presets WHERE name = ?
 `
 
 func (q *Queries) DeleteFilterPresetByName(ctx context.Context, name string) error {
@@ -61,7 +61,7 @@ func (q *Queries) DeleteFilterPresetByName(ctx context.Context, name string) err
 }
 
 const getFilterPreset = `-- name: GetFilterPreset :one
-SELECT id, name, filters, created_at, updated_at FROM filter_presets WHERE id = $1
+SELECT id, name, filters, created_at, updated_at FROM filter_presets WHERE id = ?
 `
 
 func (q *Queries) GetFilterPreset(ctx context.Context, id string) (FilterPreset, error) {
@@ -78,7 +78,7 @@ func (q *Queries) GetFilterPreset(ctx context.Context, id string) (FilterPreset,
 }
 
 const getFilterPresetByName = `-- name: GetFilterPresetByName :one
-SELECT id, name, filters, created_at, updated_at FROM filter_presets WHERE name = $1
+SELECT id, name, filters, created_at, updated_at FROM filter_presets WHERE name = ?
 `
 
 func (q *Queries) GetFilterPresetByName(ctx context.Context, name string) (FilterPreset, error) {
@@ -128,8 +128,8 @@ func (q *Queries) ListFilterPresets(ctx context.Context) ([]FilterPreset, error)
 }
 
 const updateFilterPreset = `-- name: UpdateFilterPreset :one
-UPDATE filter_presets SET name = $1, filters = $2, updated_at = $3
-WHERE id = $4
+UPDATE filter_presets SET name = ?, filters = ?, updated_at = ?
+WHERE id = ?
 RETURNING id, name, filters, created_at, updated_at
 `
 
@@ -160,7 +160,7 @@ func (q *Queries) UpdateFilterPreset(ctx context.Context, arg UpdateFilterPreset
 
 const upsertFilterPreset = `-- name: UpsertFilterPreset :one
 INSERT INTO filter_presets (id, name, filters, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $5)
+VALUES (?, ?, ?, ?, ?)
 ON CONFLICT (name) DO UPDATE SET
     filters = excluded.filters,
     updated_at = excluded.updated_at

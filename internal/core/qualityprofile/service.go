@@ -60,9 +60,9 @@ func (s *Service) Create(ctx context.Context, input Input) (*db.QualityProfile, 
 		CutoffJson:           input.CutoffJSON,
 		QualitiesJson:        input.QualitiesJSON,
 		UpgradeAllowed:       input.UpgradeAllowed,
-		UpgradeUntilJson:     nullStringFromPtr(input.UpgradeUntilJSON),
-		MinCustomFormatScore: int32(input.MinCustomFormatScore),
-		UpgradeUntilCfScore:  int32(input.UpgradeUntilCFScore),
+		UpgradeUntilJson:     input.UpgradeUntilJSON,
+		MinCustomFormatScore: int64(input.MinCustomFormatScore),
+		UpgradeUntilCfScore:  int64(input.UpgradeUntilCFScore),
 		CreatedAt:            now,
 		UpdatedAt:            now,
 	})
@@ -113,9 +113,9 @@ func (s *Service) Update(ctx context.Context, id string, input Input) (*db.Quali
 		CutoffJson:           input.CutoffJSON,
 		QualitiesJson:        input.QualitiesJSON,
 		UpgradeAllowed:       input.UpgradeAllowed,
-		UpgradeUntilJson:     nullStringFromPtr(input.UpgradeUntilJSON),
-		MinCustomFormatScore: int32(input.MinCustomFormatScore),
-		UpgradeUntilCfScore:  int32(input.UpgradeUntilCFScore),
+		UpgradeUntilJson:     input.UpgradeUntilJSON,
+		MinCustomFormatScore: int64(input.MinCustomFormatScore),
+		UpgradeUntilCfScore:  int64(input.UpgradeUntilCFScore),
 		UpdatedAt:            time.Now().UTC().Format(time.RFC3339),
 		ID:                   id,
 	})
@@ -153,12 +153,4 @@ func (s *Service) Delete(ctx context.Context, id string) error {
 	})
 
 	return nil
-}
-
-// nullStringFromPtr converts a *string to sql.NullString.
-func nullStringFromPtr(p *string) sql.NullString {
-	if p == nil {
-		return sql.NullString{}
-	}
-	return sql.NullString{String: *p, Valid: true}
 }

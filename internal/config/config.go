@@ -53,15 +53,10 @@ type ServerConfig struct {
 	ExternalURL string `mapstructure:"external_url"` // e.g., "http://pulse:9696" — for Torznab proxy URLs
 }
 
-// DatabaseConfig selects and configures the database driver.
+// DatabaseConfig configures the SQLite database.
 type DatabaseConfig struct {
-	Driver string `mapstructure:"driver"`
-	DSN    Secret `mapstructure:"dsn"`
-
-	// PasswordFile is a path to a file containing the database password,
-	// typically a Docker secret mounted at /run/secrets/*. When non-empty,
-	// its contents replace the password component of DSN at load time.
-	PasswordFile string `mapstructure:"password_file"`
+	// Path is the SQLite database file location.
+	Path string `mapstructure:"path"`
 }
 
 // LogConfig controls log output format and verbosity.

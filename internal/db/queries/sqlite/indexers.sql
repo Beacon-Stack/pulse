@@ -1,10 +1,10 @@
 -- name: CreateIndexer :one
 INSERT INTO indexers (id, name, kind, enabled, priority, url, api_key, settings, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 RETURNING *;
 
 -- name: GetIndexer :one
-SELECT * FROM indexers WHERE id = $1;
+SELECT * FROM indexers WHERE id = ?;
 
 -- name: ListIndexers :many
 SELECT * FROM indexers ORDER BY priority ASC, name ASC;
@@ -14,47 +14,47 @@ SELECT * FROM indexers WHERE enabled = TRUE ORDER BY priority ASC, name ASC;
 
 -- name: UpdateIndexer :one
 UPDATE indexers SET
-    name       = $1,
-    kind       = $2,
-    enabled    = $3,
-    priority   = $4,
-    url        = $5,
-    api_key    = $6,
-    settings   = $7,
-    updated_at = $8
-WHERE id = $9
+    name       = ?,
+    kind       = ?,
+    enabled    = ?,
+    priority   = ?,
+    url        = ?,
+    api_key    = ?,
+    settings   = ?,
+    updated_at = ?
+WHERE id = ?
 RETURNING *;
 
 -- name: DeleteIndexer :exec
-DELETE FROM indexers WHERE id = $1;
+DELETE FROM indexers WHERE id = ?;
 
 -- Assignments
 
 -- name: CreateAssignment :one
 INSERT INTO indexer_assignments (id, indexer_id, service_id, overrides)
-VALUES ($1, $2, $3, $4)
+VALUES (?, ?, ?, ?)
 RETURNING *;
 
 -- name: ListAssignmentsByIndexer :many
-SELECT * FROM indexer_assignments WHERE indexer_id = $1;
+SELECT * FROM indexer_assignments WHERE indexer_id = ?;
 
 -- name: ListAssignmentsByService :many
-SELECT * FROM indexer_assignments WHERE service_id = $1;
+SELECT * FROM indexer_assignments WHERE service_id = ?;
 
 -- name: DeleteAssignment :exec
-DELETE FROM indexer_assignments WHERE indexer_id = $1 AND service_id = $2;
+DELETE FROM indexer_assignments WHERE indexer_id = ? AND service_id = ?;
 
 -- name: DeleteAssignmentsByIndexer :exec
-DELETE FROM indexer_assignments WHERE indexer_id = $1;
+DELETE FROM indexer_assignments WHERE indexer_id = ?;
 
 -- name: DeleteAssignmentsByService :exec
-DELETE FROM indexer_assignments WHERE service_id = $1;
+DELETE FROM indexer_assignments WHERE service_id = ?;
 
 -- name: ListIndexersForService :many
 SELECT i.* FROM indexers i
 JOIN indexer_assignments ia ON i.id = ia.indexer_id
-WHERE ia.service_id = $1
+WHERE ia.service_id = ?
 ORDER BY i.priority ASC, i.name ASC;
 
 -- name: GetAssignmentOverrides :one
-SELECT overrides FROM indexer_assignments WHERE indexer_id = $1 AND service_id = $2;
+SELECT overrides FROM indexer_assignments WHERE indexer_id = ? AND service_id = ?;

@@ -4,10 +4,6 @@
 
 package db
 
-import (
-	"database/sql"
-)
-
 type ConfigEntry struct {
 	ID        string `json:"id"`
 	Namespace string `json:"namespace"`
@@ -28,9 +24,9 @@ type DownloadClient struct {
 	Kind      string `json:"kind"`
 	Protocol  string `json:"protocol"`
 	Enabled   bool   `json:"enabled"`
-	Priority  int32  `json:"priority"`
+	Priority  int64  `json:"priority"`
 	Host      string `json:"host"`
-	Port      int32  `json:"port"`
+	Port      int64  `json:"port"`
 	UseSsl    bool   `json:"useSsl"`
 	Username  string `json:"username"`
 	Password  string `json:"password"`
@@ -54,7 +50,7 @@ type Indexer struct {
 	Name      string `json:"name"`
 	Kind      string `json:"kind"`
 	Enabled   bool   `json:"enabled"`
-	Priority  int32  `json:"priority"`
+	Priority  int64  `json:"priority"`
 	Url       string `json:"url"`
 	ApiKey    string `json:"apiKey"`
 	Settings  string `json:"settings"`
@@ -75,16 +71,16 @@ type IndexerTag struct {
 }
 
 type QualityProfile struct {
-	ID                   string         `json:"id"`
-	Name                 string         `json:"name"`
-	CutoffJson           string         `json:"cutoffJson"`
-	QualitiesJson        string         `json:"qualitiesJson"`
-	UpgradeAllowed       bool           `json:"upgradeAllowed"`
-	UpgradeUntilJson     sql.NullString `json:"upgradeUntilJson"`
-	MinCustomFormatScore int32          `json:"minCustomFormatScore"`
-	UpgradeUntilCfScore  int32          `json:"upgradeUntilCfScore"`
-	CreatedAt            string         `json:"createdAt"`
-	UpdatedAt            string         `json:"updatedAt"`
+	ID                   string  `json:"id"`
+	Name                 string  `json:"name"`
+	CutoffJson           string  `json:"cutoffJson"`
+	QualitiesJson        string  `json:"qualitiesJson"`
+	UpgradeAllowed       bool    `json:"upgradeAllowed"`
+	UpgradeUntilJson     *string `json:"upgradeUntilJson"`
+	MinCustomFormatScore int64   `json:"minCustomFormatScore"`
+	UpgradeUntilCfScore  int64   `json:"upgradeUntilCfScore"`
+	CreatedAt            string  `json:"createdAt"`
+	UpdatedAt            string  `json:"updatedAt"`
 }
 
 type Service struct {
@@ -113,7 +109,7 @@ type ServiceTag struct {
 }
 
 type SharedMediaHandling struct {
-	ID                  int32  `json:"id"`
+	ID                  int64  `json:"id"`
 	ColonReplacement    string `json:"colonReplacement"`
 	ImportExtraFiles    bool   `json:"importExtraFiles"`
 	ExtraFileExtensions string `json:"extraFileExtensions"`
