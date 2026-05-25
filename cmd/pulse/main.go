@@ -95,7 +95,7 @@ func main() {
 	logger.Info("starting pulse",
 		"host", cfg.Server.Host,
 		"port", cfg.Server.Port,
-		"db_driver", cfg.Database.Driver,
+		"db_path", cfg.Database.Path,
 	)
 
 	if cfg.ConfigFile != "" {

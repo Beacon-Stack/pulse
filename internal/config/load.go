@@ -33,9 +33,7 @@ func Load(configPath string) (*Config, error) {
 	v.SetDefault("server.host", "0.0.0.0")
 	v.SetDefault("server.port", 9696)
 	v.SetDefault("server.external_url", "")
-	v.SetDefault("database.driver", "postgres")
-	v.SetDefault("database.dsn", "")
-	v.SetDefault("database.password_file", "")
+	v.SetDefault("database.path", filepath.Join(dir, "pulse.db"))
 	v.SetDefault("auth.api_key_file", "")
 	v.SetDefault("log.level", "info")
 	v.SetDefault("log.format", "json")
@@ -72,14 +70,6 @@ func Load(configPath string) (*Config, error) {
 		return nil, fmt.Errorf("unmarshaling config: %w", err)
 	}
 
-	if cfg.Database.PasswordFile != "" {
-		merged, err := secretfile.OverrideDSNPassword(cfg.Database.DSN.Value(), cfg.Database.PasswordFile)
-		if err != nil {
-			return nil, fmt.Errorf("applying database password file: %w", err)
-		}
-		cfg.Database.DSN = Secret(merged)
-	}
-
 	if cfg.Auth.APIKeyFile != "" {
 		contents, err := secretfile.Read(cfg.Auth.APIKeyFile)
 		if err != nil {
@@ -94,8 +84,8 @@ func Load(configPath string) (*Config, error) {
 
 	// The API key is no longer auto-generated here. Load() may leave
 	// cfg.Auth.APIKey empty; the caller (main.go) resolves it against the
-	// DB via EnsureAPIKey after Postgres is up. The env var and config-file
-	// values (if set) still flow through and take priority.
+	// DB via EnsureAPIKey after the database is open. The env var and
+	// config-file values (if set) still flow through and take priority.
 	return &cfg, nil
 }
 
@@ -152,8 +142,7 @@ server:
   port: 9696
 
 database:
-  driver: postgres
-  dsn: "postgres://pulse:pulse@localhost:5432/pulse_db?sslmode=disable"
+  path: "%s"
 
 log:
   level: info
@@ -161,7 +150,7 @@ log:
 
 auth:
   api_key: "%s"
-`, key)
+`, filepath.Join(dataDir(), "pulse.db"), key)
 
 	return os.WriteFile(path, []byte(content), 0o600)
 }

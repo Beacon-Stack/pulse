@@ -11,7 +11,7 @@ import (
 
 const createDownloadClient = `-- name: CreateDownloadClient :one
 INSERT INTO download_clients (id, name, kind, protocol, enabled, priority, host, port, use_ssl, username, password, category, directory, settings, created_at, updated_at)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 RETURNING id, name, kind, protocol, enabled, priority, host, port, use_ssl, username, password, category, directory, settings, created_at, updated_at
 `
 
@@ -21,9 +21,9 @@ type CreateDownloadClientParams struct {
 	Kind      string `json:"kind"`
 	Protocol  string `json:"protocol"`
 	Enabled   bool   `json:"enabled"`
-	Priority  int32  `json:"priority"`
+	Priority  int64  `json:"priority"`
 	Host      string `json:"host"`
-	Port      int32  `json:"port"`
+	Port      int64  `json:"port"`
 	UseSsl    bool   `json:"useSsl"`
 	Username  string `json:"username"`
 	Password  string `json:"password"`
@@ -76,7 +76,7 @@ func (q *Queries) CreateDownloadClient(ctx context.Context, arg CreateDownloadCl
 }
 
 const deleteDownloadClient = `-- name: DeleteDownloadClient :exec
-DELETE FROM download_clients WHERE id = $1
+DELETE FROM download_clients WHERE id = ?
 `
 
 func (q *Queries) DeleteDownloadClient(ctx context.Context, id string) error {
@@ -85,7 +85,7 @@ func (q *Queries) DeleteDownloadClient(ctx context.Context, id string) error {
 }
 
 const getDownloadClient = `-- name: GetDownloadClient :one
-SELECT id, name, kind, protocol, enabled, priority, host, port, use_ssl, username, password, category, directory, settings, created_at, updated_at FROM download_clients WHERE id = $1
+SELECT id, name, kind, protocol, enabled, priority, host, port, use_ssl, username, password, category, directory, settings, created_at, updated_at FROM download_clients WHERE id = ?
 `
 
 func (q *Queries) GetDownloadClient(ctx context.Context, id string) (DownloadClient, error) {
@@ -157,7 +157,7 @@ func (q *Queries) ListDownloadClients(ctx context.Context) ([]DownloadClient, er
 }
 
 const listDownloadClientsByProtocol = `-- name: ListDownloadClientsByProtocol :many
-SELECT id, name, kind, protocol, enabled, priority, host, port, use_ssl, username, password, category, directory, settings, created_at, updated_at FROM download_clients WHERE protocol = $1 ORDER BY priority ASC, name ASC
+SELECT id, name, kind, protocol, enabled, priority, host, port, use_ssl, username, password, category, directory, settings, created_at, updated_at FROM download_clients WHERE protocol = ? ORDER BY priority ASC, name ASC
 `
 
 func (q *Queries) ListDownloadClientsByProtocol(ctx context.Context, protocol string) ([]DownloadClient, error) {
@@ -246,21 +246,21 @@ func (q *Queries) ListEnabledDownloadClients(ctx context.Context) ([]DownloadCli
 
 const updateDownloadClient = `-- name: UpdateDownloadClient :one
 UPDATE download_clients SET
-    name       = $1,
-    kind       = $2,
-    protocol   = $3,
-    enabled    = $4,
-    priority   = $5,
-    host       = $6,
-    port       = $7,
-    use_ssl    = $8,
-    username   = $9,
-    password   = $10,
-    category   = $11,
-    directory  = $12,
-    settings   = $13,
-    updated_at = $14
-WHERE id = $15
+    name       = ?,
+    kind       = ?,
+    protocol   = ?,
+    enabled    = ?,
+    priority   = ?,
+    host       = ?,
+    port       = ?,
+    use_ssl    = ?,
+    username   = ?,
+    password   = ?,
+    category   = ?,
+    directory  = ?,
+    settings   = ?,
+    updated_at = ?
+WHERE id = ?
 RETURNING id, name, kind, protocol, enabled, priority, host, port, use_ssl, username, password, category, directory, settings, created_at, updated_at
 `
 
@@ -269,9 +269,9 @@ type UpdateDownloadClientParams struct {
 	Kind      string `json:"kind"`
 	Protocol  string `json:"protocol"`
 	Enabled   bool   `json:"enabled"`
-	Priority  int32  `json:"priority"`
+	Priority  int64  `json:"priority"`
 	Host      string `json:"host"`
-	Port      int32  `json:"port"`
+	Port      int64  `json:"port"`
 	UseSsl    bool   `json:"useSsl"`
 	Username  string `json:"username"`
 	Password  string `json:"password"`

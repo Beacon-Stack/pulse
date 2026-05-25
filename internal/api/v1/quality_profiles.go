@@ -51,11 +51,7 @@ type qualityProfileIDInput struct {
 }
 
 func toQualityProfileBody(row *db.QualityProfile) qualityProfileBody {
-	var upgradeUntil *string
-	if row.UpgradeUntilJson.Valid {
-		s := row.UpgradeUntilJson.String
-		upgradeUntil = &s
-	}
+	upgradeUntil := row.UpgradeUntilJson
 	return qualityProfileBody{
 		ID:                   row.ID,
 		Name:                 row.Name,

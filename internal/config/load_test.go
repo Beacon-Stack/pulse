@@ -12,8 +12,7 @@ const testFixture = `
 server:
   port: 9696
 database:
-  driver: postgres
-  dsn: "postgres://user:plain@host:5432/db"
+  path: "/tmp/pulse-test.db"
 auth:
   api_key: "test-key"
 `
@@ -27,56 +26,24 @@ func writeFixture(t *testing.T, dir, name, contents string) string {
 	return path
 }
 
-func TestLoad_PasswordFileOverridesDSN(t *testing.T) {
+func TestLoad_ReadsDatabasePath(t *testing.T) {
 	dir := t.TempDir()
 	cfgPath := writeFixture(t, dir, "config.yaml", testFixture)
-	pwFile := writeFixture(t, dir, "pw.txt", "secretpw\n")
-
-	t.Setenv("PULSE_DATABASE_PASSWORD_FILE", pwFile)
 
 	cfg, err := Load(cfgPath)
 	if err != nil {
 		t.Fatalf("Load: %v", err)
 	}
 
-	want := "postgres://user:secretpw@host:5432/db"
-	if got := cfg.Database.DSN.Value(); got != want {
-		t.Fatalf("DSN = %q; want %q", got, want)
-	}
-}
-
-func TestLoad_NoPasswordFile_LeavesDSNIntact(t *testing.T) {
-	dir := t.TempDir()
-	cfgPath := writeFixture(t, dir, "config.yaml", testFixture)
-
-	t.Setenv("PULSE_DATABASE_PASSWORD_FILE", "")
-
-	cfg, err := Load(cfgPath)
-	if err != nil {
-		t.Fatalf("Load: %v", err)
-	}
-
-	want := "postgres://user:plain@host:5432/db"
-	if got := cfg.Database.DSN.Value(); got != want {
-		t.Fatalf("DSN = %q; want %q", got, want)
-	}
-}
-
-func TestLoad_InvalidPasswordFilePath_Errors(t *testing.T) {
-	dir := t.TempDir()
-	cfgPath := writeFixture(t, dir, "config.yaml", testFixture)
-
-	t.Setenv("PULSE_DATABASE_PASSWORD_FILE", "/nonexistent/secret")
-
-	if _, err := Load(cfgPath); err == nil {
-		t.Fatal("expected error when password file path is invalid")
+	if got := cfg.Database.Path; got != "/tmp/pulse-test.db" {
+		t.Fatalf("Database.Path = %q; want %q", got, "/tmp/pulse-test.db")
 	}
 }
 
 // ── EnsureAPIKey ────────────────────────────────────────────────────────────
 
 // stubStore is a minimal APIKeyStore for exercising EnsureAPIKey without
-// standing up a real Postgres.
+// standing up a real database.
 type stubStore struct {
 	stored   string
 	setErr   error

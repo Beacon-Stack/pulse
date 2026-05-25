@@ -15,16 +15,23 @@ var staticFiles embed.FS
 // ServeStatic returns an http.Handler that serves the React SPA.
 // /assets/* are cached aggressively; unknown paths fall back to index.html
 // for React Router client-side navigation.
+//
+// When web/static/index.html is missing - the case in CI (the frontend
+// build artifact is gitignored) and in backend-only dev runs - the
+// returned handler responds with a small HTML stub explaining that the
+// frontend has not been built. The API endpoints registered elsewhere
+// on the router still work normally; only the SPA shell is degraded.
+// This keeps the test suite and bare-metal dev runs from panicking at
+// router construction.
 func ServeStatic() http.Handler {
-	raw, err := staticFiles.ReadFile("static/index.html")
+	indexHTML, err := staticFiles.ReadFile("static/index.html")
 	if err != nil {
-		panic("web: could not read embedded index.html: " + err.Error())
+		return frontendNotBuiltHandler(err)
 	}
-	indexHTML := raw
 
 	sub, err := fs.Sub(staticFiles, "static")
 	if err != nil {
-		panic("web: could not sub embedded static FS: " + err.Error())
+		return frontendNotBuiltHandler(err)
 	}
 	fileServer := http.FileServer(http.FS(sub))
 
@@ -49,5 +56,25 @@ func ServeStatic() http.Handler {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.Header().Set("Cache-Control", "no-store")
 		_, _ = w.Write(indexHTML)
+	})
+}
+
+// frontendNotBuiltHandler is the fallback when web/static/index.html is
+// missing from the embedded FS. Returns a 503 with a short HTML body so
+// any browser that does hit a SPA path gets a clear message; API routes
+// registered on the same router continue to work.
+func frontendNotBuiltHandler(reason error) http.Handler {
+	body := []byte(`<!DOCTYPE html>
+<html><body style="font-family: system-ui; padding: 2rem;">
+<h1>Pulse - frontend not built</h1>
+<p>The server is running but the React UI bundle is missing.
+Run <code>npm --prefix web/ui run build</code> (or use the published Docker image) to populate <code>web/static/</code>.</p>
+<p style="color:#666;font-size:0.9em">` + http.StatusText(http.StatusServiceUnavailable) + ` - ` + reason.Error() + `</p>
+</body></html>`)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.Header().Set("Cache-Control", "no-store")
+		w.WriteHeader(http.StatusServiceUnavailable)
+		_, _ = w.Write(body)
 	})
 }
