@@ -51,13 +51,15 @@ type prowlarrDef struct {
 
 // ProwlarrCatalog manages a catalog sourced from Prowlarr's GitHub repo.
 type ProwlarrCatalog struct {
-	mu       sync.RWMutex
-	entries  []CatalogEntry
-	fetched  time.Time
-	client   *http.Client
-	logger   *slog.Logger
-	fallback []CatalogEntry // static fallback if fetch fails
-	rawYAML  map[string][]byte // catalog_id → raw YAML bytes for the scraper engine
+	mu        sync.RWMutex
+	entries   []CatalogEntry
+	fetched   time.Time
+	client    *http.Client
+	logger    *slog.Logger
+	fallback  []CatalogEntry // static fallback if fetch fails
+	rawYAML   map[string][]byte // catalog_id → raw YAML bytes for the scraper engine
+	cachePath string            // on-disk copy of the last fetched zipball ("" disables)
+	onUpdate  func(map[string][]byte) // called whenever definitions are (re)loaded
 }
 
 // NewProwlarrCatalog creates a catalog that pulls from Prowlarr's definitions.
@@ -107,7 +109,8 @@ func (pc *ProwlarrCatalog) LastFetched() time.Time {
 }
 
 // Refresh fetches the latest definitions from Prowlarr's GitHub repo.
-// On failure it keeps the existing catalog (either previous fetch or static fallback).
+// On failure it keeps the existing catalog (previous fetch, local cache, or
+// static fallback).
 func (pc *ProwlarrCatalog) Refresh(ctx context.Context) error {
 	pc.logger.Info("prowlarr: fetching indexer definitions from GitHub...")
 
@@ -121,10 +124,22 @@ func (pc *ProwlarrCatalog) Refresh(ctx context.Context) error {
 
 	// Fetch all definitions via the zipball to avoid per-file rate limits.
 	pc.logger.Info("prowlarr: downloading zipball...")
-	entries, errCount, err := pc.fetchAllViaZip(ctx, files)
+	var (
+		entries  []CatalogEntry
+		rawYAML  map[string][]byte
+		errCount int64
+	)
+	zipData, err := pc.downloadZipball(ctx)
+	if err == nil {
+		entries, rawYAML, errCount, err = parseDefinitionsZip(zipData)
+	}
 	if err != nil {
 		pc.logger.Warn("prowlarr: zipball fetch failed, trying individual files", "error", err)
 		entries, errCount = pc.fetchIndividual(ctx, files)
+		// The individual path only rebuilds catalog entries; keep whatever
+		// raw YAML the scraper engine already has (rawYAML == nil → keep).
+		rawYAML = nil
+		zipData = nil
 	} else {
 		pc.logger.Info("prowlarr: zipball parsed", "entries", len(entries), "errors", errCount)
 	}
@@ -133,26 +148,49 @@ func (pc *ProwlarrCatalog) Refresh(ctx context.Context) error {
 		pc.logger.Warn("prowlarr: some definitions failed to parse", "failed", errCount, "succeeded", len(entries))
 	}
 
-	// Prowlarr's YAML definitions only cover torrent indexers. Usenet indexers
-	// are native C# implementations without YAML files. Merge in our static
-	// usenet + generic entries so the catalog is complete.
+	if len(entries) == 0 {
+		return fmt.Errorf("no definitions parsed successfully")
+	}
+
+	total := pc.apply(entries, rawYAML, time.Now().UTC())
+	if zipData != nil {
+		pc.saveCache(zipData)
+	}
+
+	pc.logger.Info("prowlarr: catalog updated", "indexers", total)
+	return nil
+}
+
+// apply installs a parsed definition set: merges the static usenet + generic
+// entries (Prowlarr's YAML only covers torrent indexers — usenet indexers are
+// native C# implementations without YAML files), swaps the catalog, and
+// notifies the registered update func so the scraper engine reloads. A nil
+// rawYAML keeps the existing raw definitions (used by the individual-file
+// fetch path, which has no YAML to offer). Returns the total entry count.
+func (pc *ProwlarrCatalog) apply(entries []CatalogEntry, rawYAML map[string][]byte, fetched time.Time) int {
 	for _, static := range builtinCatalog {
 		if static.Protocol == "usenet" || strings.HasPrefix(static.ID, "generic-") {
 			entries = append(entries, static)
 		}
 	}
 
-	if len(entries) == 0 {
-		return fmt.Errorf("no definitions parsed successfully")
-	}
-
 	pc.mu.Lock()
 	pc.entries = entries
-	pc.fetched = time.Now().UTC()
+	if rawYAML != nil {
+		pc.rawYAML = rawYAML
+	}
+	pc.fetched = fetched
+	onUpdate := pc.onUpdate
+	raw := make(map[string][]byte, len(pc.rawYAML))
+	for k, v := range pc.rawYAML {
+		raw[k] = v
+	}
 	pc.mu.Unlock()
 
-	pc.logger.Info("prowlarr: catalog updated", "indexers", len(entries))
-	return nil
+	if onUpdate != nil && len(raw) > 0 {
+		onUpdate(raw)
+	}
+	return len(entries)
 }
 
 // StartRefreshLoop refreshes the catalog immediately, then periodically.
@@ -162,7 +200,7 @@ func (pc *ProwlarrCatalog) StartRefreshLoop(ctx context.Context, interval time.D
 	}
 
 	if err := pc.Refresh(ctx); err != nil {
-		pc.logger.Warn("prowlarr: initial catalog refresh failed, using static fallback", "error", err)
+		pc.logger.Warn("prowlarr: initial catalog refresh failed, keeping current definitions", "error", err)
 	}
 
 	ticker := time.NewTicker(interval)
@@ -215,47 +253,51 @@ func (pc *ProwlarrCatalog) listV11Files(ctx context.Context) ([]string, error) {
 	return files, nil
 }
 
-// fetchAllViaZip downloads the repo zipball and extracts all v11 YAML definitions.
-// This is a single HTTP request instead of 548 individual ones.
-func (pc *ProwlarrCatalog) fetchAllViaZip(ctx context.Context, _ []string) (entries []CatalogEntry, errCount int64, err error) {
+// downloadZipball downloads the repo zipball — a single HTTP request instead
+// of 548 individual ones.
+func (pc *ProwlarrCatalog) downloadZipball(ctx context.Context) ([]byte, error) {
 	// Use the codeload URL directly to avoid the API 302 redirect.
 	zipURL := "https://codeload.github.com/Prowlarr/Indexers/legacy.zip/refs/heads/master"
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, zipURL, nil)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
 	// Use a longer timeout for the full zip download.
 	zipClient := &http.Client{Timeout: 120 * time.Second}
 	resp, err := zipClient.Do(req)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return nil, 0, fmt.Errorf("zipball returned HTTP %d", resp.StatusCode)
+		return nil, fmt.Errorf("zipball returned HTTP %d", resp.StatusCode)
 	}
 
 	// Read the entire zip into memory (it's ~2-3 MB).
 	zipData, err := io.ReadAll(io.LimitReader(resp.Body, 50*1024*1024))
 	if err != nil {
-		return nil, 0, fmt.Errorf("reading zipball: %w", err)
+		return nil, fmt.Errorf("reading zipball: %w", err)
 	}
+	return zipData, nil
+}
 
-	// Parse the zip.
+// parseDefinitionsZip extracts all v11 YAML definitions from a zip archive.
+// It accepts both GitHub zipballs (Prowlarr-Indexers-abc123/definitions/v11/…)
+// and the repacked snapshot layout (definitions/v11/…).
+func parseDefinitionsZip(zipData []byte) (entries []CatalogEntry, rawYAML map[string][]byte, errCount int64, err error) {
 	zipReader, err := zip.NewReader(bytes.NewReader(zipData), int64(len(zipData)))
 	if err != nil {
-		return nil, 0, fmt.Errorf("opening zip: %w", err)
+		return nil, nil, 0, fmt.Errorf("opening zip: %w", err)
 	}
 
-	rawYAML := make(map[string][]byte)
+	rawYAML = make(map[string][]byte)
 
 	for _, f := range zipReader.File {
-		// Zip paths look like: Prowlarr-Indexers-abc123/definitions/v11/1337x.yml
 		name := f.Name
-		idx := strings.Index(name, "definitions/v11/")
-		if idx < 0 || !strings.HasSuffix(name, ".yml") || f.FileInfo().IsDir() {
+		idx := strings.Index(name, v11Prefix)
+		if idx < 0 || !strings.HasSuffix(name, v11Suffix) || f.FileInfo().IsDir() {
 			continue
 		}
 
@@ -285,12 +327,7 @@ func (pc *ProwlarrCatalog) fetchAllViaZip(ctx context.Context, _ []string) (entr
 		}
 	}
 
-	// Store raw YAML on the catalog for the scraper engine.
-	pc.mu.Lock()
-	pc.rawYAML = rawYAML
-	pc.mu.Unlock()
-
-	return entries, errCount, nil
+	return entries, rawYAML, errCount, nil
 }
 
 // fetchIndividual fetches definitions one at a time (fallback if zipball fails).

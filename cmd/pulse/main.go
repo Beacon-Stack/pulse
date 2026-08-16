@@ -10,8 +10,10 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -334,43 +336,46 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// Prowlarr catalog refresh — fetch live definitions on startup, then daily.
-	// After each refresh, load the raw YAML into the scraper engine.
+	// Prowlarr definitions come from three sources, freshest wins: the
+	// snapshot embedded at build time, the on-disk cache of the last
+	// successful GitHub fetch, and the live GitHub fetch (daily). The local
+	// sources make search work from first boot even when GitHub is
+	// unreachable (e.g. broken container DNS); the live fetch only freshens.
+	prowlarrCatalog.SetCachePath(filepath.Join(filepath.Dir(cfg.Database.Path), "prowlarr-definitions.zip"))
+	var preWarmOnce sync.Once
+	prowlarrCatalog.SetUpdateFunc(func(raw map[string][]byte) {
+		scraperEngine.LoadDefinitions(raw)
+
+		// Pre-warm FlareSolverr sessions for configured indexers, once the
+		// first definition set is in place.
+		if flaresolverr != nil {
+			preWarmOnce.Do(func() {
+				go func() {
+					idxRows, err := queries.ListEnabledIndexers(ctx)
+					if err != nil {
+						logger.Warn("pre-warm: failed to list indexers", "error", err)
+						return
+					}
+					var urls []string
+					for _, row := range idxRows {
+						if row.Url != "" {
+							urls = append(urls, row.Url)
+						}
+					}
+					if len(urls) > 0 {
+						flaresolverr.PreWarm(ctx, urls)
+					}
+				}()
+			})
+		}
+	})
+	if source, err := prowlarrCatalog.LoadLocal(); err != nil {
+		logger.Warn("prowlarr: no local definitions available, search is down until the GitHub fetch succeeds", "error", err)
+	} else {
+		logger.Info("prowlarr: local definitions loaded", "source", source)
+	}
 	go func() {
 		prowlarrCatalog.StartRefreshLoop(ctx, 24*time.Hour)
-	}()
-	// Wait a moment for the initial fetch, then load definitions into the engine.
-	go func() {
-		// Poll until the catalog has raw YAML data (initial fetch takes a few seconds).
-		for i := 0; i < 30; i++ {
-			time.Sleep(1 * time.Second)
-			raw := prowlarrCatalog.AllRawYAML()
-			if len(raw) > 0 {
-				scraperEngine.LoadDefinitions(raw)
-
-				// Pre-warm FlareSolverr sessions for configured indexers.
-				if flaresolverr != nil {
-					go func() {
-						idxRows, err := queries.ListEnabledIndexers(ctx)
-						if err != nil {
-							logger.Warn("pre-warm: failed to list indexers", "error", err)
-							return
-						}
-						var urls []string
-						for _, row := range idxRows {
-							if row.Url != "" {
-								urls = append(urls, row.Url)
-							}
-						}
-						if len(urls) > 0 {
-							flaresolverr.PreWarm(ctx, urls)
-						}
-					}()
-				}
-				return
-			}
-		}
-		logger.Warn("scraper: timed out waiting for Prowlarr definitions")
 	}()
 
 	healthTicker := time.NewTicker(30 * time.Second)
