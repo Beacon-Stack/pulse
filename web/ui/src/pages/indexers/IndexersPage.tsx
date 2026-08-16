@@ -326,6 +326,19 @@ export default function IndexersPage() {
                       {idx.kind}
                     </span>
                     <Pill ok={idx.enabled} labelTrue="Enabled" labelFalse="Disabled" />
+                    {idx.health_status === "definition_missing" && (
+                      <span
+                        title={idx.health_message}
+                        style={{
+                          fontSize: 10, fontWeight: 600, padding: "2px 6px", borderRadius: 3,
+                          textTransform: "uppercase", letterSpacing: "0.04em",
+                          color: "var(--color-danger)",
+                          background: "color-mix(in srgb, var(--color-danger) 12%, transparent)",
+                        }}
+                      >
+                        Definition missing
+                      </span>
+                    )}
                     {(catsByName.get(idx.name.toLowerCase()) ?? []).map((cat) => (
                       <span key={cat} style={{
                         fontSize: 10, fontWeight: 500, padding: "1px 6px", borderRadius: 3,
@@ -340,6 +353,11 @@ export default function IndexersPage() {
                     <span style={{ fontSize: 12, color: "var(--color-text-muted)", fontFamily: "var(--font-family-mono)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {idx.url}
                     </span>
+                    {!test?.message && idx.health_status === "definition_missing" && idx.health_message && (
+                      <span style={{ fontSize: 11, color: "var(--color-danger)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {idx.health_message}
+                      </span>
+                    )}
                     {test?.message && (
                       <span style={{
                         fontSize: 11,

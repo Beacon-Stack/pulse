@@ -28,6 +28,13 @@ RETURNING *;
 -- name: DeleteIndexer :exec
 DELETE FROM indexers WHERE id = ?;
 
+-- name: SetIndexerHealth :exec
+UPDATE indexers SET
+    health_status     = ?,
+    health_message    = ?,
+    health_checked_at = ?
+WHERE id = ?;
+
 -- Assignments
 
 -- name: CreateAssignment :one
@@ -51,9 +58,13 @@ DELETE FROM indexer_assignments WHERE indexer_id = ?;
 DELETE FROM indexer_assignments WHERE service_id = ?;
 
 -- name: ListIndexersForService :many
+-- Indexers whose catalog definition vanished can only fail searches, so
+-- they are withheld from services entirely; the service's next sync then
+-- drops its local copy.
 SELECT i.* FROM indexers i
 JOIN indexer_assignments ia ON i.id = ia.indexer_id
 WHERE ia.service_id = ?
+  AND i.health_status != 'definition_missing'
 ORDER BY i.priority ASC, i.name ASC;
 
 -- name: GetAssignmentOverrides :one

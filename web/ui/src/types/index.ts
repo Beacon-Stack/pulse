@@ -52,6 +52,9 @@ export interface Indexer {
   settings: string;
   created_at: string;
   updated_at: string;
+  health_status: "unknown" | "ok" | "definition_missing";
+  health_message?: string;
+  health_checked_at?: string;
 }
 
 export interface CreateIndexerInput {

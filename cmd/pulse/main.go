@@ -346,6 +346,11 @@ func main() {
 	prowlarrCatalog.SetUpdateFunc(func(raw map[string][]byte) {
 		scraperEngine.LoadDefinitions(raw)
 
+		// Cross-check configured indexers against the fresh catalog so a
+		// definition removed upstream is flagged (and withheld from
+		// services) here, not discovered by failing user searches.
+		go indexerMgr.AuditCatalog(ctx, scraperEngine.ResolveCatalogID)
+
 		// Pre-warm FlareSolverr sessions for configured indexers, once the
 		// first definition set is in place.
 		if flaresolverr != nil {

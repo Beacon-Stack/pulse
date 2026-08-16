@@ -64,6 +64,9 @@ type Querier interface {
 	ListFilterPresets(ctx context.Context) ([]FilterPreset, error)
 	ListIndexerTagIDs(ctx context.Context, indexerID string) ([]string, error)
 	ListIndexers(ctx context.Context) ([]Indexer, error)
+	// Indexers whose catalog definition vanished can only fail searches, so
+	// they are withheld from services entirely; the service's next sync then
+	// drops its local copy.
 	ListIndexersForService(ctx context.Context, serviceID string) ([]Indexer, error)
 	ListOnlineServices(ctx context.Context) ([]Service, error)
 	ListQualityProfiles(ctx context.Context) ([]QualityProfile, error)
@@ -75,6 +78,7 @@ type Querier interface {
 	ListSubscriptionsByService(ctx context.Context, serviceID string) ([]string, error)
 	ListTags(ctx context.Context) ([]Tag, error)
 	SetConfigEntry(ctx context.Context, arg SetConfigEntryParams) (ConfigEntry, error)
+	SetIndexerHealth(ctx context.Context, arg SetIndexerHealthParams) error
 	// Indexer tags
 	SetIndexerTags(ctx context.Context, indexerID string) error
 	// Service tags

@@ -184,7 +184,25 @@ export default function IndexerDetailPage() {
               {indexer.kind}
             </span>
             <Pill ok={indexer.enabled} labelTrue="Enabled" labelFalse="Disabled" />
+            {indexer.health_status === "definition_missing" && (
+              <span
+                title={indexer.health_message}
+                style={{
+                  fontSize: 11, padding: "2px 8px", borderRadius: 4, fontWeight: 600,
+                  textTransform: "uppercase", letterSpacing: "0.04em",
+                  color: "var(--color-danger)",
+                  background: "color-mix(in srgb, var(--color-danger) 12%, transparent)",
+                }}
+              >
+                Definition missing
+              </span>
+            )}
           </div>
+          {indexer.health_status === "definition_missing" && indexer.health_message && (
+            <div style={{ marginTop: 6, fontSize: 12, color: "var(--color-danger)" }}>
+              {indexer.health_message} Searches through this indexer are disabled and it is not synced to services.
+            </div>
+          )}
         </div>
 
         <div style={{ display: "flex", gap: 6 }}>
