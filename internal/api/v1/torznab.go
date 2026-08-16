@@ -215,12 +215,23 @@ func (h *TorznabHandler) writeResults(w http.ResponseWriter, r *http.Request, id
 	_ = xml.NewEncoder(w).Encode(feed)
 }
 
+// torznabError is the Torznab/Newznab error document. Marshalling through
+// encoding/xml (rather than fmt-ing a template) guarantees the description is
+// attribute-escaped — error messages routinely embed quotes (e.g. an indexer
+// name rendered with %q) or "&"/"<", which would otherwise produce invalid
+// XML that clients can't parse, masking the real error behind a syntax error.
+type torznabError struct {
+	XMLName     xml.Name `xml:"error"`
+	Code        int      `xml:"code,attr"`
+	Description string   `xml:"description,attr"`
+}
+
 // xmlError writes a Torznab error response.
 func (h *TorznabHandler) xmlError(w http.ResponseWriter, code int, description string) {
 	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
 	w.WriteHeader(http.StatusOK) // Torznab errors are 200 with error XML
-	fmt.Fprintf(w, `<?xml version="1.0" encoding="UTF-8"?>
-<error code="%d" description="%s"/>`, code, description)
+	_, _ = w.Write([]byte(xml.Header))
+	_ = xml.NewEncoder(w).Encode(torznabError{Code: code, Description: description})
 }
 
 
