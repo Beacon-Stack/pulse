@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"golang.org/x/sync/singleflight"
 
 	"github.com/beacon-stack/pulse/internal/core/indexer"
 	db "github.com/beacon-stack/pulse/internal/db/generated"
@@ -30,6 +31,7 @@ type TorznabHandler struct {
 	mgr         *indexer.Manager // nil-able; search-health outcome recording
 	externalURL string           // e.g. "http://pulse:9696" — used for proxy download URLs in Docker
 	logger      *slog.Logger
+	sf          singleflight.Group // coalesces identical in-flight searches
 }
 
 // NewTorznabHandler creates a new handler. externalURL is optional; when set,
@@ -191,36 +193,60 @@ func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, ru
 		return
 	}
 
-	// Execute search with the request's context so client disconnects and
-	// timeouts propagate into the scrape.
-	results, err := runner.SearchWithQuery(r.Context(), scraper.SearchQuery{
-		Keywords:   keywords,
-		Type:       t,
-		Season:     season,
-		Ep:         ep,
-		IMDBID:     imdbID,
-		TMDBID:     params.Get("tmdbid"),
-		TVDBID:     params.Get("tvdbid"),
-		Categories: cats,
+	// Execute via singleflight, detached from any single caller's
+	// context. Cloudflare-walled indexers legitimately take 40-90s (a
+	// FlareSolverr solve per result page — clearance cookies don't
+	// satisfy CF's TLS fingerprinting from a Go client), which impatient
+	// clients (Pilot's per-indexer timeout is 25s) never wait out.
+	// Detaching lets the scrape complete and land in the cache, so the
+	// client's retry is served instantly; singleflight ensures the retry
+	// (or a concurrent duplicate) joins the in-flight scrape instead of
+	// starting a second one.
+	resCh := h.sf.DoChan(cacheKey, func() (interface{}, error) {
+		sctx, cancel := context.WithTimeout(context.WithoutCancel(r.Context()), backgroundSearchBudget)
+		defer cancel()
+		results, err := runner.SearchWithQuery(sctx, scraper.SearchQuery{
+			Keywords:   keywords,
+			Type:       t,
+			Season:     season,
+			Ep:         ep,
+			IMDBID:     imdbID,
+			TMDBID:     params.Get("tmdbid"),
+			TVDBID:     params.Get("tvdbid"),
+			Categories: cats,
+		})
+		h.recordSearchOutcome(idx.ID, err)
+		if err != nil {
+			h.logger.Warn("torznab: search failed",
+				"indexer", idx.Name, "query", keywords, "error", err)
+			// Failures are NOT cached — a transient error must not be
+			// replayed as an empty result set for the cache TTL.
+			return nil, err
+		}
+		h.engine.Cache().Set(cacheKey, results)
+		h.logger.Info("torznab: search complete",
+			"indexer", idx.Name, "query", keywords, "results", len(results))
+		return results, nil
 	})
-	h.recordSearchOutcome(idx.ID, err)
-	if err != nil {
-		h.logger.Warn("torznab: search failed",
-			"indexer", idx.Name, "query", keywords, "error", err)
-		// Failures are NOT cached — a transient error must not be replayed
-		// as an empty result set for the cache TTL.
-		h.xmlError(w, 100, "Search failed: "+err.Error())
-		return
+
+	select {
+	case res := <-resCh:
+		if res.Err != nil {
+			h.xmlError(w, 100, "Search failed: "+res.Err.Error())
+			return
+		}
+		h.writeResults(w, r, idx, res.Val.([]scraper.SearchResult), limit, offset)
+	case <-r.Context().Done():
+		// Client gave up — the shared scrape continues and will cache.
+		h.logger.Info("torznab: client disconnected, scrape continues in background",
+			"indexer", idx.Name, "query", keywords)
 	}
-
-	// Cache results
-	h.engine.Cache().Set(cacheKey, results)
-
-	h.logger.Info("torznab: search complete",
-		"indexer", idx.Name, "query", keywords, "results", len(results))
-
-	h.writeResults(w, r, idx, results, limit, offset)
 }
+
+// backgroundSearchBudget bounds a detached scrape after every client has
+// disconnected. Generous: a CF-walled multi-page definition needs a
+// FlareSolverr solve per page.
+const backgroundSearchBudget = 3 * time.Minute
 
 // writeResults encodes search results as Torznab XML.
 // Download URLs are rewritten to point at Pulse's download proxy
