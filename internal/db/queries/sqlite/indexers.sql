@@ -35,6 +35,16 @@ UPDATE indexers SET
     health_checked_at = ?
 WHERE id = ?;
 
+-- name: SetIndexerSearchHealth :exec
+UPDATE indexers SET
+    health_status     = ?,
+    health_message    = ?,
+    health_checked_at = ?,
+    failure_count     = ?,
+    last_error        = ?,
+    last_success_at   = ?
+WHERE id = ?;
+
 -- Assignments
 
 -- name: CreateAssignment :one

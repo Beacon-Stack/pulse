@@ -27,6 +27,9 @@ type indexerBody struct {
 	HealthStatus    string `json:"health_status"`
 	HealthMessage   string `json:"health_message,omitempty"`
 	HealthCheckedAt string `json:"health_checked_at,omitempty"`
+	FailureCount    int    `json:"failure_count,omitempty"`
+	LastError       string `json:"last_error,omitempty"`
+	LastSuccessAt   string `json:"last_success_at,omitempty"`
 }
 
 type indexerCreateInput struct {
@@ -89,6 +92,9 @@ func toIndexerBody(row db.Indexer) indexerBody {
 		HealthStatus:    row.HealthStatus,
 		HealthMessage:   row.HealthMessage,
 		HealthCheckedAt: row.HealthCheckedAt,
+		FailureCount:    int(row.FailureCount),
+		LastError:       row.LastError,
+		LastSuccessAt:   row.LastSuccessAt,
 	}
 }
 

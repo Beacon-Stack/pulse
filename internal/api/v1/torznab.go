@@ -1,8 +1,10 @@
 package v1
 
 import (
+	"context"
 	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -15,6 +17,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
+	"github.com/beacon-stack/pulse/internal/core/indexer"
 	db "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/scraper"
 	"github.com/beacon-stack/pulse/internal/torznab"
@@ -24,14 +27,28 @@ import (
 type TorznabHandler struct {
 	engine      *scraper.Engine
 	q           db.Querier
-	externalURL string // e.g. "http://pulse:9696" — used for proxy download URLs in Docker
+	mgr         *indexer.Manager // nil-able; search-health outcome recording
+	externalURL string           // e.g. "http://pulse:9696" — used for proxy download URLs in Docker
 	logger      *slog.Logger
 }
 
 // NewTorznabHandler creates a new handler. externalURL is optional; when set,
 // torznab download proxy URLs use it instead of the request's Host header.
-func NewTorznabHandler(engine *scraper.Engine, q db.Querier, externalURL string, logger *slog.Logger) *TorznabHandler {
-	return &TorznabHandler{engine: engine, q: q, externalURL: strings.TrimRight(externalURL, "/"), logger: logger}
+// mgr may be nil (tests) — search-health recording is then skipped.
+func NewTorznabHandler(engine *scraper.Engine, q db.Querier, mgr *indexer.Manager, externalURL string, logger *slog.Logger) *TorznabHandler {
+	return &TorznabHandler{engine: engine, q: q, mgr: mgr, externalURL: strings.TrimRight(externalURL, "/"), logger: logger}
+}
+
+// recordSearchOutcome forwards a search result to the health tracker.
+// Client-side cancellations are not indexer failures and are ignored.
+func (h *TorznabHandler) recordSearchOutcome(indexerID string, searchErr error) {
+	if h.mgr == nil {
+		return
+	}
+	if searchErr != nil && (errors.Is(searchErr, context.Canceled) || errors.Is(searchErr, context.DeadlineExceeded)) {
+		return
+	}
+	go h.mgr.RecordSearchOutcome(context.Background(), indexerID, searchErr)
 }
 
 // RegisterTorznabRoutes registers the Torznab proxy endpoint on the chi router.
@@ -186,6 +203,7 @@ func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, ru
 		TVDBID:     params.Get("tvdbid"),
 		Categories: cats,
 	})
+	h.recordSearchOutcome(idx.ID, err)
 	if err != nil {
 		h.logger.Warn("torznab: search failed",
 			"indexer", idx.Name, "query", keywords, "error", err)
@@ -405,6 +423,7 @@ func (h *TorznabHandler) HandleTestSearch(w http.ResponseWriter, r *http.Request
 
 	// Do a real search with a generic query to verify the indexer works.
 	results, err := runner.Search(r.Context(), "test", nil)
+	h.recordSearchOutcome(idx.ID, err)
 	if err != nil {
 		if scraper.IsCloudflareError(err) {
 			writeJSON(w, TestSearchResult{

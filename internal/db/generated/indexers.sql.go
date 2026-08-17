@@ -44,7 +44,7 @@ func (q *Queries) CreateAssignment(ctx context.Context, arg CreateAssignmentPara
 const createIndexer = `-- name: CreateIndexer :one
 INSERT INTO indexers (id, name, kind, enabled, priority, url, api_key, settings, created_at, updated_at)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-RETURNING id, name, kind, enabled, priority, url, api_key, settings, created_at, updated_at, health_status, health_message, health_checked_at
+RETURNING id, name, kind, enabled, priority, url, api_key, settings, created_at, updated_at, health_status, health_message, health_checked_at, failure_count, last_error, last_success_at
 `
 
 type CreateIndexerParams struct {
@@ -88,6 +88,9 @@ func (q *Queries) CreateIndexer(ctx context.Context, arg CreateIndexerParams) (I
 		&i.HealthStatus,
 		&i.HealthMessage,
 		&i.HealthCheckedAt,
+		&i.FailureCount,
+		&i.LastError,
+		&i.LastSuccessAt,
 	)
 	return i, err
 }
@@ -150,7 +153,7 @@ func (q *Queries) GetAssignmentOverrides(ctx context.Context, arg GetAssignmentO
 }
 
 const getIndexer = `-- name: GetIndexer :one
-SELECT id, name, kind, enabled, priority, url, api_key, settings, created_at, updated_at, health_status, health_message, health_checked_at FROM indexers WHERE id = ?
+SELECT id, name, kind, enabled, priority, url, api_key, settings, created_at, updated_at, health_status, health_message, health_checked_at, failure_count, last_error, last_success_at FROM indexers WHERE id = ?
 `
 
 func (q *Queries) GetIndexer(ctx context.Context, id string) (Indexer, error) {
@@ -170,6 +173,9 @@ func (q *Queries) GetIndexer(ctx context.Context, id string) (Indexer, error) {
 		&i.HealthStatus,
 		&i.HealthMessage,
 		&i.HealthCheckedAt,
+		&i.FailureCount,
+		&i.LastError,
+		&i.LastSuccessAt,
 	)
 	return i, err
 }
@@ -239,7 +245,7 @@ func (q *Queries) ListAssignmentsByService(ctx context.Context, serviceID string
 }
 
 const listEnabledIndexers = `-- name: ListEnabledIndexers :many
-SELECT id, name, kind, enabled, priority, url, api_key, settings, created_at, updated_at, health_status, health_message, health_checked_at FROM indexers WHERE enabled = TRUE ORDER BY priority ASC, name ASC
+SELECT id, name, kind, enabled, priority, url, api_key, settings, created_at, updated_at, health_status, health_message, health_checked_at, failure_count, last_error, last_success_at FROM indexers WHERE enabled = TRUE ORDER BY priority ASC, name ASC
 `
 
 func (q *Queries) ListEnabledIndexers(ctx context.Context) ([]Indexer, error) {
@@ -265,6 +271,9 @@ func (q *Queries) ListEnabledIndexers(ctx context.Context) ([]Indexer, error) {
 			&i.HealthStatus,
 			&i.HealthMessage,
 			&i.HealthCheckedAt,
+			&i.FailureCount,
+			&i.LastError,
+			&i.LastSuccessAt,
 		); err != nil {
 			return nil, err
 		}
@@ -280,7 +289,7 @@ func (q *Queries) ListEnabledIndexers(ctx context.Context) ([]Indexer, error) {
 }
 
 const listIndexers = `-- name: ListIndexers :many
-SELECT id, name, kind, enabled, priority, url, api_key, settings, created_at, updated_at, health_status, health_message, health_checked_at FROM indexers ORDER BY priority ASC, name ASC
+SELECT id, name, kind, enabled, priority, url, api_key, settings, created_at, updated_at, health_status, health_message, health_checked_at, failure_count, last_error, last_success_at FROM indexers ORDER BY priority ASC, name ASC
 `
 
 func (q *Queries) ListIndexers(ctx context.Context) ([]Indexer, error) {
@@ -306,6 +315,9 @@ func (q *Queries) ListIndexers(ctx context.Context) ([]Indexer, error) {
 			&i.HealthStatus,
 			&i.HealthMessage,
 			&i.HealthCheckedAt,
+			&i.FailureCount,
+			&i.LastError,
+			&i.LastSuccessAt,
 		); err != nil {
 			return nil, err
 		}
@@ -321,7 +333,7 @@ func (q *Queries) ListIndexers(ctx context.Context) ([]Indexer, error) {
 }
 
 const listIndexersForService = `-- name: ListIndexersForService :many
-SELECT i.id, i.name, i.kind, i.enabled, i.priority, i.url, i.api_key, i.settings, i.created_at, i.updated_at, i.health_status, i.health_message, i.health_checked_at FROM indexers i
+SELECT i.id, i.name, i.kind, i.enabled, i.priority, i.url, i.api_key, i.settings, i.created_at, i.updated_at, i.health_status, i.health_message, i.health_checked_at, i.failure_count, i.last_error, i.last_success_at FROM indexers i
 JOIN indexer_assignments ia ON i.id = ia.indexer_id
 WHERE ia.service_id = ?
   AND i.health_status != 'definition_missing'
@@ -354,6 +366,9 @@ func (q *Queries) ListIndexersForService(ctx context.Context, serviceID string) 
 			&i.HealthStatus,
 			&i.HealthMessage,
 			&i.HealthCheckedAt,
+			&i.FailureCount,
+			&i.LastError,
+			&i.LastSuccessAt,
 		); err != nil {
 			return nil, err
 		}
@@ -393,6 +408,40 @@ func (q *Queries) SetIndexerHealth(ctx context.Context, arg SetIndexerHealthPara
 	return err
 }
 
+const setIndexerSearchHealth = `-- name: SetIndexerSearchHealth :exec
+UPDATE indexers SET
+    health_status     = ?,
+    health_message    = ?,
+    health_checked_at = ?,
+    failure_count     = ?,
+    last_error        = ?,
+    last_success_at   = ?
+WHERE id = ?
+`
+
+type SetIndexerSearchHealthParams struct {
+	HealthStatus    string `json:"healthStatus"`
+	HealthMessage   string `json:"healthMessage"`
+	HealthCheckedAt string `json:"healthCheckedAt"`
+	FailureCount    int64  `json:"failureCount"`
+	LastError       string `json:"lastError"`
+	LastSuccessAt   string `json:"lastSuccessAt"`
+	ID              string `json:"id"`
+}
+
+func (q *Queries) SetIndexerSearchHealth(ctx context.Context, arg SetIndexerSearchHealthParams) error {
+	_, err := q.db.ExecContext(ctx, setIndexerSearchHealth,
+		arg.HealthStatus,
+		arg.HealthMessage,
+		arg.HealthCheckedAt,
+		arg.FailureCount,
+		arg.LastError,
+		arg.LastSuccessAt,
+		arg.ID,
+	)
+	return err
+}
+
 const updateIndexer = `-- name: UpdateIndexer :one
 UPDATE indexers SET
     name       = ?,
@@ -404,7 +453,7 @@ UPDATE indexers SET
     settings   = ?,
     updated_at = ?
 WHERE id = ?
-RETURNING id, name, kind, enabled, priority, url, api_key, settings, created_at, updated_at, health_status, health_message, health_checked_at
+RETURNING id, name, kind, enabled, priority, url, api_key, settings, created_at, updated_at, health_status, health_message, health_checked_at, failure_count, last_error, last_success_at
 `
 
 type UpdateIndexerParams struct {
@@ -446,6 +495,9 @@ func (q *Queries) UpdateIndexer(ctx context.Context, arg UpdateIndexerParams) (I
 		&i.HealthStatus,
 		&i.HealthMessage,
 		&i.HealthCheckedAt,
+		&i.FailureCount,
+		&i.LastError,
+		&i.LastSuccessAt,
 	)
 	return i, err
 }

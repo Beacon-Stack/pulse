@@ -59,6 +59,9 @@ type Indexer struct {
 	HealthStatus    string `json:"healthStatus"`
 	HealthMessage   string `json:"healthMessage"`
 	HealthCheckedAt string `json:"healthCheckedAt"`
+	FailureCount    int64  `json:"failureCount"`
+	LastError       string `json:"lastError"`
+	LastSuccessAt   string `json:"lastSuccessAt"`
 }
 
 type IndexerAssignment struct {

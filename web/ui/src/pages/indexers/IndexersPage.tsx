@@ -326,17 +326,19 @@ export default function IndexersPage() {
                       {idx.kind}
                     </span>
                     <Pill ok={idx.enabled} labelTrue="Enabled" labelFalse="Disabled" />
-                    {idx.health_status === "definition_missing" && (
+                    {(idx.health_status === "definition_missing" || idx.health_status === "failing") && (
                       <span
                         title={idx.health_message}
                         style={{
                           fontSize: 10, fontWeight: 600, padding: "2px 6px", borderRadius: 3,
                           textTransform: "uppercase", letterSpacing: "0.04em",
-                          color: "var(--color-danger)",
-                          background: "color-mix(in srgb, var(--color-danger) 12%, transparent)",
+                          color: idx.health_status === "failing" ? "var(--color-warning)" : "var(--color-danger)",
+                          background: idx.health_status === "failing"
+                            ? "color-mix(in srgb, var(--color-warning) 12%, transparent)"
+                            : "color-mix(in srgb, var(--color-danger) 12%, transparent)",
                         }}
                       >
-                        Definition missing
+                        {idx.health_status === "failing" ? "Failing" : "Definition missing"}
                       </span>
                     )}
                     {(catsByName.get(idx.name.toLowerCase()) ?? []).map((cat) => (
@@ -353,8 +355,8 @@ export default function IndexersPage() {
                     <span style={{ fontSize: 12, color: "var(--color-text-muted)", fontFamily: "var(--font-family-mono)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {idx.url}
                     </span>
-                    {!test?.message && idx.health_status === "definition_missing" && idx.health_message && (
-                      <span style={{ fontSize: 11, color: "var(--color-danger)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {!test?.message && (idx.health_status === "definition_missing" || idx.health_status === "failing") && idx.health_message && (
+                      <span style={{ fontSize: 11, color: idx.health_status === "failing" ? "var(--color-warning)" : "var(--color-danger)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         {idx.health_message}
                       </span>
                     )}

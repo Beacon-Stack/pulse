@@ -70,7 +70,7 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	// Torznab proxy — registered directly on chi (XML responses, not JSON).
 	// Auth is via the apikey query parameter (standard Torznab auth).
 	if cfg.ScraperEngine != nil && cfg.Queries != nil {
-		torznabHandler := v1.NewTorznabHandler(cfg.ScraperEngine, cfg.Queries, cfg.ExternalURL, cfg.Logger)
+		torznabHandler := v1.NewTorznabHandler(cfg.ScraperEngine, cfg.Queries, cfg.IndexerManager, cfg.ExternalURL, cfg.Logger)
 		v1.RegisterTorznabRoutes(r, torznabHandler)
 	}
 

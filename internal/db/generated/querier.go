@@ -79,6 +79,7 @@ type Querier interface {
 	ListTags(ctx context.Context) ([]Tag, error)
 	SetConfigEntry(ctx context.Context, arg SetConfigEntryParams) (ConfigEntry, error)
 	SetIndexerHealth(ctx context.Context, arg SetIndexerHealthParams) error
+	SetIndexerSearchHealth(ctx context.Context, arg SetIndexerSearchHealthParams) error
 	// Indexer tags
 	SetIndexerTags(ctx context.Context, indexerID string) error
 	// Service tags

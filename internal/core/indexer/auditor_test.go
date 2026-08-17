@@ -3,6 +3,7 @@ package indexer
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"log/slog"
 	"sync"
 	"testing"
@@ -170,6 +171,87 @@ func TestAuditCatalog_RecoveryFlipsBackToOK(t *testing.T) {
 	}
 	if row.HealthStatus != HealthOK {
 		t.Errorf("health after recovery = %q, want %q", row.HealthStatus, HealthOK)
+	}
+}
+
+// Three consecutive search failures flip an indexer to failing; one
+// success flips it back to ok. This is the live-search health dimension
+// that AuditCatalog (definition dimension) cannot see — an indexer
+// 400-ing on every search used to stay 'ok' forever.
+func TestRecordSearchOutcome_FailingThresholdAndRecovery(t *testing.T) {
+	mgr, q, rec := newTestManager(t)
+	createTestIndexer(t, q, "id-x", "SomeIndexer")
+	ctx := context.Background()
+
+	boom := errors.New("HTTP 400")
+	mgr.RecordSearchOutcome(ctx, "id-x", boom)
+	mgr.RecordSearchOutcome(ctx, "id-x", boom)
+
+	row, _ := q.GetIndexer(ctx, "id-x")
+	if row.HealthStatus == HealthFailing {
+		t.Fatalf("flipped to failing after only 2 failures, threshold is %d", failingThreshold)
+	}
+	if row.FailureCount != 2 {
+		t.Errorf("failure_count = %d, want 2", row.FailureCount)
+	}
+
+	mgr.RecordSearchOutcome(ctx, "id-x", boom)
+	row, _ = q.GetIndexer(ctx, "id-x")
+	if row.HealthStatus != HealthFailing {
+		t.Fatalf("health = %q after %d failures, want %q", row.HealthStatus, failingThreshold, HealthFailing)
+	}
+	if row.LastError == "" {
+		t.Error("last_error should record the failure")
+	}
+	rec.waitFor(t, events.TypeIndexerHealthChanged, 1)
+
+	// Recovery.
+	mgr.RecordSearchOutcome(ctx, "id-x", nil)
+	row, _ = q.GetIndexer(ctx, "id-x")
+	if row.HealthStatus != HealthOK {
+		t.Fatalf("health after success = %q, want %q", row.HealthStatus, HealthOK)
+	}
+	if row.FailureCount != 0 || row.LastError != "" {
+		t.Errorf("failure streak not reset: count=%d last_error=%q", row.FailureCount, row.LastError)
+	}
+	if row.LastSuccessAt == "" {
+		t.Error("last_success_at should be stamped")
+	}
+	rec.waitFor(t, events.TypeIndexerHealthChanged, 2)
+}
+
+// A catalog audit must not clear the failing state — the definition
+// resolving fine says nothing about live search health.
+func TestAuditCatalog_PreservesFailingState(t *testing.T) {
+	mgr, q, _ := newTestManager(t)
+	createTestIndexer(t, q, "id-x", "SomeIndexer")
+	ctx := context.Background()
+
+	boom := errors.New("HTTP 400")
+	for i := 0; i < failingThreshold; i++ {
+		mgr.RecordSearchOutcome(ctx, "id-x", boom)
+	}
+
+	mgr.AuditCatalog(ctx, func(string, string) string { return "someindexer" })
+
+	row, _ := q.GetIndexer(ctx, "id-x")
+	if row.HealthStatus != HealthFailing {
+		t.Errorf("audit reset health to %q, want %q preserved", row.HealthStatus, HealthFailing)
+	}
+}
+
+// Search outcomes must not resurrect a definition_missing indexer.
+func TestRecordSearchOutcome_DoesNotOverrideDefinitionMissing(t *testing.T) {
+	mgr, q, _ := newTestManager(t)
+	createTestIndexer(t, q, "id-x", "GoneIndexer")
+	ctx := context.Background()
+
+	mgr.AuditCatalog(ctx, func(string, string) string { return "" })
+	mgr.RecordSearchOutcome(ctx, "id-x", nil)
+
+	row, _ := q.GetIndexer(ctx, "id-x")
+	if row.HealthStatus != HealthDefinitionMissing {
+		t.Errorf("health = %q, want %q preserved", row.HealthStatus, HealthDefinitionMissing)
 	}
 }
 
