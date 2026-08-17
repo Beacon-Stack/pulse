@@ -345,3 +345,36 @@ func TestSearchWithQuery_PopulatesQueryContext(t *testing.T) {
 		t.Errorf("query = %q, want season=2 ep=1 kw=Severance", captured.URL.RawQuery)
 	}
 }
+
+// The runner cache must be keyed on settings too: keyed on catalogID
+// alone, a settings change in Pulse (fixing Nyaa's invalid cat-id)
+// never reached the scraper until a restart.
+func TestGetRunner_SettingsChangeInvalidatesCache(t *testing.T) {
+	e := NewEngine(slog.Default(), nil)
+	e.LoadDefinitions(map[string][]byte{
+		"testidx": []byte("id: testidx\nname: Test\nlinks:\n  - https://example.org\n"),
+	})
+
+	r1, err := e.GetRunner("testidx", `{"cat-id":"0"}`)
+	if err != nil {
+		t.Fatalf("GetRunner: %v", err)
+	}
+	r1again, err := e.GetRunner("testidx", `{"cat-id":"0"}`)
+	if err != nil {
+		t.Fatalf("GetRunner: %v", err)
+	}
+	if r1 != r1again {
+		t.Error("same settings should hit the cached runner")
+	}
+
+	r2, err := e.GetRunner("testidx", `{"cat-id":"0_0"}`)
+	if err != nil {
+		t.Fatalf("GetRunner: %v", err)
+	}
+	if r1 == r2 {
+		t.Error("changed settings returned the stale cached runner")
+	}
+	if got := r2.settings["cat-id"]; got != "0_0" {
+		t.Errorf("new runner settings cat-id = %q, want 0_0", got)
+	}
+}

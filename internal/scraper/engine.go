@@ -15,7 +15,7 @@ type Engine struct {
 	nameToID     map[string]string  // normalized name → catalog_id
 	urlToID      map[string]string  // domain → catalog_id
 	mu           sync.RWMutex
-	runners      sync.Map           // catalog_id → *Runner
+	runners      sync.Map           // catalog_id + "\x00" + settings JSON → *Runner
 	cache        *ResultCache
 	flaresolverr *FlareSolverr
 	logger       *slog.Logger
@@ -84,8 +84,12 @@ func (e *Engine) HasDefinition(catalogID string) bool {
 
 // GetRunner returns a cached or new Runner for the given catalog ID and settings.
 func (e *Engine) GetRunner(catalogID string, settingsJSON string) (*Runner, error) {
-	// Check cache first
-	if r, ok := e.runners.Load(catalogID); ok {
+	// The cache key must include the settings: keying on catalogID alone
+	// meant a settings change in Pulse (e.g. fixing Nyaa's cat-id) never
+	// reached the scraper until a process restart — the runner kept its
+	// stale merged settings forever.
+	cacheKey := catalogID + "\x00" + settingsJSON
+	if r, ok := e.runners.Load(cacheKey); ok {
 		return r.(*Runner), nil
 	}
 
@@ -116,7 +120,7 @@ func (e *Engine) GetRunner(catalogID string, settingsJSON string) (*Runner, erro
 	runner := NewRunner(def, settings, e.flaresolverr, e.logger)
 
 	// Cache it
-	e.runners.Store(catalogID, runner)
+	e.runners.Store(cacheKey, runner)
 
 	return runner, nil
 }
