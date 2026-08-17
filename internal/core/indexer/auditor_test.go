@@ -255,6 +255,27 @@ func TestRecordSearchOutcome_DoesNotOverrideDefinitionMissing(t *testing.T) {
 	}
 }
 
+// IsLikelyIPBan must match hard Cloudflare bans (fixable by VPN
+// rotation) and NOT plain challenges (handled by FlareSolverr).
+func TestIsLikelyIPBan(t *testing.T) {
+	cases := []struct {
+		in   string
+		want bool
+	}{
+		{`FlareSolverr failed: FlareSolverr error: Error: Error solving the challenge. Cloudflare has blocked this request. Probably your IP is banned for this site`, true},
+		{"FlareSolverr error: Cloudflare has blocked this request (Code 1020)", true},
+		{"path \"/\": Cloudflare protection detected (HTTP 403) — requires FlareSolverr", false}, // challenge, not ban
+		{"HTTP 400", false},
+		{"context deadline exceeded", false},
+		{"", false},
+	}
+	for _, tc := range cases {
+		if got := IsLikelyIPBan(tc.in); got != tc.want {
+			t.Errorf("IsLikelyIPBan(%q) = %v, want %v", tc.in, got, tc.want)
+		}
+	}
+}
+
 // definition_missing indexers must be withheld from the per-service list —
 // that is what makes the service's next sync drop its local copy instead
 // of failing every search against it.

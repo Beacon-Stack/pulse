@@ -58,6 +58,9 @@ export interface Indexer {
   failure_count?: number;
   last_error?: string;
   last_success_at?: string;
+  // Set when last_error matches the Cloudflare IP-ban signature — the
+  // UI offers "Rotate VPN IP" in context.
+  likely_ip_ban?: boolean;
 }
 
 export interface CreateIndexerInput {

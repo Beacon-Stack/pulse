@@ -144,6 +144,21 @@ func (f *FlareSolverr) Solve(ctx context.Context, targetURL string) (html string
 	return fsResp.Solution.Response, fsResp.Solution.Cookies, fsResp.Solution.UserAgent, nil
 }
 
+// ClearSessions drops every cached Cloudflare session. Sessions are
+// bound to the egress IP that solved them, so a VPN rotation invalidates
+// them all — keeping them makes CF-walled indexers fail mysteriously
+// until the TTL expires. Sessions are client-side only (no FlareSolverr
+// server-side session objects exist), so a map reset is the whole job.
+func (f *FlareSolverr) ClearSessions() {
+	if f == nil {
+		return
+	}
+	f.mu.Lock()
+	f.sessions = make(map[string]*cfSession)
+	f.mu.Unlock()
+	f.logger.Info("flaresolverr: cleared all cached CF sessions")
+}
+
 // GetSession returns the cached CF session for a domain, if valid.
 func (f *FlareSolverr) GetSession(domain string) (*cfSession, bool) {
 	f.mu.RLock()

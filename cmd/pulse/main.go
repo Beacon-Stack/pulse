@@ -304,6 +304,36 @@ func main() {
 		dashAgg.GluetunService = cfg.Dashboard.GluetunContainer
 	}
 
+	// preWarmSessions solves Cloudflare challenges for all configured
+	// indexers so the first user search doesn't pay the 60-120s solve
+	// cost. Reused by the first catalog load and by VPN IP rotation
+	// (which invalidates every session).
+	preWarmSessions := func(warmCtx context.Context) {
+		if flaresolverr == nil {
+			return
+		}
+		idxRows, err := queries.ListEnabledIndexers(warmCtx)
+		if err != nil {
+			logger.Warn("pre-warm: failed to list indexers", "error", err)
+			return
+		}
+		var urls []string
+		for _, row := range idxRows {
+			if row.Url != "" {
+				urls = append(urls, row.Url)
+			}
+		}
+		if len(urls) > 0 {
+			flaresolverr.PreWarm(warmCtx, urls)
+		}
+	}
+
+	// VPN IP rotation — only when a gluetun control server is configured.
+	var vpnRotator *gluetun.Rotator
+	if gluetunClient != nil {
+		vpnRotator = gluetun.NewRotator(gluetunClient, scraperEngine.ClearScraperState, preWarmSessions, bus, logger)
+	}
+
 	router := api.NewRouter(api.RouterConfig{
 		Auth:            cfg.Auth.APIKey,
 		Logger:          logger,
@@ -318,6 +348,7 @@ func main() {
 		ScraperEngine:   scraperEngine,
 		Queries:         queries,
 		DashboardAggregator: dashAgg,
+		VPNRotator:      vpnRotator,
 		ExternalURL:     externalURL,
 		LogSystem:       logSystem,
 		DockerLogs:      dockerLogs,
@@ -353,26 +384,7 @@ func main() {
 
 		// Pre-warm FlareSolverr sessions for configured indexers, once the
 		// first definition set is in place.
-		if flaresolverr != nil {
-			preWarmOnce.Do(func() {
-				go func() {
-					idxRows, err := queries.ListEnabledIndexers(ctx)
-					if err != nil {
-						logger.Warn("pre-warm: failed to list indexers", "error", err)
-						return
-					}
-					var urls []string
-					for _, row := range idxRows {
-						if row.Url != "" {
-							urls = append(urls, row.Url)
-						}
-					}
-					if len(urls) > 0 {
-						flaresolverr.PreWarm(ctx, urls)
-					}
-				}()
-			})
-		}
+		preWarmOnce.Do(func() { go preWarmSessions(ctx) })
 	})
 	if source, err := prowlarrCatalog.LoadLocal(); err != nil {
 		logger.Warn("prowlarr: no local definitions available, search is down until the GitHub fetch succeeds", "error", err)

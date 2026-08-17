@@ -6,6 +6,7 @@ import {
   Check,
   AlertCircle,
   Loader2,
+  RotateCw,
   Server,
   X,
 } from "lucide-react";
@@ -22,6 +23,7 @@ import {
 } from "@/api/indexers";
 import { useServices } from "@/api/services";
 import { useCatalog } from "@/api/catalog";
+import { useRotateVPN } from "@/api/dashboard";
 
 const categoryColors: Record<string, string> = {
   Movies: "#3b9eff",
@@ -42,6 +44,20 @@ export default function IndexerDetailPage() {
   const deleteIndexer = useDeleteIndexer();
   const unassign = useUnassignIndexer();
   const confirm = useConfirm();
+  const rotateVPN = useRotateVPN();
+
+  async function handleRotateVPN() {
+    if (
+      !(await confirm({
+        title: "Rotate VPN IP",
+        message:
+          "The tunnel reconnects until the provider assigns a new exit IP (up to ~2 minutes). Active downloads pause briefly and all Cloudflare sessions are re-solved.",
+        confirmLabel: "Rotate",
+      }))
+    )
+      return;
+    rotateVPN.mutate();
+  }
   const { data: catalogData } = useCatalog();
 
   // Look up catalog entry to get categories, description, language, privacy
@@ -208,6 +224,27 @@ export default function IndexerDetailPage() {
           {indexer.health_status === "failing" && indexer.health_message && (
             <div style={{ marginTop: 6, fontSize: 12, color: "var(--color-warning)" }}>
               {indexer.health_message}{indexer.last_success_at ? ` Last success: ${indexer.last_success_at}.` : ""} It will recover automatically on the next successful search.
+              {indexer.likely_ip_ban && (
+                <span style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
+                  This looks like a Cloudflare IP ban — rotating the VPN exit IP usually fixes it.
+                  <button
+                    onClick={handleRotateVPN}
+                    disabled={rotateVPN.isPending}
+                    style={{
+                      display: "inline-flex", alignItems: "center", gap: 5,
+                      padding: "4px 10px", borderRadius: 5,
+                      border: "1px solid color-mix(in srgb, var(--color-warning) 40%, transparent)",
+                      background: "color-mix(in srgb, var(--color-warning) 8%, transparent)",
+                      color: "var(--color-warning)",
+                      fontSize: 12, fontWeight: 500,
+                      cursor: rotateVPN.isPending ? "wait" : "pointer",
+                    }}
+                  >
+                    <RotateCw size={12} style={rotateVPN.isPending ? { animation: "spin 1s linear infinite" } : undefined} />
+                    {rotateVPN.isPending ? "Rotating…" : "Rotate VPN IP"}
+                  </button>
+                </span>
+              )}
             </div>
           )}
         </div>

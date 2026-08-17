@@ -8,6 +8,7 @@
 package gluetun
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -45,6 +46,7 @@ type Status struct {
 // Client talks to a Gluetun control server.
 type Client struct {
 	http    *http.Client
+	slow    *http.Client // rotate ops: control server lags during reconnect
 	baseURL string
 	logger  *slog.Logger
 }
@@ -62,6 +64,7 @@ func NewClient(baseURL string, logger *slog.Logger) *Client {
 	}
 	return &Client{
 		http:    &http.Client{Timeout: 1500 * time.Millisecond},
+		slow:    &http.Client{Timeout: 15 * time.Second},
 		baseURL: strings.TrimRight(baseURL, "/"),
 		logger:  logger,
 	}
@@ -227,6 +230,57 @@ func (c *Client) getJSON(ctx context.Context, path string, out any) error {
 		return fmt.Errorf("gluetun GET %s: HTTP %d", path, resp.StatusCode)
 	}
 	return json.NewDecoder(resp.Body).Decode(out)
+}
+
+// SetOpenVPNStatus starts or stops the OpenVPN tunnel via the control
+// server. status must be "running" or "stopped". Uses the slow client —
+// stopping/starting the tunnel can take several seconds to acknowledge.
+func (c *Client) SetOpenVPNStatus(ctx context.Context, status string) error {
+	if c == nil {
+		return ErrDisabled
+	}
+	body, _ := json.Marshal(map[string]string{"status": status})
+	req, err := http.NewRequestWithContext(ctx, http.MethodPut, c.baseURL+"/v1/openvpn/status", bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := c.slow.Do(req)
+	if err != nil {
+		return fmt.Errorf("gluetun PUT /v1/openvpn/status: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("gluetun PUT /v1/openvpn/status: HTTP %d", resp.StatusCode)
+	}
+	return nil
+}
+
+// PublicIP returns the tunnel's current public IP (empty while the
+// tunnel is down or the IP-fetch hasn't completed). Uses the slow client
+// — after a reconnect the control server's IP endpoint can lag well past
+// the 1s Status budget.
+func (c *Client) PublicIP(ctx context.Context) (string, error) {
+	if c == nil {
+		return "", ErrDisabled
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+"/v1/publicip/ip", nil)
+	if err != nil {
+		return "", err
+	}
+	resp, err := c.slow.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("gluetun GET /v1/publicip/ip: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 400 {
+		return "", fmt.Errorf("gluetun GET /v1/publicip/ip: HTTP %d", resp.StatusCode)
+	}
+	var body publicIPResponse
+	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
+		return "", err
+	}
+	return body.IP, nil
 }
 
 // Response shapes — only fields we actually use.

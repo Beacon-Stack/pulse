@@ -30,6 +30,9 @@ type indexerBody struct {
 	FailureCount    int    `json:"failure_count,omitempty"`
 	LastError       string `json:"last_error,omitempty"`
 	LastSuccessAt   string `json:"last_success_at,omitempty"`
+	// LikelyIPBan flags a last_error matching the Cloudflare IP-ban
+	// signature — the UI offers "Rotate VPN IP" in context.
+	LikelyIPBan bool `json:"likely_ip_ban,omitempty"`
 }
 
 type indexerCreateInput struct {
@@ -95,6 +98,7 @@ func toIndexerBody(row db.Indexer) indexerBody {
 		FailureCount:    int(row.FailureCount),
 		LastError:       row.LastError,
 		LastSuccessAt:   row.LastSuccessAt,
+		LikelyIPBan:     indexer.IsLikelyIPBan(row.LastError),
 	}
 }
 

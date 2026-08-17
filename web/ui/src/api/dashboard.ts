@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { apiFetch } from "./client";
 
 // Backend lives at pulse/internal/core/dashboard/aggregator.go — keep
@@ -121,6 +122,36 @@ export function useDashboardOverview() {
     queryFn: () => apiFetch<DashboardOverview>("/dashboard/overview"),
     refetchInterval: 2000,
     refetchOnWindowFocus: false,
+  });
+}
+
+export interface RotateVPNResponse {
+  old_ip: string;
+  new_ip: string;
+  attempts: number;
+  changed: boolean;
+  message?: string;
+}
+
+/**
+ * Cycles the VPN tunnel until the provider assigns a new exit IP (up to
+ * 3 attempts, ~30s-2min). Clears Cloudflare sessions server-side. The
+ * backend rate-limits to one rotation per 5 minutes.
+ */
+export function useRotateVPN() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => apiFetch<RotateVPNResponse>("/vpn/rotate", { method: "POST" }),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["dashboard", "overview"] });
+      qc.invalidateQueries({ queryKey: ["indexers"] });
+      if (res.changed) {
+        toast.success(`VPN IP rotated: ${res.old_ip} → ${res.new_ip}`);
+      } else {
+        toast.warning(res.message ?? "VPN reconnected but the IP did not change");
+      }
+    },
+    onError: (err) => toast.error((err as Error).message),
   });
 }
 

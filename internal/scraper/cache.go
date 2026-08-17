@@ -41,6 +41,14 @@ func (c *ResultCache) Get(key string) ([]SearchResult, bool) {
 	return e.results, true
 }
 
+// Clear drops all cached entries — used when the egress IP changes and
+// cached results (and their proxied download URLs) may be stale.
+func (c *ResultCache) Clear() {
+	c.mu.Lock()
+	c.entries = make(map[string]cacheEntry)
+	c.mu.Unlock()
+}
+
 // Set stores results in the cache.
 func (c *ResultCache) Set(key string, results []SearchResult) {
 	c.mu.Lock()

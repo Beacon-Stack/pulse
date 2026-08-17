@@ -130,6 +130,14 @@ func (e *Engine) Cache() *ResultCache {
 	return e.cache
 }
 
+// ClearScraperState drops all IP-bound scraper state: cached FlareSolverr
+// Cloudflare sessions and cached search results. Called after a VPN IP
+// rotation — both are tied to the egress IP that produced them.
+func (e *Engine) ClearScraperState() {
+	e.flaresolverr.ClearSessions() // nil-safe
+	e.cache.Clear()
+}
+
 // ResolveCatalogID finds the Prowlarr catalog ID for an indexer by trying:
 // 1. Exact catalog ID match
 // 2. Normalized name match (e.g., "The Pirate Bay" → "thepiratebay")

@@ -3,6 +3,7 @@ package indexer
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	db "github.com/beacon-stack/pulse/internal/db/generated"
@@ -29,6 +30,34 @@ const (
 // approach: one transient error is noise, three in a row is a signal.
 const failingThreshold = 3
 
+// ipBanSignatures are substrings (matched case-insensitively against an
+// indexer's last_error) that indicate the egress IP itself is banned by
+// Cloudflare — the failure mode a VPN IP rotation actually fixes. The
+// plain challenge signal ("Cloudflare protection detected") is
+// deliberately absent: a challenge is normal and FlareSolverr handles
+// it; only a hard ban warrants rotating.
+var ipBanSignatures = []string{
+	"cloudflare has blocked",
+	"ip is banned",
+	"code 1020",
+}
+
+// IsLikelyIPBan reports whether a search error message looks like a
+// Cloudflare IP ban (vs an ordinary failure). Used by the API to offer
+// the "Rotate VPN IP" action in context.
+func IsLikelyIPBan(lastError string) bool {
+	if lastError == "" {
+		return false
+	}
+	lower := strings.ToLower(lastError)
+	for _, sig := range ipBanSignatures {
+		if strings.Contains(lower, sig) {
+			return true
+		}
+	}
+	return false
+}
+
 // RecordSearchOutcome updates an indexer's search-health counters after a
 // proxied search. searchErr == nil records a success (resets the failure
 // streak and, if the indexer was failing, restores it to ok).
@@ -48,7 +77,7 @@ func (m *Manager) RecordSearchOutcome(ctx context.Context, indexerID string, sea
 	status := row.HealthStatus
 	message := row.HealthMessage
 	failureCount := row.FailureCount
-	lastError := row.LastError
+	var lastError string
 	lastSuccess := row.LastSuccessAt
 
 	if searchErr == nil {
