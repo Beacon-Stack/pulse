@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 )
 
 // Regression suite for the 2026-08-17 "half the indexer fleet silently
@@ -343,6 +344,53 @@ func TestSearchWithQuery_PopulatesQueryContext(t *testing.T) {
 	q := captured.URL.Query()
 	if q.Get("season") != "2" || q.Get("ep") != "1" || q.Get("kw") != "Severance" {
 		t.Errorf("query = %q, want season=2 ep=1 kw=Severance", captured.URL.RawQuery)
+	}
+}
+
+// A Cloudflare challenge solve must survive the search caller hanging up
+// (Pilot's per-indexer timeout is 25s; solves take 60-120s). When the
+// caller's context propagated into the solve, the solve aborted, the
+// session was never cached, and every later search hit a cold session —
+// CF-walled indexers were stuck in a permanent timeout loop.
+func TestSolveWithFlareSolverr_SurvivesCallerCancellation(t *testing.T) {
+	// Fake FlareSolverr: waits 300ms (past the caller's cancellation),
+	// then returns a solved page containing one row.
+	fsrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(300 * time.Millisecond)
+		_, _ = w.Write([]byte(`{"status":"ok","message":"","solution":{"url":"","status":200,"response":"` +
+			`<table><tr class=\"row\"><td class=\"title\">Severance S02E01</td></tr></table>` +
+			`","cookies":[{"name":"cf_clearance","value":"tok"}],"userAgent":"UA"}}`))
+	}))
+	t.Cleanup(fsrv.Close)
+
+	// Fake Cloudflare-walled site.
+	site := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Server", "cloudflare")
+		w.WriteHeader(http.StatusForbidden)
+	}))
+	t.Cleanup(site.Close)
+
+	def := simpleDef(site.URL, "search?q={{ .Keywords }}", nil)
+	fs := NewFlareSolverr(fsrv.URL, slog.Default())
+	r := NewRunner(def, nil, fs, slog.Default())
+
+	// Cancel the caller's context shortly after the scrape starts —
+	// mid-solve, like an impatient client.
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		time.Sleep(100 * time.Millisecond)
+		cancel()
+	}()
+
+	results, err := r.Search(ctx, "Severance S02E01", nil)
+	if err != nil {
+		t.Fatalf("Search: %v — the detached solve should have completed despite cancellation", err)
+	}
+	if len(results) != 1 {
+		t.Fatalf("len(results) = %d, want 1 from the solved page", len(results))
+	}
+	if _, ok := fs.GetSession(extractDomainFromURL(site.URL)); !ok {
+		t.Error("solved session was not cached — the next search would hit a cold session again")
 	}
 }
 

@@ -395,6 +395,26 @@ func main() {
 		prowlarrCatalog.StartRefreshLoop(ctx, 24*time.Hour)
 	}()
 
+	// Keep FlareSolverr sessions perpetually warm. Sessions expire after
+	// 25 minutes and a cold solve takes 60-120s — far beyond what an
+	// interactive search's timeout can absorb — so re-solve on a cadence
+	// inside the refresh margin instead of on demand. A pass over
+	// already-fresh sessions is free (PreWarm skips them).
+	if flaresolverr != nil {
+		go func() {
+			warmTicker := time.NewTicker(10 * time.Minute)
+			defer warmTicker.Stop()
+			for {
+				select {
+				case <-warmTicker.C:
+					preWarmSessions(ctx)
+				case <-ctx.Done():
+					return
+				}
+			}
+		}()
+	}
+
 	healthTicker := time.NewTicker(30 * time.Second)
 	go func() {
 		for {

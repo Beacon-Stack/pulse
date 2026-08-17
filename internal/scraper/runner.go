@@ -230,7 +230,12 @@ func (r *Runner) ResolveDownload(ctx context.Context, detailURL string) (string,
 		server := resp.Header.Get("Server")
 		if cfHeader == "challenge" || strings.Contains(strings.ToLower(server), "cloudflare") {
 			resp.Body.Close()
-			html, _, _, err := r.flaresolverr.Solve(ctx, detailURL)
+			// Detached for the same reason as solveWithFlareSolverr: let
+			// the solve complete and cache the session even if the
+			// download caller gives up first.
+			solveCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), flareSolveBudget)
+			defer cancel()
+			html, _, _, err := r.flaresolverr.Solve(solveCtx, detailURL)
 			if err != nil {
 				return "", fmt.Errorf("FlareSolverr failed for download page: %w", err)
 			}
@@ -542,11 +547,25 @@ func (r *Runner) executePath(ctx context.Context, path SearchPath, tmplCtx *Temp
 	}
 }
 
+// flareSolveBudget bounds a detached challenge solve. Matches
+// FlareSolverr's own max solve timeout plus transport headroom.
+const flareSolveBudget = 160 * time.Second
+
 // solveWithFlareSolverr uses FlareSolverr to bypass Cloudflare and returns
 // parsed results from the solved page. The HTML from FlareSolverr is used
 // directly — no need to re-fetch with cookies.
+//
+// The solve runs detached from the caller's context: solves take 60-120s
+// while impatient clients (Pilot's per-indexer timeout is 25s) hang up
+// long before that. Propagating that cancellation aborted the solve
+// mid-flight, so the session was never cached and every subsequent
+// search hit a cold session again — CF-walled indexers were stuck in a
+// permanent timeout loop. Letting the solve finish caches the session,
+// making the NEXT search fast even when THIS caller has given up.
 func (r *Runner) solveWithFlareSolverr(ctx context.Context, fullURL string, path SearchPath, tmplCtx *TemplateContext) ([]SearchResult, error) {
-	html, _, _, err := r.flaresolverr.Solve(ctx, fullURL)
+	solveCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), flareSolveBudget)
+	defer cancel()
+	html, _, _, err := r.flaresolverr.Solve(solveCtx, fullURL)
 	if err != nil {
 		return nil, fmt.Errorf("FlareSolverr failed: %w", err)
 	}
