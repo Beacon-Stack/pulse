@@ -184,14 +184,15 @@ func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, ru
 
 	keywords := composeKeywords(query, season, ep)
 
-	// Check cache. The key carries every parameter that changes the
-	// scrape: keywords (with season/ep composed in), the raw season/ep
-	// (definitions may reference .Query.Season/.Query.Ep), and category
-	// filters. The t= mode is deliberately EXCLUDED — the runner builds
-	// identical URLs for tvsearch and search with the same keywords, and
-	// keying on t made Sonarr-style tvsearch→text fallbacks spawn a
-	// duplicate scrape instead of joining/reusing the first one.
-	cacheKey := fmt.Sprintf("%s:%s:%d:%d:%v", idx.ID, keywords, season, ep, cats)
+	// Check cache. The key is (indexer, composed keywords, categories) —
+	// deliberately NOT the t= mode or raw season/ep: composeKeywords
+	// already bakes season/ep into the keywords whenever they're
+	// distinguishing, and the runner builds identical URLs for tvsearch
+	// and plain search with the same keywords. Keying on t or raw
+	// season/ep made the standard tvsearch→text fallback (same keywords,
+	// no season params) re-scrape instead of hitting the cache — every
+	// zero-result query stayed perpetually one scrape behind.
+	cacheKey := fmt.Sprintf("%s:%s:%v", idx.ID, keywords, cats)
 	if cached, ok := h.engine.Cache().Get(cacheKey); ok {
 		h.writeResults(w, r, idx, cached, limit, offset)
 		return
