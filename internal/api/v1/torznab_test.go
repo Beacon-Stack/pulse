@@ -67,3 +67,27 @@ func TestXMLError_EscapesSpecialCharacters(t *testing.T) {
 		})
 	}
 }
+
+// composeKeywords must merge structured season/ep params into the keyword
+// string the way Prowlarr does for keyword-only Cardigann definitions —
+// and must not double-append when the client already baked SxxExx into q.
+func TestComposeKeywords(t *testing.T) {
+	cases := []struct {
+		q          string
+		season, ep int
+		want       string
+	}{
+		{"Severance", 2, 1, "Severance S02E01"},
+		{"Severance", 2, 0, "Severance S02"},
+		{"Severance S02E01", 2, 1, "Severance S02E01"}, // already tokenized — no dup
+		{"Severance S02", 2, 0, "Severance S02"},
+		{"Severance Season 2", 2, 0, "Severance Season 2"},
+		{"Severance", 0, 0, "Severance"},
+		{"", 2, 1, ""}, // keywordless feed request stays keywordless
+	}
+	for _, tc := range cases {
+		if got := composeKeywords(tc.q, tc.season, tc.ep); got != tc.want {
+			t.Errorf("composeKeywords(%q, %d, %d) = %q, want %q", tc.q, tc.season, tc.ep, got, tc.want)
+		}
+	}
+}

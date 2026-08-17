@@ -64,6 +64,7 @@ type TestBlock struct {
 type SearchBlock struct {
 	Paths           []SearchPath          `yaml:"paths"`
 	Inputs          map[string]string     `yaml:"inputs"`
+	Headers         map[string][]string   `yaml:"headers"`
 	KeywordsFilters []FilterDef           `yaml:"keywordsfilters"`
 	Rows            RowsBlock             `yaml:"rows"`
 	Fields          map[string]FieldBlock `yaml:"fields"`
@@ -71,10 +72,11 @@ type SearchBlock struct {
 
 // SearchPath is a single search URL pattern.
 type SearchPath struct {
-	Path     string            `yaml:"path"`
-	Method   string            `yaml:"method"`
-	Inputs   map[string]string `yaml:"inputs"`
-	Response *ResponseConfig   `yaml:"response,omitempty"`
+	Path     string              `yaml:"path"`
+	Method   string              `yaml:"method"`
+	Inputs   map[string]string   `yaml:"inputs"`
+	Headers  map[string][]string `yaml:"headers"`
+	Response *ResponseConfig     `yaml:"response,omitempty"`
 }
 
 // ResponseConfig specifies the response format.
@@ -90,12 +92,14 @@ type RowsBlock struct {
 	Remove    string `yaml:"remove"`
 	Multiple  bool   `yaml:"multiple"`
 	Count     *SelectorBlock `yaml:"count,omitempty"`
+	Filters   []FilterDef    `yaml:"filters"` // e.g. andmatch — client-side keyword guard
 }
 
 // FieldBlock defines how to extract a single field from a result row.
 type FieldBlock struct {
 	SelectorBlock `yaml:",inline"`
-	Optional      bool `yaml:"optional"`
+	Optional      bool        `yaml:"optional"`
+	Default       interface{} `yaml:"default"` // fallback when extraction yields nothing
 }
 
 // SelectorBlock is the core unit for extracting data from HTML/JSON.

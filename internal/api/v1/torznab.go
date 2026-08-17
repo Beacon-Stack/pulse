@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"context"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -9,6 +8,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -118,14 +118,39 @@ func (h *TorznabHandler) handleCaps(w http.ResponseWriter, runner *scraper.Runne
 	_ = xml.NewEncoder(w).Encode(caps)
 }
 
+// seasonEpisodeTokenRe detects an SxxEyy / Sxx / "Season N" token already
+// present in a text query, so composeKeywords doesn't append a duplicate.
+var seasonEpisodeTokenRe = regexp.MustCompile(`(?i)(?:^|\s)(?:S\d{1,2}(?:E\d{1,2})?|Season\s+\d{1,2})(?:\s|$)`)
+
+// composeKeywords merges the torznab q/season/ep params into the keyword
+// string a Cardigann definition searches with. Prowlarr does the same for
+// definitions that only take free-text keywords: a Sonarr-style request
+// `?t=tvsearch&q=Severance&season=2&ep=1` must search "Severance S02E01",
+// not bare "Severance" (which returns every season, unfiltered).
+func composeKeywords(q string, season, ep int) string {
+	if q == "" || season <= 0 || seasonEpisodeTokenRe.MatchString(q) {
+		return q
+	}
+	if ep > 0 {
+		return fmt.Sprintf("%s S%02dE%02d", q, season, ep)
+	}
+	return fmt.Sprintf("%s S%02d", q, season)
+}
+
 // handleSearch executes a search and returns Torznab XML results.
 func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, runner *scraper.Runner, idx db.Indexer) {
-	query := r.URL.Query().Get("q")
-	imdbID := r.URL.Query().Get("imdbid")
+	params := r.URL.Query()
+	query := params.Get("q")
+	imdbID := params.Get("imdbid")
+	t := params.Get("t")
+	season, _ := strconv.Atoi(params.Get("season"))
+	ep, _ := strconv.Atoi(params.Get("ep"))
+	limit, _ := strconv.Atoi(params.Get("limit"))
+	offset, _ := strconv.Atoi(params.Get("offset"))
 
 	// Parse category filter
 	var cats []int
-	if catStr := r.URL.Query().Get("cat"); catStr != "" {
+	if catStr := params.Get("cat"); catStr != "" {
 		for _, c := range strings.Split(catStr, ",") {
 			if n, err := strconv.Atoi(strings.TrimSpace(c)); err == nil {
 				cats = append(cats, n)
@@ -138,18 +163,34 @@ func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, ru
 		query = imdbID
 	}
 
-	// Check cache
-	cacheKey := fmt.Sprintf("%s:%s:%v", idx.ID, query, cats)
+	keywords := composeKeywords(query, season, ep)
+
+	// Check cache. The key must carry every parameter that changes the
+	// result set — an earlier version keyed only on (indexer, q, cats),
+	// so a tvsearch and a plain search for the same q shadowed each other.
+	cacheKey := fmt.Sprintf("%s:%s:%s:%d:%d:%v", idx.ID, t, keywords, season, ep, cats)
 	if cached, ok := h.engine.Cache().Get(cacheKey); ok {
-		h.writeResults(w, r, idx, cached)
+		h.writeResults(w, r, idx, cached, limit, offset)
 		return
 	}
 
-	// Execute search
-	results, err := runner.Search(context.Background(), query, cats)
+	// Execute search with the request's context so client disconnects and
+	// timeouts propagate into the scrape.
+	results, err := runner.SearchWithQuery(r.Context(), scraper.SearchQuery{
+		Keywords:   keywords,
+		Type:       t,
+		Season:     season,
+		Ep:         ep,
+		IMDBID:     imdbID,
+		TMDBID:     params.Get("tmdbid"),
+		TVDBID:     params.Get("tvdbid"),
+		Categories: cats,
+	})
 	if err != nil {
 		h.logger.Warn("torznab: search failed",
-			"indexer", idx.Name, "query", query, "error", err)
+			"indexer", idx.Name, "query", keywords, "error", err)
+		// Failures are NOT cached — a transient error must not be replayed
+		// as an empty result set for the cache TTL.
 		h.xmlError(w, 100, "Search failed: "+err.Error())
 		return
 	}
@@ -158,15 +199,26 @@ func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, ru
 	h.engine.Cache().Set(cacheKey, results)
 
 	h.logger.Info("torznab: search complete",
-		"indexer", idx.Name, "query", query, "results", len(results))
+		"indexer", idx.Name, "query", keywords, "results", len(results))
 
-	h.writeResults(w, r, idx, results)
+	h.writeResults(w, r, idx, results, limit, offset)
 }
 
 // writeResults encodes search results as Torznab XML.
 // Download URLs are rewritten to point at Pulse's download proxy
 // so clients don't need CF cookies or tracker sessions.
-func (h *TorznabHandler) writeResults(w http.ResponseWriter, r *http.Request, idx db.Indexer, results []scraper.SearchResult) {
+// limit/offset implement the torznab paging params (0 = no paging).
+func (h *TorznabHandler) writeResults(w http.ResponseWriter, r *http.Request, idx db.Indexer, results []scraper.SearchResult, limit, offset int) {
+	if offset > 0 {
+		if offset >= len(results) {
+			results = nil
+		} else {
+			results = results[offset:]
+		}
+	}
+	if limit > 0 && limit < len(results) {
+		results = results[:limit]
+	}
 	// Build the proxy download base URL.
 	// Use the configured external URL when set (Docker), otherwise derive from the request.
 	var baseURL string

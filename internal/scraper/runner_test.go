@@ -186,7 +186,10 @@ func TestBuildQueryString_EvaluatesPathInputsAgainstContext(t *testing.T) {
 	ctx := NewTemplateContext(r.settings, "jujutsu kaisen")
 
 	pathInputs := map[string]string{"q": "{{ .Keywords }}"}
-	got := r.buildQueryString(pathInputs, ctx)
+	got, err := r.buildQueryString(pathInputs, ctx)
+	if err != nil {
+		t.Fatalf("buildQueryString: %v", err)
+	}
 
 	// Sorted iteration — c, f, q
 	want := "c=1_2&f=0&q=jujutsu+kaisen"
@@ -202,11 +205,14 @@ func TestBuildQueryString_SkipsEmptyValues(t *testing.T) {
 	r := NewRunner(def, map[string]string{"x": ""}, nil, slog.Default())
 	ctx := NewTemplateContext(r.settings, "")
 
-	got := r.buildQueryString(map[string]string{
+	got, err := r.buildQueryString(map[string]string{
 		"q":         "real",
 		"strip_s01": "{{ .Config.x }}", // empty
 		"empty":     "",
 	}, ctx)
+	if err != nil {
+		t.Fatalf("buildQueryString: %v", err)
+	}
 	want := "q=real"
 	if got != want {
 		t.Errorf("query string = %q, want %q", got, want)
@@ -221,7 +227,10 @@ func TestBuildQueryString_PathInputsOverrideBlockInputs(t *testing.T) {
 	r := NewRunner(def, nil, nil, slog.Default())
 	ctx := NewTemplateContext(r.settings, "")
 
-	got := r.buildQueryString(map[string]string{"p": "2"}, ctx)
+	got, err := r.buildQueryString(map[string]string{"p": "2"}, ctx)
+	if err != nil {
+		t.Fatalf("buildQueryString: %v", err)
+	}
 	want := "p=2&q=from_block"
 	if got != want {
 		t.Errorf("query string = %q, want %q", got, want)
