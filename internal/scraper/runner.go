@@ -723,6 +723,36 @@ func (r *Runner) extractJSONRow(jsonItem string, tmplCtx *TemplateContext) Searc
 	return r.buildResult(fieldValues)
 }
 
+// defaultMagnetTrackers is the announce list embedded in magnet links
+// synthesized from an infohash-only search result. Mirrors the open
+// tracker set Prowlarr bakes into its generated magnets — the swarm is
+// also reachable via DHT, so this list is a bootstrap aid, not a
+// requirement.
+var defaultMagnetTrackers = []string{
+	"udp://tracker.opentrackr.org:1337/announce",
+	"udp://open.demonii.com:1337/announce",
+	"udp://open.stealth.si:80/announce",
+	"udp://tracker.torrent.eu.org:451/announce",
+	"udp://exodus.desync.com:6969/announce",
+}
+
+// magnetFromInfoHash builds a magnet URI for definitions that yield an
+// infohash but no download link (e.g. The Pirate Bay's apibay API).
+func magnetFromInfoHash(infoHash, title string) string {
+	var b strings.Builder
+	b.WriteString("magnet:?xt=urn:btih:")
+	b.WriteString(strings.TrimSpace(infoHash))
+	if title != "" {
+		b.WriteString("&dn=")
+		b.WriteString(url.QueryEscape(title))
+	}
+	for _, tr := range defaultMagnetTrackers {
+		b.WriteString("&tr=")
+		b.WriteString(url.QueryEscape(tr))
+	}
+	return b.String()
+}
+
 // buildResult converts extracted field values into a SearchResult.
 func (r *Runner) buildResult(fields map[string]string) SearchResult {
 	// Resolve details/download URLs
@@ -748,6 +778,16 @@ func (r *Runner) buildResult(fields map[string]string) SearchResult {
 	}
 	if magnetURI == "" && strings.HasPrefix(download, "magnet:") {
 		magnetURI = download
+	}
+	// Some definitions provide only an infohash — Prowlarr's
+	// thepiratebay.yml is the canonical case: apibay serves no
+	// .torrent files and the YAML has no download/magnet field, so
+	// Prowlarr's engine synthesizes a magnet link from the hash.
+	// Match that behavior; without it every TPB row ships with no
+	// <enclosure> and grabbing fails downstream with "release … has
+	// no download URL".
+	if magnetURI == "" && download == "" && fields["infohash"] != "" {
+		magnetURI = magnetFromInfoHash(fields["infohash"], fields["title"])
 	}
 
 	size := parseSize(fields["size"])

@@ -592,6 +592,52 @@ func TestBuildResult_MagnetUriWinsOverMagnet(t *testing.T) {
 	}
 }
 
+func TestBuildResult_SynthesizesMagnetFromInfoHash(t *testing.T) {
+	// The Pirate Bay case (live incident 2026-09-01, Silo S03E01):
+	// Prowlarr's thepiratebay.yml yields only an infohash — no
+	// download, no magnet field. Every result shipped with no
+	// <enclosure> and grabs failed in Pilot/Prism with "release …
+	// has no download URL". The runner must synthesize a magnet the
+	// way Prowlarr's engine does.
+	r := newRunnerForBuildResult()
+	got := r.buildResult(map[string]string{
+		"infohash": "9E0834A800BFC96E839A9FB428FA3FE83B65FC81",
+		"title":    "Silo S03E01 1080p WEBRip",
+	})
+	if !strings.HasPrefix(got.MagnetURI, "magnet:?xt=urn:btih:9E0834A800BFC96E839A9FB428FA3FE83B65FC81") {
+		t.Fatalf("magnet not synthesized from infohash; got MagnetURI=%q", got.MagnetURI)
+	}
+	if !strings.Contains(got.MagnetURI, "&dn=Silo+S03E01+1080p+WEBRip") {
+		t.Errorf("magnet missing display name; got %q", got.MagnetURI)
+	}
+	if !strings.Contains(got.MagnetURI, "&tr=") {
+		t.Errorf("magnet missing bootstrap trackers; got %q", got.MagnetURI)
+	}
+	if got.InfoHash != "9E0834A800BFC96E839A9FB428FA3FE83B65FC81" {
+		t.Errorf("InfoHash not propagated; got %q", got.InfoHash)
+	}
+}
+
+func TestBuildResult_InfoHashDoesNotOverrideRealLinks(t *testing.T) {
+	// A definition that yields both an infohash AND a download or
+	// magnet link keeps the real link — synthesis is a last resort.
+	r := newRunnerForBuildResult()
+	got := r.buildResult(map[string]string{
+		"infohash": "abc123",
+		"magnet":   "magnet:?xt=urn:btih:realdeal",
+	})
+	if got.MagnetURI != "magnet:?xt=urn:btih:realdeal" {
+		t.Errorf("synthesis should not override a real magnet; got %q", got.MagnetURI)
+	}
+	got = r.buildResult(map[string]string{
+		"infohash": "abc123",
+		"download": "https://example.org/file.torrent",
+	})
+	if got.MagnetURI != "" {
+		t.Errorf("synthesis should not fire when a download URL exists; got %q", got.MagnetURI)
+	}
+}
+
 func TestBuildResult_FallsBackToDownloadIfMagnet(t *testing.T) {
 	// Pre-existing behavior: when `download` itself contains a
 	// magnet: URI and no separate magnet field is set, lift it into

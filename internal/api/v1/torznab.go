@@ -304,7 +304,7 @@ func (h *TorznabHandler) writeResults(w http.ResponseWriter, r *http.Request, id
 			res.Title, guid, res.Details, res.Date, res.Size,
 			enclosureURL, res.Seeders, res.Leechers,
 			res.DownloadVolumeFactor, res.UploadVolumeFactor,
-			res.Category,
+			res.Category, res.InfoHash,
 		))
 	}
 
