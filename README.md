@@ -46,7 +46,7 @@ Central tag registry with usage counts. Tags are used by indexer assignment, not
 - Full REST API (Huma v2 + Chi v5) under `/api/v1/`
 - OpenAPI documentation at `/api/docs`
 - WebSocket event stream at `/ws` — services subscribe for live updates when shared state changes
-- Postgres-backed state
+- SQLite database: no separate database server
 - Go client SDK at `pkg/sdk` — drop-in for any Go service that wants to register with Pulse
 - React 19 + TypeScript + Vite frontend embedded in the Go binary
 - Per-mode theme system (dark + light presets) shared with the other Beacon services
@@ -55,19 +55,23 @@ Central tag registry with usage counts. Tags are used by indexer assignment, not
 
 ## Getting started
 
-### Standalone
+### Docker
 
-A single-service compose that runs Pulse with its own dedicated Postgres lives at [`docker-compose.yml`](docker-compose.yml). Edit the `/path/to/...` line and the placeholder password, then:
+Pulse is optional: Pilot, Prism and Haul each run on their own. Connect them to Pulse to manage indexers, quality profiles and download clients in one place.
+
+Set the config path and `PULSE_SERVER_EXTERNAL_URL` in the compose file. The external URL is the address Pilot and Prism use to reach Pulse, so use this host's IP or DNS name, not `localhost`.
+
+The compose file is [`docker-compose.yml`](docker-compose.yml). Then:
 
 ```bash
 docker compose up -d
 ```
 
-The web UI is at `http://localhost:9696`. Pulse generates an API key on first run; find it in Settings → System.
+The web UI is at `http://<this-host>:9696`. Pulse generates an API key on first run; find it in Settings → System. Each app connects with its `*_PULSE_URL` (this Pulse's address) and `*_PULSE_API_KEY` settings, plus `ADVERTISE_HOST` so Pulse can reach the app back.
 
-### As part of the Beacon Stack
+### Running it with the other Beacon apps
 
-For the full setup — Pulse + Pilot + Prism + Haul + VPN — see [`beacon-stack/deploy`](https://github.com/beacon-stack/deploy). Pulse stands on its own; once Pilot, Prism, or Haul join it, the centralized indexer / quality-profile / shared-config story comes online.
+Each app ships its own compose file; run the ones you want and connect them. [beaconstack.io](https://beaconstack.io) has larger examples, from Pilot + Haul up to the full stack with Pulse and a VPN.
 
 ### Build from source
 
@@ -91,8 +95,9 @@ Pulse works with zero configuration. All settings are editable through the web U
 |---|---|---|
 | `PULSE_SERVER_HOST` | `0.0.0.0` | Bind address |
 | `PULSE_SERVER_PORT` | `9696` | HTTP port |
-| `PULSE_DATABASE_DSN` | | Postgres connection string |
+| `PULSE_DATABASE_PATH` | `/config/pulse.db` | SQLite database file |
 | `PULSE_AUTH_API_KEY` | auto-generated | API key for external access |
+| `PULSE_SERVER_EXTERNAL_URL` | `http://localhost:9696` | Address apps use to reach Pulse; it goes into the indexer URLs Pulse hands out. Set it to this host's IP or DNS name. |
 | `PULSE_LOG_LEVEL` | `info` | `debug`, `info`, `warn`, `error` |
 | `PULSE_LOG_FORMAT` | `json` | `json` or `text` |
 
