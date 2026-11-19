@@ -1,63 +1,38 @@
 # ============================================================================
-# Pulse — standalone deployment
+# Pulse — control plane for the Beacon apps
+# https://beaconstack.io/pulse
 #
-# Runs Pulse on its own with a dedicated Postgres. No Pilot/Prism/Haul.
-#
-# For the full Beacon Stack (Pulse + Pilot + Prism + Haul + VPN), see
-# https://github.com/beacon-stack/deploy
-#
-# Quick start:
-#   1. Edit the /path/to/... line and the password below.
+#   1. Set the host path and the external URL below.
 #   2. docker compose up -d
-#   3. Visit http://localhost:9696. Find your API key in Settings → System.
+#   3. Open http://<this-host>:9696
+#
+# Pulse is optional. Pilot, Prism and Haul each run on their own; connect
+# them to Pulse to share indexers, quality profiles and download clients
+# in one place. Point each app at this Pulse with its *_PULSE_URL and
+# *_PULSE_API_KEY settings (see each app's compose file). Examples that
+# connect the whole stack: https://beaconstack.io
 # ============================================================================
 
 services:
-
-  pulse-postgres:
-    image: postgres:17-alpine
-    container_name: pulse-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: pulse
-      POSTGRES_PASSWORD: change-me-please
-      POSTGRES_DB: pulse_db
-    volumes:
-      - pulse-pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U pulse"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-
   pulse:
     image: ghcr.io/beacon-stack/pulse:latest
     container_name: pulse
     restart: unless-stopped
-    depends_on:
-      pulse-postgres:
-        condition: service_healthy
-    environment:
-      # Override the beacon-stack defaults baked into the image.
-      PULSE_DATABASE_DSN: "postgres://pulse:change-me-please@pulse-postgres:5432/pulse_db?sslmode=disable"
-      PULSE_DATABASE_PASSWORD_FILE: ""
-      PULSE_AUTH_API_KEY_FILE: ""
-      # Empty external URL falls back to the request host. Set this
-      # explicitly if you're exposing Pulse to other hosts (e.g.
-      # http://pulse.example.com:9696) so the indexer-proxy URLs it
-      # hands out point back to the right place.
-      PULSE_SERVER_EXTERNAL_URL: ""
-    volumes:
-      - /path/to/config:/config
     ports:
       - "9696:9696"
+    environment:
+      TZ: UTC                       # your timezone, e.g. America/New_York
+
+      # The address Pilot and Prism use to reach Pulse. Pulse puts it in
+      # the indexer URLs it hands them, so it must work from inside their
+      # containers: use this host's IP or DNS name, not localhost.
+      PULSE_SERVER_EXTERNAL_URL: http://192.168.1.10:9696
+    volumes:
+      # Pulse's database and settings. Keep it on a local disk.
+      - /path/to/config/pulse:/config
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9696/health"]
       interval: 15s
       timeout: 5s
       retries: 5
       start_period: 20s
-
-volumes:
-  pulse-pgdata:
