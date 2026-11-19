@@ -4,17 +4,21 @@ import (
 	"context"
 	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"golang.org/x/sync/singleflight"
 
+	"github.com/beacon-stack/pulse/internal/core/indexer"
 	db "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/scraper"
 	"github.com/beacon-stack/pulse/internal/torznab"
@@ -24,14 +28,29 @@ import (
 type TorznabHandler struct {
 	engine      *scraper.Engine
 	q           db.Querier
-	externalURL string // e.g. "http://pulse:9696" — used for proxy download URLs in Docker
+	mgr         *indexer.Manager // nil-able; search-health outcome recording
+	externalURL string           // e.g. "http://pulse:9696" — used for proxy download URLs in Docker
 	logger      *slog.Logger
+	sf          singleflight.Group // coalesces identical in-flight searches
 }
 
 // NewTorznabHandler creates a new handler. externalURL is optional; when set,
 // torznab download proxy URLs use it instead of the request's Host header.
-func NewTorznabHandler(engine *scraper.Engine, q db.Querier, externalURL string, logger *slog.Logger) *TorznabHandler {
-	return &TorznabHandler{engine: engine, q: q, externalURL: strings.TrimRight(externalURL, "/"), logger: logger}
+// mgr may be nil (tests) — search-health recording is then skipped.
+func NewTorznabHandler(engine *scraper.Engine, q db.Querier, mgr *indexer.Manager, externalURL string, logger *slog.Logger) *TorznabHandler {
+	return &TorznabHandler{engine: engine, q: q, mgr: mgr, externalURL: strings.TrimRight(externalURL, "/"), logger: logger}
+}
+
+// recordSearchOutcome forwards a search result to the health tracker.
+// Client-side cancellations are not indexer failures and are ignored.
+func (h *TorznabHandler) recordSearchOutcome(indexerID string, searchErr error) {
+	if h.mgr == nil {
+		return
+	}
+	if searchErr != nil && (errors.Is(searchErr, context.Canceled) || errors.Is(searchErr, context.DeadlineExceeded)) {
+		return
+	}
+	go h.mgr.RecordSearchOutcome(context.Background(), indexerID, searchErr)
 }
 
 // RegisterTorznabRoutes registers the Torznab proxy endpoint on the chi router.
@@ -118,14 +137,39 @@ func (h *TorznabHandler) handleCaps(w http.ResponseWriter, runner *scraper.Runne
 	_ = xml.NewEncoder(w).Encode(caps)
 }
 
+// seasonEpisodeTokenRe detects an SxxEyy / Sxx / "Season N" token already
+// present in a text query, so composeKeywords doesn't append a duplicate.
+var seasonEpisodeTokenRe = regexp.MustCompile(`(?i)(?:^|\s)(?:S\d{1,2}(?:E\d{1,2})?|Season\s+\d{1,2})(?:\s|$)`)
+
+// composeKeywords merges the torznab q/season/ep params into the keyword
+// string a Cardigann definition searches with. Prowlarr does the same for
+// definitions that only take free-text keywords: a Sonarr-style request
+// `?t=tvsearch&q=Severance&season=2&ep=1` must search "Severance S02E01",
+// not bare "Severance" (which returns every season, unfiltered).
+func composeKeywords(q string, season, ep int) string {
+	if q == "" || season <= 0 || seasonEpisodeTokenRe.MatchString(q) {
+		return q
+	}
+	if ep > 0 {
+		return fmt.Sprintf("%s S%02dE%02d", q, season, ep)
+	}
+	return fmt.Sprintf("%s S%02d", q, season)
+}
+
 // handleSearch executes a search and returns Torznab XML results.
 func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, runner *scraper.Runner, idx db.Indexer) {
-	query := r.URL.Query().Get("q")
-	imdbID := r.URL.Query().Get("imdbid")
+	params := r.URL.Query()
+	query := params.Get("q")
+	imdbID := params.Get("imdbid")
+	t := params.Get("t")
+	season, _ := strconv.Atoi(params.Get("season"))
+	ep, _ := strconv.Atoi(params.Get("ep"))
+	limit, _ := strconv.Atoi(params.Get("limit"))
+	offset, _ := strconv.Atoi(params.Get("offset"))
 
 	// Parse category filter
 	var cats []int
-	if catStr := r.URL.Query().Get("cat"); catStr != "" {
+	if catStr := params.Get("cat"); catStr != "" {
 		for _, c := range strings.Split(catStr, ",") {
 			if n, err := strconv.Atoi(strings.TrimSpace(c)); err == nil {
 				cats = append(cats, n)
@@ -138,35 +182,92 @@ func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, ru
 		query = imdbID
 	}
 
-	// Check cache
-	cacheKey := fmt.Sprintf("%s:%s:%v", idx.ID, query, cats)
+	keywords := composeKeywords(query, season, ep)
+
+	// Check cache. The key is (indexer, composed keywords, categories) —
+	// deliberately NOT the t= mode or raw season/ep: composeKeywords
+	// already bakes season/ep into the keywords whenever they're
+	// distinguishing, and the runner builds identical URLs for tvsearch
+	// and plain search with the same keywords. Keying on t or raw
+	// season/ep made the standard tvsearch→text fallback (same keywords,
+	// no season params) re-scrape instead of hitting the cache — every
+	// zero-result query stayed perpetually one scrape behind.
+	cacheKey := fmt.Sprintf("%s:%s:%v", idx.ID, keywords, cats)
 	if cached, ok := h.engine.Cache().Get(cacheKey); ok {
-		h.writeResults(w, r, idx, cached)
+		h.writeResults(w, r, idx, cached, limit, offset)
 		return
 	}
 
-	// Execute search
-	results, err := runner.Search(context.Background(), query, cats)
-	if err != nil {
-		h.logger.Warn("torznab: search failed",
-			"indexer", idx.Name, "query", query, "error", err)
-		h.xmlError(w, 100, "Search failed: "+err.Error())
-		return
+	// Execute via singleflight, detached from any single caller's
+	// context. Cloudflare-walled indexers legitimately take 40-90s (a
+	// FlareSolverr solve per result page — clearance cookies don't
+	// satisfy CF's TLS fingerprinting from a Go client), which impatient
+	// clients (Pilot's per-indexer timeout is 25s) never wait out.
+	// Detaching lets the scrape complete and land in the cache, so the
+	// client's retry is served instantly; singleflight ensures the retry
+	// (or a concurrent duplicate) joins the in-flight scrape instead of
+	// starting a second one.
+	resCh := h.sf.DoChan(cacheKey, func() (interface{}, error) {
+		sctx, cancel := context.WithTimeout(context.WithoutCancel(r.Context()), backgroundSearchBudget)
+		defer cancel()
+		results, err := runner.SearchWithQuery(sctx, scraper.SearchQuery{
+			Keywords:   keywords,
+			Type:       t,
+			Season:     season,
+			Ep:         ep,
+			IMDBID:     imdbID,
+			TMDBID:     params.Get("tmdbid"),
+			TVDBID:     params.Get("tvdbid"),
+			Categories: cats,
+		})
+		h.recordSearchOutcome(idx.ID, err)
+		if err != nil {
+			h.logger.Warn("torznab: search failed",
+				"indexer", idx.Name, "query", keywords, "error", err)
+			// Failures are NOT cached — a transient error must not be
+			// replayed as an empty result set for the cache TTL.
+			return nil, err
+		}
+		h.engine.Cache().Set(cacheKey, results)
+		h.logger.Info("torznab: search complete",
+			"indexer", idx.Name, "query", keywords, "results", len(results))
+		return results, nil
+	})
+
+	select {
+	case res := <-resCh:
+		if res.Err != nil {
+			h.xmlError(w, 100, "Search failed: "+res.Err.Error())
+			return
+		}
+		h.writeResults(w, r, idx, res.Val.([]scraper.SearchResult), limit, offset)
+	case <-r.Context().Done():
+		// Client gave up — the shared scrape continues and will cache.
+		h.logger.Info("torznab: client disconnected, scrape continues in background",
+			"indexer", idx.Name, "query", keywords)
 	}
-
-	// Cache results
-	h.engine.Cache().Set(cacheKey, results)
-
-	h.logger.Info("torznab: search complete",
-		"indexer", idx.Name, "query", query, "results", len(results))
-
-	h.writeResults(w, r, idx, results)
 }
+
+// backgroundSearchBudget bounds a detached scrape after every client has
+// disconnected. Generous: a CF-walled multi-page definition needs a
+// FlareSolverr solve per page.
+const backgroundSearchBudget = 3 * time.Minute
 
 // writeResults encodes search results as Torznab XML.
 // Download URLs are rewritten to point at Pulse's download proxy
 // so clients don't need CF cookies or tracker sessions.
-func (h *TorznabHandler) writeResults(w http.ResponseWriter, r *http.Request, idx db.Indexer, results []scraper.SearchResult) {
+// limit/offset implement the torznab paging params (0 = no paging).
+func (h *TorznabHandler) writeResults(w http.ResponseWriter, r *http.Request, idx db.Indexer, results []scraper.SearchResult, limit, offset int) {
+	if offset > 0 {
+		if offset >= len(results) {
+			results = nil
+		} else {
+			results = results[offset:]
+		}
+	}
+	if limit > 0 && limit < len(results) {
+		results = results[:limit]
+	}
 	// Build the proxy download base URL.
 	// Use the configured external URL when set (Docker), otherwise derive from the request.
 	var baseURL string
@@ -203,7 +304,7 @@ func (h *TorznabHandler) writeResults(w http.ResponseWriter, r *http.Request, id
 			res.Title, guid, res.Details, res.Date, res.Size,
 			enclosureURL, res.Seeders, res.Leechers,
 			res.DownloadVolumeFactor, res.UploadVolumeFactor,
-			res.Category,
+			res.Category, res.InfoHash,
 		))
 	}
 
@@ -215,12 +316,23 @@ func (h *TorznabHandler) writeResults(w http.ResponseWriter, r *http.Request, id
 	_ = xml.NewEncoder(w).Encode(feed)
 }
 
+// torznabError is the Torznab/Newznab error document. Marshalling through
+// encoding/xml (rather than fmt-ing a template) guarantees the description is
+// attribute-escaped — error messages routinely embed quotes (e.g. an indexer
+// name rendered with %q) or "&"/"<", which would otherwise produce invalid
+// XML that clients can't parse, masking the real error behind a syntax error.
+type torznabError struct {
+	XMLName     xml.Name `xml:"error"`
+	Code        int      `xml:"code,attr"`
+	Description string   `xml:"description,attr"`
+}
+
 // xmlError writes a Torznab error response.
 func (h *TorznabHandler) xmlError(w http.ResponseWriter, code int, description string) {
 	w.Header().Set("Content-Type", "application/xml; charset=utf-8")
 	w.WriteHeader(http.StatusOK) // Torznab errors are 200 with error XML
-	fmt.Fprintf(w, `<?xml version="1.0" encoding="UTF-8"?>
-<error code="%d" description="%s"/>`, code, description)
+	_, _ = w.Write([]byte(xml.Header))
+	_ = xml.NewEncoder(w).Encode(torznabError{Code: code, Description: description})
 }
 
 
@@ -342,6 +454,7 @@ func (h *TorznabHandler) HandleTestSearch(w http.ResponseWriter, r *http.Request
 
 	// Do a real search with a generic query to verify the indexer works.
 	results, err := runner.Search(r.Context(), "test", nil)
+	h.recordSearchOutcome(idx.ID, err)
 	if err != nil {
 		if scraper.IsCloudflareError(err) {
 			writeJSON(w, TestSearchResult{

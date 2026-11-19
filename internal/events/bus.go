@@ -23,6 +23,8 @@ const (
 	TypeIndexerDeleted      Type = "indexer_deleted"
 	TypeIndexerAssigned     Type = "indexer_assigned"
 	TypeIndexerUnassigned   Type = "indexer_unassigned"
+	TypeIndexerHealthChanged Type = "indexer_health_changed"
+	TypeVPNIPRotated        Type = "vpn_ip_rotated"
 	TypeHealthCheck         Type = "health_check"
 	TypeQualityProfileCreated Type = "quality_profile_created"
 	TypeQualityProfileUpdated Type = "quality_profile_updated"

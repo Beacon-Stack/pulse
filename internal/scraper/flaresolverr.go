@@ -144,6 +144,21 @@ func (f *FlareSolverr) Solve(ctx context.Context, targetURL string) (html string
 	return fsResp.Solution.Response, fsResp.Solution.Cookies, fsResp.Solution.UserAgent, nil
 }
 
+// ClearSessions drops every cached Cloudflare session. Sessions are
+// bound to the egress IP that solved them, so a VPN rotation invalidates
+// them all — keeping them makes CF-walled indexers fail mysteriously
+// until the TTL expires. Sessions are client-side only (no FlareSolverr
+// server-side session objects exist), so a map reset is the whole job.
+func (f *FlareSolverr) ClearSessions() {
+	if f == nil {
+		return
+	}
+	f.mu.Lock()
+	f.sessions = make(map[string]*cfSession)
+	f.mu.Unlock()
+	f.logger.Info("flaresolverr: cleared all cached CF sessions")
+}
+
 // GetSession returns the cached CF session for a domain, if valid.
 func (f *FlareSolverr) GetSession(domain string) (*cfSession, bool) {
 	f.mu.RLock()
@@ -171,16 +186,25 @@ func (sess *cfSession) ToHTTPCookies() []*http.Cookie {
 	return out
 }
 
+// cfSessionRefreshMargin: PreWarm re-solves a session this close to its
+// TTL expiry, so a periodically-invoked pre-warm keeps sessions
+// perpetually fresh and interactive searches (which cannot afford a
+// 60-120s solve inside their timeout) never hit a cold session.
+const cfSessionRefreshMargin = 10 * time.Minute
+
 // PreWarm proactively solves Cloudflare challenges for a list of URLs.
-// This is called at startup so that user searches hit cached sessions.
+// Called at startup, after VPN IP rotation, and on a periodic ticker;
+// sessions younger than TTL−margin are skipped, so a warm pass is cheap.
 func (f *FlareSolverr) PreWarm(ctx context.Context, urls []string) {
 	for _, u := range urls {
+		if ctx.Err() != nil {
+			return
+		}
 		domain := extractDomainFromURL(u)
 		if domain == "" {
 			continue
 		}
-		// Skip if already cached.
-		if _, ok := f.GetSession(domain); ok {
+		if f.sessionFresh(domain) {
 			continue
 		}
 		f.logger.Info("flaresolverr: pre-warming session", "url", u)
@@ -189,6 +213,15 @@ func (f *FlareSolverr) PreWarm(ctx context.Context, urls []string) {
 			f.logger.Warn("flaresolverr: pre-warm failed", "url", u, "error", err)
 		}
 	}
+}
+
+// sessionFresh reports whether the domain has a cached session that is
+// not yet inside the refresh margin.
+func (f *FlareSolverr) sessionFresh(domain string) bool {
+	f.mu.RLock()
+	defer f.mu.RUnlock()
+	sess, ok := f.sessions[domain]
+	return ok && time.Since(sess.created) < cfSessionTTL-cfSessionRefreshMargin
 }
 
 func extractDomainFromURL(rawURL string) string {

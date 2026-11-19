@@ -279,10 +279,13 @@ func ResultToItem(r interface{ GetTitle() string }, baseURL string) Item {
 }
 
 // SearchResultToItem converts a scraper.SearchResult to a torznab.Item.
-func SearchResultToItem(title, guid, link, pubDate string, size int64, downloadURL string, seeders, leechers int, dvf, uvf float64, category string) Item {
+func SearchResultToItem(title, guid, link, pubDate string, size int64, downloadURL string, seeders, leechers int, dvf, uvf float64, category, infoHash string) Item {
 	attrs := map[string]string{
 		"category": category,
 		"size":     strconv.FormatInt(size, 10),
+	}
+	if infoHash != "" {
+		attrs["infohash"] = infoHash
 	}
 	if seeders > 0 {
 		attrs["seeders"] = strconv.Itoa(seeders)

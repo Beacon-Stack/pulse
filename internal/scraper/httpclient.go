@@ -42,16 +42,22 @@ func (c *RateLimitedClient) Do(req *http.Request) (*http.Response, error) {
 		time.Sleep(c.delay - since)
 	}
 	c.lastReq = time.Now()
-	// Use the FlareSolverr user-agent for this domain if we have one.
-	ua := "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+	// User-Agent precedence: a FlareSolverr session UA for this domain
+	// always wins (CF validates cookies against the solving browser's UA),
+	// then a caller-set header (definition `search.headers`), then the
+	// default browser UA.
+	var cfUA string
 	if req.URL != nil {
-		if cfUA, ok := c.cfUA[req.URL.Hostname()]; ok {
-			ua = cfUA
-		}
+		cfUA = c.cfUA[req.URL.Hostname()]
 	}
 	c.mu.Unlock()
 
-	req.Header.Set("User-Agent", ua)
+	switch {
+	case cfUA != "":
+		req.Header.Set("User-Agent", cfUA)
+	case req.Header.Get("User-Agent") == "":
+		req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+	}
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	req.Header.Set("Accept-Language", "en-US,en;q=0.5")
 

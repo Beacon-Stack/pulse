@@ -3,8 +3,11 @@ package scraper
 import (
 	"bytes"
 	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
 	"text/template"
+	"time"
 )
 
 // TemplateContext holds the variables available in Cardigann templates.
@@ -21,15 +24,16 @@ type TemplateContext struct {
 
 // QueryContext holds search query parameters.
 type QueryContext struct {
-	Type   string
-	Q      string
-	IMDBID string
-	TMDBID string
-	TVDBID string
-	Season string
-	Ep     string
-	Year   string
-	Page   int
+	Type     string
+	Q        string
+	Keywords string // same as the top-level Keywords; some definitions use .Query.Keywords
+	IMDBID   string
+	TMDBID   string
+	TVDBID   string
+	Season   string
+	Ep       string
+	Year     string
+	Page     int
 }
 
 // TodayContext provides date helpers.
@@ -43,12 +47,13 @@ func NewTemplateContext(config map[string]string, query string) *TemplateContext
 		Config:   config,
 		Keywords: query,
 		Query: QueryContext{
-			Q: query,
+			Q:        query,
+			Keywords: query,
 		},
 		Result: map[string]string{},
 		True:   true,
 		False:  false,
-		Today:  TodayContext{Year: 2026},
+		Today:  TodayContext{Year: time.Now().Year()},
 	}
 }
 
@@ -65,7 +70,10 @@ var templateFuncs = template.FuncMap{
 	"contains":   strings.Contains,
 	"hasprefix":  strings.HasPrefix,
 	"hassuffix":  strings.HasSuffix,
-	"re_replace": func(pattern, replacement, value string) string { return filterReReplace(value, pattern, replacement) },
+	// Cardigann's calling convention is `re_replace <value> <pattern>
+	// <replacement>` (e.g. `re_replace .Config.sort "_" ""`). Getting this
+	// order wrong silently corrupts every definition that uses it.
+	"re_replace": func(value, pattern, replacement string) string { return filterReReplace(value, pattern, replacement) },
 	"eq":         coercingEq,
 	"ne":         func(a, b interface{}) bool { return !coercingEq(a, b) },
 }
@@ -100,7 +108,15 @@ func EvalTemplate(tmplStr string, ctx *TemplateContext) (string, error) {
 
 	t, err := template.New("").Option("missingkey=zero").Funcs(templateFuncs).Parse(tmplStr)
 	if err != nil {
-		return "", err
+		// Cardigann definitions are written for Prowlarr's C# engine, whose
+		// template dialect is looser than Go's text/template. Retry once
+		// with known dialect gaps normalized — silently dropping the value
+		// here is what let Nyaa's second search path degrade to the
+		// unfiltered homepage.
+		t, err = template.New("").Option("missingkey=zero").Funcs(templateFuncs).Parse(normalizeCardigannTemplate(tmplStr))
+		if err != nil {
+			return "", err
+		}
 	}
 
 	var buf bytes.Buffer
@@ -108,6 +124,69 @@ func EvalTemplate(tmplStr string, ctx *TemplateContext) (string, error) {
 		return "", err
 	}
 	return buf.String(), nil
+}
+
+// dashedConfigKeyRe matches `.Config.some-key` field accesses whose key
+// contains a dash — legal in Cardigann, a lexer error in Go templates
+// (the `-id` reads as the start of a number literal).
+var dashedConfigKeyRe = regexp.MustCompile(`\.Config\.([A-Za-z0-9_]+(?:-[A-Za-z0-9_]+)+)`)
+
+// actionStringRe matches double-quoted string literals inside a template
+// action, honoring backslash escapes.
+var actionStringRe = regexp.MustCompile(`"(?:\\.|[^"\\])*"`)
+
+// actionRe matches whole template actions so string-literal fixes stay
+// inside {{ ... }} and never touch literal text.
+var actionRe = regexp.MustCompile(`\{\{(?:[^}]|\}[^}])*\}\}`)
+
+// normalizeCardigannTemplate rewrites Cardigann template constructs that
+// Go's text/template rejects:
+//
+//  1. `.Config.filter-id` → `(index .Config "filter-id")` — dashed keys.
+//  2. Regex escapes in string literals: `"\b0(\d{1})\b"` is invalid as a Go
+//     string (\b at string level is fine but \d is not a legal escape), so
+//     the whole template fails to parse. Prowlarr's engine passes the
+//     backslashes through to the regex. Doubling only the invalid escapes
+//     (`\d` → `\\d`) makes strconv.Unquote yield the original `\d` while
+//     leaving already-valid escapes like `\\s` untouched.
+func normalizeCardigannTemplate(src string) string {
+	src = dashedConfigKeyRe.ReplaceAllString(src, `(index .Config "$1")`)
+	return actionRe.ReplaceAllStringFunc(src, func(action string) string {
+		return actionStringRe.ReplaceAllStringFunc(action, fixInvalidStringEscapes)
+	})
+}
+
+// fixInvalidStringEscapes takes a double-quoted string literal (quotes
+// included). If Go's strconv.Unquote accepts it, it passes through
+// unchanged. If not, the author was writing regex-style escapes (`\d`,
+// `\b`, `\1`, …) with Prowlarr's C#-engine semantics, where the backslash
+// reaches the regex literally — so EVERY escape is made literal by
+// doubling its backslash. A bare `\b` in such a string means regex
+// word-boundary, never backspace. Only `\"` (structural — terminates the
+// literal otherwise) and `\\` (already an escaped backslash) are kept.
+func fixInvalidStringEscapes(lit string) string {
+	if _, err := strconv.Unquote(lit); err == nil {
+		return lit
+	}
+	inner := lit[1 : len(lit)-1]
+	var b strings.Builder
+	for i := 0; i < len(inner); i++ {
+		c := inner[i]
+		if c != '\\' || i+1 >= len(inner) {
+			b.WriteByte(c)
+			continue
+		}
+		next := inner[i+1]
+		if next == '"' || next == '\\' {
+			b.WriteByte(c)
+			b.WriteByte(next)
+		} else {
+			b.WriteString(`\\`)
+			b.WriteByte(next)
+		}
+		i++
+	}
+	return `"` + b.String() + `"`
 }
 
 // EvalTemplateOr evaluates a template, returning the fallback on error.

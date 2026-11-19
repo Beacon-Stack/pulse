@@ -143,9 +143,18 @@ func normalizeBoolString(s string) string {
 // canonical example. Empty values are skipped so we don't send
 // `&strip_s01=` and the like when a checkbox is unset.
 //
+// A template error is a hard error for the whole path, never a silent
+// skip: dropping a failed `q` input is exactly how Nyaa's search degraded
+// to its unfiltered homepage and polluted every search with 75 unrelated
+// rows.
+//
+// The special `$raw` input (Cardigann convention) is an already-formatted
+// query-string fragment (e.g. `s_cat=5000&s_cat=5070&`) and is spliced in
+// verbatim rather than escaped as a parameter.
+//
 // Sorted iteration so the same inputs always produce the same URL —
 // makes scraper logs greppable and avoids spurious diffs in tests.
-func (r *Runner) buildQueryString(pathInputs map[string]string, tmplCtx *TemplateContext) string {
+func (r *Runner) buildQueryString(pathInputs map[string]string, tmplCtx *TemplateContext) (string, error) {
 	merged := make(map[string]string, len(r.def.Search.Inputs)+len(pathInputs))
 	for k, v := range r.def.Search.Inputs {
 		merged[k] = v
@@ -154,7 +163,7 @@ func (r *Runner) buildQueryString(pathInputs map[string]string, tmplCtx *Templat
 		merged[k] = v
 	}
 	if len(merged) == 0 {
-		return ""
+		return "", nil
 	}
 
 	keys := make([]string, 0, len(merged))
@@ -166,12 +175,21 @@ func (r *Runner) buildQueryString(pathInputs map[string]string, tmplCtx *Templat
 	var parts []string
 	for _, k := range keys {
 		evaluated, err := EvalTemplate(merged[k], tmplCtx)
-		if err != nil || evaluated == "" {
+		if err != nil {
+			return "", fmt.Errorf("evaluating input %q: %w", k, err)
+		}
+		if evaluated == "" {
+			continue
+		}
+		if k == "$raw" {
+			if raw := strings.Trim(evaluated, "&"); raw != "" {
+				parts = append(parts, raw)
+			}
 			continue
 		}
 		parts = append(parts, url.QueryEscape(k)+"="+url.QueryEscape(evaluated))
 	}
-	return strings.Join(parts, "&")
+	return strings.Join(parts, "&"), nil
 }
 
 // ResolveDownload fetches a detail page and extracts the actual download URL
@@ -212,7 +230,12 @@ func (r *Runner) ResolveDownload(ctx context.Context, detailURL string) (string,
 		server := resp.Header.Get("Server")
 		if cfHeader == "challenge" || strings.Contains(strings.ToLower(server), "cloudflare") {
 			resp.Body.Close()
-			html, _, _, err := r.flaresolverr.Solve(ctx, detailURL)
+			// Detached for the same reason as solveWithFlareSolverr: let
+			// the solve complete and cache the session even if the
+			// download caller gives up first.
+			solveCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), flareSolveBudget)
+			defer cancel()
+			html, _, _, err := r.flaresolverr.Solve(solveCtx, detailURL)
 			if err != nil {
 				return "", fmt.Errorf("FlareSolverr failed for download page: %w", err)
 			}
@@ -283,8 +306,37 @@ func (r *Runner) extractDownloadFromHTML(html, baseURL string) (string, error) {
 	return "", fmt.Errorf("no download link found on detail page")
 }
 
+// SearchQuery carries the structured torznab search parameters into the
+// template context, so definitions using .Query.Season / .Query.IMDBID
+// and friends resolve correctly.
+type SearchQuery struct {
+	Keywords   string
+	Type       string // torznab t= mode: search, tvsearch, movie, ...
+	Season     int
+	Ep         int
+	IMDBID     string
+	TMDBID     string
+	TVDBID     string
+	Year       int
+	Categories []int
+}
+
 // Search executes a search and returns structured results.
+// Kept for callers that only have a bare keyword string.
 func (r *Runner) Search(ctx context.Context, query string, categories []int) ([]SearchResult, error) {
+	return r.SearchWithQuery(ctx, SearchQuery{Keywords: query, Categories: categories})
+}
+
+// SearchWithQuery executes a search with full structured parameters.
+//
+// Error contract: per-path failures are collected; if at least one path
+// produced results, those are returned (with failures logged). If EVERY
+// path failed, the combined error is returned — silently degrading a
+// hard failure to "0 results" is what let half the indexer fleet stay
+// broken for weeks without anything surfacing it.
+func (r *Runner) SearchWithQuery(ctx context.Context, sq SearchQuery) ([]SearchResult, error) {
+	query := sq.Keywords
+
 	// Apply keyword filters. We need a context for template evaluation —
 	// keyword filters routinely conditionally rewrite the query based on
 	// user settings (e.g. Nyaa's strip_s01 / radarr_compatibility).
@@ -294,13 +346,27 @@ func (r *Runner) Search(ctx context.Context, query string, categories []int) ([]
 	}
 
 	// Map requested Torznab categories to site category IDs
-	siteCats := r.mapCategories(categories)
+	siteCats := r.mapCategories(sq.Categories)
 
 	// Build template context
 	tmplCtx := NewTemplateContext(r.settings, query)
 	tmplCtx.Categories = siteCats
+	tmplCtx.Query.Type = sq.Type
+	if sq.Season > 0 {
+		tmplCtx.Query.Season = strconv.Itoa(sq.Season)
+	}
+	if sq.Ep > 0 {
+		tmplCtx.Query.Ep = strconv.Itoa(sq.Ep)
+	}
+	tmplCtx.Query.IMDBID = sq.IMDBID
+	tmplCtx.Query.TMDBID = sq.TMDBID
+	tmplCtx.Query.TVDBID = sq.TVDBID
+	if sq.Year > 0 {
+		tmplCtx.Query.Year = strconv.Itoa(sq.Year)
+	}
 
 	var allResults []SearchResult
+	var pathErrs []error
 
 	// Execute each search path
 	for _, path := range r.def.Search.Paths {
@@ -311,12 +377,51 @@ func (r *Runner) Search(ctx context.Context, query string, categories []int) ([]
 				"path", path.Path,
 				"error", err,
 			)
+			pathErrs = append(pathErrs, fmt.Errorf("path %q: %w", path.Path, err))
 			continue
 		}
 		allResults = append(allResults, results...)
 	}
 
+	if len(allResults) == 0 && len(pathErrs) > 0 {
+		return nil, errors.Join(pathErrs...)
+	}
+
+	allResults = r.applyRowsFilters(allResults, query)
 	return allResults, nil
+}
+
+// applyRowsFilters applies definition-level rows filters. Currently
+// implements `andmatch`: keep only rows whose title contains every
+// keyword term (case-insensitive) — Cardigann's client-side guard against
+// sites whose search fuzzy-matches or ignores the query.
+func (r *Runner) applyRowsFilters(results []SearchResult, keywords string) []SearchResult {
+	hasAndMatch := false
+	for _, f := range r.def.Search.Rows.Filters {
+		if strings.EqualFold(f.Name, "andmatch") {
+			hasAndMatch = true
+		}
+	}
+	if !hasAndMatch || strings.TrimSpace(keywords) == "" {
+		return results
+	}
+
+	terms := strings.Fields(strings.ToLower(keywords))
+	filtered := results[:0]
+	for _, res := range results {
+		title := strings.ToLower(res.Title)
+		match := true
+		for _, t := range terms {
+			if !strings.Contains(title, t) {
+				match = false
+				break
+			}
+		}
+		if match {
+			filtered = append(filtered, res)
+		}
+	}
+	return filtered
 }
 
 // executePath fetches a single search URL and extracts results.
@@ -340,13 +445,31 @@ func (r *Runner) executePath(ctx context.Context, path SearchPath, tmplCtx *Temp
 	// convention: path-level inputs override block-level inputs of the
 	// same name. Without this, Nyaa.si requests hit `/` with no `?q=…`,
 	// so the homepage comes back regardless of the search query.
-	if qs := r.buildQueryString(path.Inputs, tmplCtx); qs != "" {
+	qs, err := r.buildQueryString(path.Inputs, tmplCtx)
+	if err != nil {
+		return nil, err
+	}
+	if qs != "" {
 		sep := "?"
 		if strings.Contains(fullURL, "?") {
 			sep = "&"
 		}
 		fullURL += sep + qs
 	}
+
+	// Re-encode the query portion. Keywords substituted into the path
+	// template itself (`search?q={{ .Keywords }}`) arrive with raw spaces;
+	// Go percent-encodes the *path* automatically at request time but
+	// emits the query verbatim, so `GET /search?q=Severance S02E01` went
+	// out with a literal space and servers rejected it with HTTP 400 —
+	// this single defect broke TorrentDownload, kickasstorrents.to,
+	// Torrent[CORE], and The Pirate Bay.
+	u, err := url.Parse(fullURL)
+	if err != nil {
+		return nil, fmt.Errorf("invalid search URL %q: %w", fullURL, err)
+	}
+	u.RawQuery = u.Query().Encode()
+	fullURL = u.String()
 
 	r.logger.Debug("scraper: fetching",
 		"indexer", r.def.Name,
@@ -365,6 +488,19 @@ func (r *Runner) executePath(ctx context.Context, path SearchPath, tmplCtx *Temp
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fullURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("creating request: %w", err)
+	}
+
+	// Definition-supplied headers (search.headers, overridden by
+	// path-level headers). Values are templates.
+	for k, vals := range r.def.Search.Headers {
+		if len(vals) > 0 {
+			req.Header.Set(k, EvalTemplateOr(vals[0], tmplCtx, vals[0]))
+		}
+	}
+	for k, vals := range path.Headers {
+		if len(vals) > 0 {
+			req.Header.Set(k, EvalTemplateOr(vals[0], tmplCtx, vals[0]))
+		}
 	}
 
 	resp, err := r.client.Do(req)
@@ -411,11 +547,25 @@ func (r *Runner) executePath(ctx context.Context, path SearchPath, tmplCtx *Temp
 	}
 }
 
+// flareSolveBudget bounds a detached challenge solve. Matches
+// FlareSolverr's own max solve timeout plus transport headroom.
+const flareSolveBudget = 160 * time.Second
+
 // solveWithFlareSolverr uses FlareSolverr to bypass Cloudflare and returns
 // parsed results from the solved page. The HTML from FlareSolverr is used
 // directly — no need to re-fetch with cookies.
+//
+// The solve runs detached from the caller's context: solves take 60-120s
+// while impatient clients (Pilot's per-indexer timeout is 25s) hang up
+// long before that. Propagating that cancellation aborted the solve
+// mid-flight, so the session was never cached and every subsequent
+// search hit a cold session again — CF-walled indexers were stuck in a
+// permanent timeout loop. Letting the solve finish caches the session,
+// making the NEXT search fast even when THIS caller has given up.
 func (r *Runner) solveWithFlareSolverr(ctx context.Context, fullURL string, path SearchPath, tmplCtx *TemplateContext) ([]SearchResult, error) {
-	html, _, _, err := r.flaresolverr.Solve(ctx, fullURL)
+	solveCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), flareSolveBudget)
+	defer cancel()
+	html, _, _, err := r.flaresolverr.Solve(solveCtx, fullURL)
 	if err != nil {
 		return nil, fmt.Errorf("FlareSolverr failed: %w", err)
 	}
@@ -573,6 +723,36 @@ func (r *Runner) extractJSONRow(jsonItem string, tmplCtx *TemplateContext) Searc
 	return r.buildResult(fieldValues)
 }
 
+// defaultMagnetTrackers is the announce list embedded in magnet links
+// synthesized from an infohash-only search result. Mirrors the open
+// tracker set Prowlarr bakes into its generated magnets — the swarm is
+// also reachable via DHT, so this list is a bootstrap aid, not a
+// requirement.
+var defaultMagnetTrackers = []string{
+	"udp://tracker.opentrackr.org:1337/announce",
+	"udp://open.demonii.com:1337/announce",
+	"udp://open.stealth.si:80/announce",
+	"udp://tracker.torrent.eu.org:451/announce",
+	"udp://exodus.desync.com:6969/announce",
+}
+
+// magnetFromInfoHash builds a magnet URI for definitions that yield an
+// infohash but no download link (e.g. The Pirate Bay's apibay API).
+func magnetFromInfoHash(infoHash, title string) string {
+	var b strings.Builder
+	b.WriteString("magnet:?xt=urn:btih:")
+	b.WriteString(strings.TrimSpace(infoHash))
+	if title != "" {
+		b.WriteString("&dn=")
+		b.WriteString(url.QueryEscape(title))
+	}
+	for _, tr := range defaultMagnetTrackers {
+		b.WriteString("&tr=")
+		b.WriteString(url.QueryEscape(tr))
+	}
+	return b.String()
+}
+
 // buildResult converts extracted field values into a SearchResult.
 func (r *Runner) buildResult(fields map[string]string) SearchResult {
 	// Resolve details/download URLs
@@ -598,6 +778,16 @@ func (r *Runner) buildResult(fields map[string]string) SearchResult {
 	}
 	if magnetURI == "" && strings.HasPrefix(download, "magnet:") {
 		magnetURI = download
+	}
+	// Some definitions provide only an infohash — Prowlarr's
+	// thepiratebay.yml is the canonical case: apibay serves no
+	// .torrent files and the YAML has no download/magnet field, so
+	// Prowlarr's engine synthesizes a magnet link from the hash.
+	// Match that behavior; without it every TPB row ships with no
+	// <enclosure> and grabbing fails downstream with "release … has
+	// no download URL".
+	if magnetURI == "" && download == "" && fields["infohash"] != "" {
+		magnetURI = magnetFromInfoHash(fields["infohash"], fields["title"])
 	}
 
 	size := parseSize(fields["size"])

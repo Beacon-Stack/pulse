@@ -46,16 +46,22 @@ type FilterPreset struct {
 }
 
 type Indexer struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	Kind      string `json:"kind"`
-	Enabled   bool   `json:"enabled"`
-	Priority  int64  `json:"priority"`
-	Url       string `json:"url"`
-	ApiKey    string `json:"apiKey"`
-	Settings  string `json:"settings"`
-	CreatedAt string `json:"createdAt"`
-	UpdatedAt string `json:"updatedAt"`
+	ID              string `json:"id"`
+	Name            string `json:"name"`
+	Kind            string `json:"kind"`
+	Enabled         bool   `json:"enabled"`
+	Priority        int64  `json:"priority"`
+	Url             string `json:"url"`
+	ApiKey          string `json:"apiKey"`
+	Settings        string `json:"settings"`
+	CreatedAt       string `json:"createdAt"`
+	UpdatedAt       string `json:"updatedAt"`
+	HealthStatus    string `json:"healthStatus"`
+	HealthMessage   string `json:"healthMessage"`
+	HealthCheckedAt string `json:"healthCheckedAt"`
+	FailureCount    int64  `json:"failureCount"`
+	LastError       string `json:"lastError"`
+	LastSuccessAt   string `json:"lastSuccessAt"`
 }
 
 type IndexerAssignment struct {

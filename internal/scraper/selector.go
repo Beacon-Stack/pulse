@@ -1,6 +1,7 @@
 package scraper
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -44,6 +45,16 @@ func ExtractFieldHTML(row *goquery.Selection, field FieldBlock, ctx *TemplateCon
 		value = ApplyFilters(value, field.Filters, ctx)
 	}
 
+	return withFieldDefault(value, field)
+}
+
+// withFieldDefault substitutes the field's declared default when
+// extraction produced nothing (Cardigann `default:` — e.g. Nyaa's
+// `seeders: default: 0`).
+func withFieldDefault(value string, field FieldBlock) string {
+	if value == "" && field.Default != nil {
+		return strings.TrimSpace(fmt.Sprintf("%v", field.Default))
+	}
 	return value
 }
 
@@ -68,7 +79,7 @@ func ExtractFieldJSON(jsonStr string, field FieldBlock, ctx *TemplateContext) st
 		value = ApplyFilters(value, field.Filters, ctx)
 	}
 
-	return value
+	return withFieldDefault(value, field)
 }
 
 // FindRowsHTML finds result rows in an HTML document using the rows selector.

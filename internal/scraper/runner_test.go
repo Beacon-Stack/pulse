@@ -186,7 +186,10 @@ func TestBuildQueryString_EvaluatesPathInputsAgainstContext(t *testing.T) {
 	ctx := NewTemplateContext(r.settings, "jujutsu kaisen")
 
 	pathInputs := map[string]string{"q": "{{ .Keywords }}"}
-	got := r.buildQueryString(pathInputs, ctx)
+	got, err := r.buildQueryString(pathInputs, ctx)
+	if err != nil {
+		t.Fatalf("buildQueryString: %v", err)
+	}
 
 	// Sorted iteration — c, f, q
 	want := "c=1_2&f=0&q=jujutsu+kaisen"
@@ -202,11 +205,14 @@ func TestBuildQueryString_SkipsEmptyValues(t *testing.T) {
 	r := NewRunner(def, map[string]string{"x": ""}, nil, slog.Default())
 	ctx := NewTemplateContext(r.settings, "")
 
-	got := r.buildQueryString(map[string]string{
+	got, err := r.buildQueryString(map[string]string{
 		"q":         "real",
 		"strip_s01": "{{ .Config.x }}", // empty
 		"empty":     "",
 	}, ctx)
+	if err != nil {
+		t.Fatalf("buildQueryString: %v", err)
+	}
 	want := "q=real"
 	if got != want {
 		t.Errorf("query string = %q, want %q", got, want)
@@ -221,7 +227,10 @@ func TestBuildQueryString_PathInputsOverrideBlockInputs(t *testing.T) {
 	r := NewRunner(def, nil, nil, slog.Default())
 	ctx := NewTemplateContext(r.settings, "")
 
-	got := r.buildQueryString(map[string]string{"p": "2"}, ctx)
+	got, err := r.buildQueryString(map[string]string{"p": "2"}, ctx)
+	if err != nil {
+		t.Fatalf("buildQueryString: %v", err)
+	}
 	want := "p=2&q=from_block"
 	if got != want {
 		t.Errorf("query string = %q, want %q", got, want)
@@ -580,6 +589,52 @@ func TestBuildResult_MagnetUriWinsOverMagnet(t *testing.T) {
 	})
 	if got.MagnetURI != "magnet:?canonical" {
 		t.Errorf("magneturi should override magnet; got MagnetURI=%q", got.MagnetURI)
+	}
+}
+
+func TestBuildResult_SynthesizesMagnetFromInfoHash(t *testing.T) {
+	// The Pirate Bay case (live incident 2026-09-01, Silo S03E01):
+	// Prowlarr's thepiratebay.yml yields only an infohash — no
+	// download, no magnet field. Every result shipped with no
+	// <enclosure> and grabs failed in Pilot/Prism with "release …
+	// has no download URL". The runner must synthesize a magnet the
+	// way Prowlarr's engine does.
+	r := newRunnerForBuildResult()
+	got := r.buildResult(map[string]string{
+		"infohash": "9E0834A800BFC96E839A9FB428FA3FE83B65FC81",
+		"title":    "Silo S03E01 1080p WEBRip",
+	})
+	if !strings.HasPrefix(got.MagnetURI, "magnet:?xt=urn:btih:9E0834A800BFC96E839A9FB428FA3FE83B65FC81") {
+		t.Fatalf("magnet not synthesized from infohash; got MagnetURI=%q", got.MagnetURI)
+	}
+	if !strings.Contains(got.MagnetURI, "&dn=Silo+S03E01+1080p+WEBRip") {
+		t.Errorf("magnet missing display name; got %q", got.MagnetURI)
+	}
+	if !strings.Contains(got.MagnetURI, "&tr=") {
+		t.Errorf("magnet missing bootstrap trackers; got %q", got.MagnetURI)
+	}
+	if got.InfoHash != "9E0834A800BFC96E839A9FB428FA3FE83B65FC81" {
+		t.Errorf("InfoHash not propagated; got %q", got.InfoHash)
+	}
+}
+
+func TestBuildResult_InfoHashDoesNotOverrideRealLinks(t *testing.T) {
+	// A definition that yields both an infohash AND a download or
+	// magnet link keeps the real link — synthesis is a last resort.
+	r := newRunnerForBuildResult()
+	got := r.buildResult(map[string]string{
+		"infohash": "abc123",
+		"magnet":   "magnet:?xt=urn:btih:realdeal",
+	})
+	if got.MagnetURI != "magnet:?xt=urn:btih:realdeal" {
+		t.Errorf("synthesis should not override a real magnet; got %q", got.MagnetURI)
+	}
+	got = r.buildResult(map[string]string{
+		"infohash": "abc123",
+		"download": "https://example.org/file.torrent",
+	})
+	if got.MagnetURI != "" {
+		t.Errorf("synthesis should not fire when a download URL exists; got %q", got.MagnetURI)
 	}
 }
 

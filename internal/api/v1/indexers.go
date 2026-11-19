@@ -15,15 +15,24 @@ import (
 // ── Request / Response types ─────────────────────────────────────────────────
 
 type indexerBody struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	Kind      string `json:"kind"`
-	Enabled   bool   `json:"enabled"`
-	Priority  int    `json:"priority"`
-	URL       string `json:"url"`
-	Settings  string `json:"settings"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+	ID              string `json:"id"`
+	Name            string `json:"name"`
+	Kind            string `json:"kind"`
+	Enabled         bool   `json:"enabled"`
+	Priority        int    `json:"priority"`
+	URL             string `json:"url"`
+	Settings        string `json:"settings"`
+	CreatedAt       string `json:"created_at"`
+	UpdatedAt       string `json:"updated_at"`
+	HealthStatus    string `json:"health_status"`
+	HealthMessage   string `json:"health_message,omitempty"`
+	HealthCheckedAt string `json:"health_checked_at,omitempty"`
+	FailureCount    int    `json:"failure_count,omitempty"`
+	LastError       string `json:"last_error,omitempty"`
+	LastSuccessAt   string `json:"last_success_at,omitempty"`
+	// LikelyIPBan flags a last_error matching the Cloudflare IP-ban
+	// signature — the UI offers "Rotate VPN IP" in context.
+	LikelyIPBan bool `json:"likely_ip_ban,omitempty"`
 }
 
 type indexerCreateInput struct {
@@ -74,15 +83,22 @@ type indexerForServiceInput struct {
 
 func toIndexerBody(row db.Indexer) indexerBody {
 	return indexerBody{
-		ID:        row.ID,
-		Name:      row.Name,
-		Kind:      row.Kind,
-		Enabled:   row.Enabled,
-		Priority:  int(row.Priority),
-		URL:       row.Url,
-		Settings:  row.Settings,
-		CreatedAt: row.CreatedAt,
-		UpdatedAt: row.UpdatedAt,
+		ID:              row.ID,
+		Name:            row.Name,
+		Kind:            row.Kind,
+		Enabled:         row.Enabled,
+		Priority:        int(row.Priority),
+		URL:             row.Url,
+		Settings:        row.Settings,
+		CreatedAt:       row.CreatedAt,
+		UpdatedAt:       row.UpdatedAt,
+		HealthStatus:    row.HealthStatus,
+		HealthMessage:   row.HealthMessage,
+		HealthCheckedAt: row.HealthCheckedAt,
+		FailureCount:    int(row.FailureCount),
+		LastError:       row.LastError,
+		LastSuccessAt:   row.LastSuccessAt,
+		LikelyIPBan:     indexer.IsLikelyIPBan(row.LastError),
 	}
 }
 

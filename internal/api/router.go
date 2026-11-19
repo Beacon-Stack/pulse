@@ -17,6 +17,7 @@ import (
 	appconfig "github.com/beacon-stack/pulse/internal/config"
 	"github.com/beacon-stack/pulse/internal/core/dashboard"
 	"github.com/beacon-stack/pulse/internal/core/downloadclient"
+	"github.com/beacon-stack/pulse/internal/core/gluetun"
 	"github.com/beacon-stack/pulse/internal/core/indexer"
 	"github.com/beacon-stack/pulse/internal/core/qualityprofile"
 	"github.com/beacon-stack/pulse/internal/core/registry"
@@ -43,6 +44,7 @@ type RouterConfig struct {
 	ScraperEngine        *scraper.Engine
 	Queries              db.Querier
 	DashboardAggregator  *dashboard.Aggregator
+	VPNRotator           *gluetun.Rotator // nil when gluetun is not configured
 	ExternalURL          string // e.g., "http://pulse:9696" — used for Torznab proxy URL rewriting
 	// LogSystem is the handle returned by log.New. When non-nil, the
 	// router exposes /api/v1/system/logs and /api/v1/system/log-level
@@ -70,7 +72,7 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	// Torznab proxy — registered directly on chi (XML responses, not JSON).
 	// Auth is via the apikey query parameter (standard Torznab auth).
 	if cfg.ScraperEngine != nil && cfg.Queries != nil {
-		torznabHandler := v1.NewTorznabHandler(cfg.ScraperEngine, cfg.Queries, cfg.ExternalURL, cfg.Logger)
+		torznabHandler := v1.NewTorznabHandler(cfg.ScraperEngine, cfg.Queries, cfg.IndexerManager, cfg.ExternalURL, cfg.Logger)
 		v1.RegisterTorznabRoutes(r, torznabHandler)
 	}
 
@@ -159,6 +161,10 @@ func NewRouter(cfg RouterConfig) http.Handler {
 
 	if cfg.DashboardAggregator != nil {
 		v1.RegisterDashboardRoutes(humaAPI, cfg.DashboardAggregator)
+	}
+
+	if cfg.VPNRotator != nil {
+		v1.RegisterVPNRoutes(humaAPI, cfg.VPNRotator)
 	}
 
 	// Serve the embedded React SPA. Must come after all API routes

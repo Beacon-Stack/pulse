@@ -52,6 +52,15 @@ export interface Indexer {
   settings: string;
   created_at: string;
   updated_at: string;
+  health_status: "unknown" | "ok" | "definition_missing" | "failing";
+  health_message?: string;
+  health_checked_at?: string;
+  failure_count?: number;
+  last_error?: string;
+  last_success_at?: string;
+  // Set when last_error matches the Cloudflare IP-ban signature — the
+  // UI offers "Rotate VPN IP" in context.
+  likely_ip_ban?: boolean;
 }
 
 export interface CreateIndexerInput {
