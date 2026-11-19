@@ -22,6 +22,9 @@ func newTestDB(t *testing.T) *db.Queries {
 	if err != nil {
 		t.Fatalf("opening in-memory db: %v", err)
 	}
+	// Each pooled connection to ":memory:" opens its own empty database,
+	// so pin the pool to one connection or queries can miss the schema.
+	sqlDB.SetMaxOpenConns(1)
 	t.Cleanup(func() { sqlDB.Close() })
 	if err := pulsedb.Migrate(sqlDB); err != nil {
 		t.Fatalf("migrating: %v", err)
