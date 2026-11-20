@@ -250,3 +250,39 @@ func jsonString(v any) string {
 	b, _ := json.Marshal(v)
 	return string(b)
 }
+
+// Gluetun reports regions lowercased. The check must treat "ca toronto"
+// as "CA Toronto", or it would reconnect the VPN every two minutes.
+func TestReapplyPreferred_IgnoresGluetunsLowercase(t *testing.T) {
+	client := &fakeRegionClient{fakeRotateClient: fakeRotateClient{ips: []string{"1.1.1.1", "9.9.9.9"}}, regions: []string{"switzerland"}, pf: true}
+	var cleared bool
+	r := regionRotator(t, client, &memPref{v: "Switzerland"}, &cleared)
+	r.reapplyPreferred(context.Background())
+	if len(client.sets) != 0 {
+		t.Errorf("sets = %v, want none: lowercase is the same region", client.sets)
+	}
+}
+
+func TestRegions_CurrentInCatalogSpelling(t *testing.T) {
+	client := &fakeRegionClient{fakeRotateClient: fakeRotateClient{ips: []string{"1.1.1.1"}}, regions: []string{"ca toronto"}, pf: true}
+	var cleared bool
+	r := regionRotator(t, client, &memPref{}, &cleared)
+	info := r.Regions(context.Background())
+	if len(info.Current) != 1 || info.Current[0] != "CA Toronto" {
+		t.Errorf("current = %v, want [CA Toronto]", info.Current)
+	}
+}
+
+func TestChangeRegion_AcceptsAnyCase(t *testing.T) {
+	client := &fakeRegionClient{fakeRotateClient: fakeRotateClient{ips: []string{"1.1.1.1", "9.9.9.9"}}, pf: true}
+	prefs := &memPref{}
+	var cleared bool
+	r := regionRotator(t, client, prefs, &cleared)
+	res, err := r.ChangeRegion(context.Background(), "switzerland")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.Region != "Switzerland" || prefs.v != "Switzerland" {
+		t.Errorf("region %q saved %q, want the catalog spelling", res.Region, prefs.v)
+	}
+}
