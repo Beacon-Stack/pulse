@@ -164,7 +164,11 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	}
 
 	if cfg.VPNRotator != nil {
-		v1.RegisterVPNRoutes(humaAPI, cfg.VPNRotator)
+		var troubles func() []scraper.SiteTrouble
+		if cfg.ScraperEngine != nil {
+			troubles = cfg.ScraperEngine.ChallengeTroubles
+		}
+		v1.RegisterVPNRoutes(humaAPI, cfg.VPNRotator, troubles)
 	}
 
 	// Serve the embedded React SPA. Must come after all API routes

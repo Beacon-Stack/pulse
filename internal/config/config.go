@@ -28,6 +28,17 @@ type DashboardConfig struct {
 	// (e.g. "http://vpn:8000"). Empty disables the VPN panel.
 	GluetunURL string `mapstructure:"gluetun_url"`
 
+	// GluetunAPIKey is sent as X-API-Key to Gluetun's control server. The
+	// routes that change the VPN region (/v1/vpn/settings) can read the
+	// VPN credentials, so they belong behind a Gluetun role with apikey
+	// auth rather than auth = "none".
+	GluetunAPIKey string `mapstructure:"gluetun_api_key"`
+
+	// GluetunServersDir is Gluetun's servers directory (/gluetun/servers)
+	// mounted read-only, for the list of regions. With GluetunAPIKey it
+	// enables changing the VPN region from the dashboard.
+	GluetunServersDir string `mapstructure:"gluetun_servers_dir"`
+
 	// GluetunContainer is the docker container name for Gluetun. Defaults
 	// to "vpn" when unset, matching deploy/docker-compose.vpn.yml.
 	GluetunContainer string `mapstructure:"gluetun_container"`

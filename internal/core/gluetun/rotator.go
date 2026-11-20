@@ -59,6 +59,33 @@ type Rotator struct {
 	mu         sync.Mutex
 	rotating   bool
 	lastRotate time.Time
+
+	// Region changes; nil/empty until EnableRegions.
+	regionClient regionClient
+	catalog      RegionCatalog
+	prefs        RegionPreference
+}
+
+// begin claims the tunnel for one reconnect (rotation or region change),
+// refusing while another runs or inside the cool-down. Pair with end.
+func (r *Rotator) begin() error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if r.rotating {
+		return fmt.Errorf("a VPN reconnect is already in progress")
+	}
+	if wait := r.minInterval - time.Since(r.lastRotate); !r.lastRotate.IsZero() && wait > 0 {
+		return fmt.Errorf("%w: try again in %s", ErrRotateTooSoon, wait.Truncate(time.Second))
+	}
+	r.rotating = true
+	return nil
+}
+
+func (r *Rotator) end() {
+	r.mu.Lock()
+	r.rotating = false
+	r.lastRotate = time.Now()
+	r.mu.Unlock()
 }
 
 // NewRotator wires a Rotator. client must be non-nil (pass nil to the
@@ -86,24 +113,10 @@ func NewRotator(client rotateClient, clearScraperState func(), prewarm func(ctx 
 // state is cleared after any successful reconnect, changed or not (the
 // tunnel bounce invalidated the sessions either way).
 func (r *Rotator) Rotate(ctx context.Context) (RotateResult, error) {
-	r.mu.Lock()
-	if r.rotating {
-		r.mu.Unlock()
-		return RotateResult{}, fmt.Errorf("a rotation is already in progress")
+	if err := r.begin(); err != nil {
+		return RotateResult{}, err
 	}
-	if wait := r.minInterval - time.Since(r.lastRotate); !r.lastRotate.IsZero() && wait > 0 {
-		r.mu.Unlock()
-		return RotateResult{}, fmt.Errorf("%w: try again in %s", ErrRotateTooSoon, wait.Truncate(time.Second))
-	}
-	r.rotating = true
-	r.mu.Unlock()
-
-	defer func() {
-		r.mu.Lock()
-		r.rotating = false
-		r.lastRotate = time.Now()
-		r.mu.Unlock()
-	}()
+	defer r.end()
 
 	oldIP, err := r.client.PublicIP(ctx)
 	if err != nil {
@@ -134,24 +147,12 @@ func (r *Rotator) Rotate(ctx context.Context) (RotateResult, error) {
 	}
 
 	// Sessions are IP-bound and the tunnel bounced regardless of outcome.
-	if r.clearScraperState != nil {
-		r.clearScraperState()
-	}
-	if r.prewarm != nil {
-		go r.prewarm(context.WithoutCancel(ctx))
-	}
-
-	if r.bus != nil {
-		r.bus.Publish(ctx, events.Event{
-			Type: events.TypeVPNIPRotated,
-			Data: map[string]any{
-				"old_ip":   result.OldIP,
-				"new_ip":   result.NewIP,
-				"attempts": result.Attempts,
-				"changed":  result.Changed,
-			},
-		})
-	}
+	r.afterReconnect(ctx, map[string]any{
+		"old_ip":   result.OldIP,
+		"new_ip":   result.NewIP,
+		"attempts": result.Attempts,
+		"changed":  result.Changed,
+	})
 	r.logger.Info("vpn rotate: done",
 		"old_ip", result.OldIP, "new_ip", result.NewIP,
 		"attempts", result.Attempts, "changed", result.Changed)

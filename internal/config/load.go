@@ -41,6 +41,8 @@ func Load(configPath string) (*Config, error) {
 	v.SetDefault("dashboard.docker_socket", "")
 	v.SetDefault("dashboard.gluetun_url", "")
 	v.SetDefault("dashboard.gluetun_container", "vpn")
+	v.SetDefault("dashboard.gluetun_api_key", "")
+	v.SetDefault("dashboard.gluetun_servers_dir", "")
 
 	// Env vars: PULSE_SERVER_PORT, etc.
 	v.SetEnvPrefix("PULSE")

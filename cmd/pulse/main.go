@@ -297,6 +297,7 @@ func main() {
 	}
 	gluetunClient := gluetun.NewClient(cfg.Dashboard.GluetunURL, logger)
 	if gluetunClient != nil {
+		gluetunClient.SetAPIKey(cfg.Dashboard.GluetunAPIKey)
 		logger.Info("dashboard: gluetun integration enabled", "url", cfg.Dashboard.GluetunURL)
 	}
 	dashAgg := dashboard.New(registrySvc, dockerClient, gluetunClient)
@@ -332,6 +333,12 @@ func main() {
 	var vpnRotator *gluetun.Rotator
 	if gluetunClient != nil {
 		vpnRotator = gluetun.NewRotator(gluetunClient, scraperEngine.ClearScraperState, preWarmSessions, bus, logger)
+		if cfg.Dashboard.GluetunAPIKey != "" && cfg.Dashboard.GluetunServersDir != "" {
+			vpnRotator.EnableRegions(gluetunClient,
+				gluetun.RegionCatalog{Dir: cfg.Dashboard.GluetunServersDir},
+				regionPreference{store: configStore})
+			logger.Info("dashboard: VPN region changes enabled", "servers_dir", cfg.Dashboard.GluetunServersDir)
+		}
 	}
 
 	router := api.NewRouter(api.RouterConfig{
@@ -394,6 +401,12 @@ func main() {
 	go func() {
 		prowlarrCatalog.StartRefreshLoop(ctx, 24*time.Hour)
 	}()
+
+	// Put the user's chosen VPN region back if the VPN container restarts
+	// (its SERVER_REGIONS environment applies again on boot).
+	if vpnRotator != nil {
+		go vpnRotator.KeepPreferredRegion(ctx, 2*time.Minute)
+	}
 
 	// Keep FlareSolverr sessions perpetually warm. Sessions expire after
 	// 25 minutes and a cold solve takes 60-120s — far beyond what an

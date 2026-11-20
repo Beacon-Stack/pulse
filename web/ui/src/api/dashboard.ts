@@ -145,11 +145,85 @@ export function useRotateVPN() {
     onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ["dashboard", "overview"] });
       qc.invalidateQueries({ queryKey: ["indexers"] });
+      qc.invalidateQueries({ queryKey: ["vpn", "advice"] });
       if (res.changed) {
         toast.success(`VPN IP rotated: ${res.old_ip} → ${res.new_ip}`);
       } else {
         toast.warning(res.message ?? "VPN reconnected but the IP did not change");
       }
+    },
+    onError: (err) => toast.error((err as Error).message),
+  });
+}
+
+export interface SiteTrouble {
+  host: string;
+  failures: number;
+  successes: number;
+  last_error: string;
+  last_failure: string;
+}
+
+export interface VPNAdvice {
+  recommend_rotate: boolean;
+  sites: SiteTrouble[];
+  window_minutes: number;
+}
+
+/** Sites whose Cloudflare challenges keep failing from this VPN IP. */
+export function useVPNAdvice(enabled: boolean) {
+  return useQuery({
+    queryKey: ["vpn", "advice"],
+    queryFn: () => apiFetch<VPNAdvice>("/vpn/advice"),
+    enabled,
+    refetchInterval: 60_000,
+  });
+}
+
+export interface VPNRegions {
+  available: boolean;
+  reason?: string;
+  provider?: string;
+  current: string[];
+  preferred?: string;
+  regions: string[];
+  port_forward_only: boolean;
+}
+
+export function useVPNRegions(enabled: boolean) {
+  return useQuery({
+    queryKey: ["vpn", "regions"],
+    queryFn: () => apiFetch<VPNRegions>("/vpn/regions"),
+    enabled,
+    staleTime: 60_000,
+  });
+}
+
+export interface ChangeRegionResponse {
+  region: string;
+  old_ip: string;
+  new_ip: string;
+  changed: boolean;
+}
+
+/** Reconnects the tunnel in another region (shares rotation's cool-down). */
+export function useChangeVPNRegion() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (region: string) =>
+      apiFetch<ChangeRegionResponse>("/vpn/region", {
+        method: "POST",
+        body: JSON.stringify({ region }),
+      }),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["dashboard", "overview"] });
+      qc.invalidateQueries({ queryKey: ["vpn"] });
+      qc.invalidateQueries({ queryKey: ["indexers"] });
+      toast.success(
+        res.changed
+          ? `VPN moved to ${res.region}: ${res.old_ip} → ${res.new_ip}`
+          : `VPN set to ${res.region} (same IP: ${res.new_ip})`,
+      );
     },
     onError: (err) => toast.error((err as Error).message),
   });
