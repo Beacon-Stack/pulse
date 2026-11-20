@@ -8,7 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "@beacon-shared": path.resolve(__dirname, "../../../web-shared"),
+      "@beacon-shared": path.resolve(__dirname, "./src/shared"),
       // Force React singleton. See pilot/web/ui/vite.config.ts for context.
       react: path.resolve(__dirname, "node_modules/react"),
       "react-dom": path.resolve(__dirname, "node_modules/react-dom"),

@@ -1,3 +1,21 @@
+# ── Frontend build stage ──────────────────────────────────────────────────────
+# The web UI is embedded in the binary (web/embed.go). web/static is
+# gitignored, so without this stage the published image served only a
+# "frontend not built" page.
+FROM node:22-alpine AS frontend
+
+WORKDIR /app
+
+# Package files first so the dependency layer caches until they change.
+COPY web/ui/package.json web/ui/package-lock.json ./web/ui/
+RUN cd web/ui && npm ci
+
+# The rest of the frontend, including the vendored shared components
+# under src/shared/ (copied from beacon-stack/web-shared).
+COPY web/ui/ ./web/ui/
+RUN cd web/ui && npm run build
+# Output lands in /app/web/static/
+
 # ── Build stage ──────────────────────────────────────────────────────────────
 FROM golang:1.25-alpine AS build
 
@@ -6,6 +24,8 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
+# Overwrite web/static/ with the freshly built frontend.
+COPY --from=frontend /app/web/static/ ./web/static/
 RUN CGO_ENABLED=0 go build -o /pulse ./cmd/pulse
 
 # ── Runtime stage ──────────────────────────────────────────────────────��─────

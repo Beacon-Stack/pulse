@@ -86,12 +86,41 @@ jobs:
           path: bin/pulse
           retention-days: 7
 
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/ui/package-lock.json
+
+      # Same commands the Docker image runs, so a broken UI fails the PR
+      # rather than the image build after merge.
+      - name: Install and build
+        working-directory: web/ui
+        run: |
+          npm ci
+          npm run build
+
   docker:
     name: Docker
     runs-on: ubuntu-latest
     # Only build and push images on pushes to main (not PRs).
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [test, build]
+    needs: [test, build, frontend]
+    # A stuck build fails here instead of holding a runner for GitHub's
+    # 6-hour default.
+    timeout-minutes: 45
+    # Newest push wins: an older build still running is cancelled, so it
+    # can never finish late and push an older image over :latest.
+    concurrency:
+      group: docker-${{ github.ref }}
+      cancel-in-progress: true
     permissions:
       contents: read
       packages: write  # required to push to ghcr.io
