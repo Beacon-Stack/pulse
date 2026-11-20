@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -125,15 +124,12 @@ func (r *Rotator) Regions(ctx context.Context) RegionInfo {
 	info := RegionInfo{
 		Available:       true,
 		Provider:        sel.Provider,
-		Current:         sel.Regions,
+		Current:         canonicalRegions(sel.Regions, regions),
 		Regions:         regions,
 		PortForwardOnly: sel.PortForwarding,
 	}
 	if r.prefs != nil {
 		info.Preferred, _ = r.prefs.Get(ctx)
-	}
-	if info.Current == nil {
-		info.Current = []string{}
 	}
 	return info
 }
@@ -146,9 +142,11 @@ func (r *Rotator) ChangeRegion(ctx context.Context, region string) (RegionResult
 	if !info.Available {
 		return RegionResult{}, fmt.Errorf("%w: %s", ErrRegionsUnavailable, info.Reason)
 	}
-	if !slices.Contains(info.Regions, region) {
+	canonical, ok := findRegion(info.Regions, region)
+	if !ok {
 		return RegionResult{}, fmt.Errorf("%q is not a region this VPN can use", region)
 	}
+	region = canonical
 	if err := r.begin(); err != nil {
 		return RegionResult{}, err
 	}
@@ -212,7 +210,10 @@ func (r *Rotator) reapplyPreferred(ctx context.Context) {
 		r.logger.Debug("vpn region: can't read Gluetun settings to check region", "error", err)
 		return
 	}
-	if len(sel.Regions) == 1 && sel.Regions[0] == want {
+	// Gluetun reports regions lowercased ("ca toronto") while its server
+	// list spells them "CA Toronto"; an exact compare would reconnect the
+	// VPN on every check.
+	if len(sel.Regions) == 1 && strings.EqualFold(sel.Regions[0], want) {
 		return
 	}
 	if err := r.begin(); err != nil {
@@ -234,6 +235,31 @@ func (r *Rotator) reapplyPreferred(ctx context.Context) {
 	r.afterReconnect(ctx, map[string]any{
 		"old_ip": oldIP, "new_ip": newIP, "changed": newIP != oldIP, "region": want, "reapplied": true,
 	})
+}
+
+// findRegion finds name in the catalog's regions, ignoring case, and
+// returns the catalog's spelling.
+func findRegion(regions []string, name string) (string, bool) {
+	for _, r := range regions {
+		if strings.EqualFold(r, name) {
+			return r, true
+		}
+	}
+	return "", false
+}
+
+// canonicalRegions maps Gluetun's (lowercased) region names to the
+// catalog's spelling, keeping any it can't match as given.
+func canonicalRegions(current, catalog []string) []string {
+	out := make([]string, 0, len(current))
+	for _, c := range current {
+		if r, ok := findRegion(catalog, c); ok {
+			out = append(out, r)
+		} else {
+			out = append(out, c)
+		}
+	}
+	return out
 }
 
 // waitForNewIP waits for the reconnected tunnel to report an IP other
