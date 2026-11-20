@@ -13,6 +13,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -49,6 +50,26 @@ type Client struct {
 	slow    *http.Client // rotate ops: control server lags during reconnect
 	baseURL string
 	logger  *slog.Logger
+	// apiKey, when set, is sent as X-API-Key on every request. Routes
+	// that can read credentials or change settings (/v1/vpn/settings)
+	// belong behind a Gluetun role with apikey auth.
+	apiKey string
+}
+
+// SetAPIKey sets the key sent as X-API-Key on every control-server
+// request. Empty sends none.
+func (c *Client) SetAPIKey(key string) {
+	if c != nil {
+		c.apiKey = key
+	}
+}
+
+// do sends req with the API key header, if one is set.
+func (c *Client) do(hc *http.Client, req *http.Request) (*http.Response, error) {
+	if c.apiKey != "" {
+		req.Header.Set("X-API-Key", c.apiKey)
+	}
+	return hc.Do(req)
 }
 
 // NewClient returns a Gluetun client. If baseURL is empty, returns nil —
@@ -221,7 +242,7 @@ func (c *Client) getJSON(ctx context.Context, path string, out any) error {
 	if err != nil {
 		return err
 	}
-	resp, err := c.http.Do(req)
+	resp, err := c.do(c.http, req)
 	if err != nil {
 		return fmt.Errorf("gluetun GET %s: %w", path, err)
 	}
@@ -245,7 +266,7 @@ func (c *Client) SetOpenVPNStatus(ctx context.Context, status string) error {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	resp, err := c.slow.Do(req)
+	resp, err := c.do(c.slow, req)
 	if err != nil {
 		return fmt.Errorf("gluetun PUT /v1/openvpn/status: %w", err)
 	}
@@ -268,7 +289,7 @@ func (c *Client) PublicIP(ctx context.Context) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	resp, err := c.slow.Do(req)
+	resp, err := c.do(c.slow, req)
 	if err != nil {
 		return "", fmt.Errorf("gluetun GET /v1/publicip/ip: %w", err)
 	}
@@ -283,7 +304,93 @@ func (c *Client) PublicIP(ctx context.Context) (string, error) {
 	return body.IP, nil
 }
 
+// VPNSelection is the part of Gluetun's VPN settings Pulse reads: which
+// provider, which regions it may pick servers from, and whether port
+// forwarding is on. The full settings document also carries the VPN
+// credentials; they are never decoded.
+type VPNSelection struct {
+	Provider       string
+	Regions        []string
+	PortForwarding bool
+}
+
+// VPNSettings reads the provider, region filter and port-forwarding flag
+// from GET /v1/vpn/settings.
+func (c *Client) VPNSettings(ctx context.Context) (VPNSelection, error) {
+	if c == nil {
+		return VPNSelection{}, ErrDisabled
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+"/v1/vpn/settings", nil)
+	if err != nil {
+		return VPNSelection{}, err
+	}
+	resp, err := c.do(c.slow, req)
+	if err != nil {
+		return VPNSelection{}, fmt.Errorf("gluetun GET /v1/vpn/settings: %w", err)
+	}
+	defer func() { _ = resp.Body.Close() }()
+	if resp.StatusCode >= 400 {
+		return VPNSelection{}, fmt.Errorf("gluetun GET /v1/vpn/settings: HTTP %d", resp.StatusCode)
+	}
+	var body vpnSettingsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
+		return VPNSelection{}, fmt.Errorf("gluetun GET /v1/vpn/settings: %w", err)
+	}
+	sel := VPNSelection{
+		Provider: body.Provider.Name,
+		Regions:  body.Provider.ServerSelection.Regions,
+	}
+	if pf := body.Provider.PortForwarding.Enabled; pf != nil {
+		sel.PortForwarding = *pf
+	}
+	return sel, nil
+}
+
+// SetRegions limits server selection to regions and applies it live:
+// Gluetun validates the change and reconnects the tunnel. It lasts until
+// the container restarts, when its environment applies again — see
+// Rotator.KeepPreferredRegion.
+func (c *Client) SetRegions(ctx context.Context, regions []string) error {
+	if c == nil {
+		return ErrDisabled
+	}
+	body, _ := json.Marshal(map[string]any{
+		"provider": map[string]any{
+			"server_selection": map[string]any{"regions": regions},
+		},
+	})
+	req, err := http.NewRequestWithContext(ctx, http.MethodPut, c.baseURL+"/v1/vpn/settings", bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := c.do(c.slow, req)
+	if err != nil {
+		return fmt.Errorf("gluetun PUT /v1/vpn/settings: %w", err)
+	}
+	defer func() { _ = resp.Body.Close() }()
+	if resp.StatusCode >= 400 {
+		// Gluetun's validation message ("region X is not valid ...") is
+		// the useful part of a 400.
+		msg, _ := io.ReadAll(io.LimitReader(resp.Body, 512))
+		return fmt.Errorf("gluetun PUT /v1/vpn/settings: HTTP %d: %s", resp.StatusCode, strings.TrimSpace(string(msg)))
+	}
+	return nil
+}
+
 // Response shapes — only fields we actually use.
+
+type vpnSettingsResponse struct {
+	Provider struct {
+		Name            string `json:"name"`
+		ServerSelection struct {
+			Regions []string `json:"regions"`
+		} `json:"server_selection"`
+		PortForwarding struct {
+			Enabled *bool `json:"enabled"`
+		} `json:"port_forwarding"`
+	} `json:"provider"`
+}
 
 type publicIPResponse struct {
 	IP           string `json:"public_ip"`

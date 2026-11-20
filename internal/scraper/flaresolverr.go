@@ -28,6 +28,8 @@ type FlareSolverr struct {
 
 	mu       sync.RWMutex
 	sessions map[string]*cfSession // domain → session
+
+	stats *challengeStats // recent solve outcomes per site
 }
 
 // cfSession holds cached Cloudflare bypass cookies for a domain.
@@ -78,12 +80,34 @@ func NewFlareSolverr(apiURL string, logger *slog.Logger) *FlareSolverr {
 		client:   &http.Client{Timeout: flareMaxTimeout},
 		logger:   logger,
 		sessions: make(map[string]*cfSession),
+		stats:    newChallengeStats(),
 	}
 }
 
 // Solve sends a URL to FlareSolverr to bypass Cloudflare and returns the
 // page HTML, cookies, and user agent string.
 func (f *FlareSolverr) Solve(ctx context.Context, targetURL string) (html string, cookies []fsCookie, userAgent string, err error) {
+	html, cookies, userAgent, err = f.solve(ctx, targetURL)
+	// Count FlareSolverr's own verdicts only; see challenges.go.
+	switch {
+	case err == nil:
+		f.stats.record(extractDomainFromURL(targetURL), true, "")
+	case solverReported(err):
+		f.stats.record(extractDomainFromURL(targetURL), false, err.Error())
+	}
+	return html, cookies, userAgent, err
+}
+
+// ChallengeTroubles lists sites whose Cloudflare challenges keep failing
+// lately (see challengeStats.troubles). Nil-safe.
+func (f *FlareSolverr) ChallengeTroubles() []SiteTrouble {
+	if f == nil {
+		return nil
+	}
+	return f.stats.troubles()
+}
+
+func (f *FlareSolverr) solve(ctx context.Context, targetURL string) (html string, cookies []fsCookie, userAgent string, err error) {
 	f.logger.Info("flaresolverr: solving challenge",
 		"url", targetURL,
 	)
@@ -156,6 +180,8 @@ func (f *FlareSolverr) ClearSessions() {
 	f.mu.Lock()
 	f.sessions = make(map[string]*cfSession)
 	f.mu.Unlock()
+	// The solve record belonged to the old egress IP too.
+	f.stats.reset()
 	f.logger.Info("flaresolverr: cleared all cached CF sessions")
 }
 

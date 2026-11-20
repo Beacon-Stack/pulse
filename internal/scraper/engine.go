@@ -138,6 +138,12 @@ func (e *Engine) ClearScraperState() {
 	e.cache.Clear()
 }
 
+// ChallengeTroubles lists sites whose Cloudflare challenges keep failing
+// on the current egress IP. Empty without FlareSolverr.
+func (e *Engine) ChallengeTroubles() []SiteTrouble {
+	return e.flaresolverr.ChallengeTroubles() // nil-safe
+}
+
 // ResolveCatalogID finds the Prowlarr catalog ID for an indexer by trying:
 // 1. Exact catalog ID match
 // 2. Normalized name match (e.g., "The Pirate Bay" → "thepiratebay")
