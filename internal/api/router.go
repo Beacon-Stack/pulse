@@ -2,6 +2,7 @@ package api
 
 import (
 	"crypto/subtle"
+	"github.com/beacon-stack/pulse/internal/version"
 	"log/slog"
 	"net/http"
 	"time"
@@ -31,21 +32,21 @@ import (
 
 // RouterConfig holds everything the router needs to function.
 type RouterConfig struct {
-	Auth            appconfig.Secret
-	Logger          *slog.Logger
-	StartTime       time.Time
-	RegistryService *registry.Service
-	IndexerManager  *indexer.Manager
-	TagService      *tag.Service
-	WSHub           *ws.Hub
+	Auth                  appconfig.Secret
+	Logger                *slog.Logger
+	StartTime             time.Time
+	RegistryService       *registry.Service
+	IndexerManager        *indexer.Manager
+	TagService            *tag.Service
+	WSHub                 *ws.Hub
 	DownloadClientService *downloadclient.Service
 	QualityProfileService *qualityprofile.Service
 	SharedSettingsService *sharedsettings.Service
-	ScraperEngine        *scraper.Engine
-	Queries              db.Querier
-	DashboardAggregator  *dashboard.Aggregator
-	VPNRotator           *gluetun.Rotator // nil when gluetun is not configured
-	ExternalURL          string // e.g., "http://pulse:9696" — used for Torznab proxy URL rewriting
+	ScraperEngine         *scraper.Engine
+	Queries               db.Querier
+	DashboardAggregator   *dashboard.Aggregator
+	VPNRotator            *gluetun.Rotator // nil when gluetun is not configured
+	ExternalURL           string           // e.g., "http://pulse:9696" — used for Torznab proxy URL rewriting
 	// LogSystem is the handle returned by log.New. When non-nil, the
 	// router exposes /api/v1/system/logs and /api/v1/system/log-level
 	// for the in-app viewer. DockerLogs (optional) adds the
@@ -83,7 +84,7 @@ func NewRouter(cfg RouterConfig) http.Handler {
 		_, _ = w.Write([]byte(`{"status":"ok"}`))
 	})
 
-	humaConfig := huma.DefaultConfig("Pulse API", "0.1.0")
+	humaConfig := huma.DefaultConfig("Pulse API", version.Version)
 	humaConfig.DocsPath = "/api/docs"
 	humaConfig.OpenAPIPath = "/api/openapi"
 	humaConfig.SchemasPath = "/api/schemas"
@@ -123,6 +124,7 @@ func NewRouter(cfg RouterConfig) http.Handler {
 
 	// Register route groups.
 	v1.RegisterSystemRoutes(humaAPI, cfg.StartTime)
+	v1.RegisterUpdateRoutes(humaAPI)
 	v1.RegisterRuntimeRoutes(humaAPI, cfg.StartTime)
 	v1.RegisterEnvRoutes(humaAPI)
 	if cfg.LogSystem != nil {

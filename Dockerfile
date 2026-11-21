@@ -26,7 +26,14 @@ RUN go mod download
 COPY . .
 # Overwrite web/static/ with the freshly built frontend.
 COPY --from=frontend /app/web/static/ ./web/static/
-RUN CGO_ENABLED=0 go build -o /pulse ./cmd/pulse
+# CI passes the commit as VERSION; the update check compares it with the
+# newest published build.
+ARG VERSION=dev
+ARG BUILD_TIME=unknown
+RUN CGO_ENABLED=0 go build \
+      -ldflags "-X github.com/beacon-stack/pulse/internal/version.Version=${VERSION} \
+                -X github.com/beacon-stack/pulse/internal/version.BuildTime=${BUILD_TIME} -s -w" \
+      -o /pulse ./cmd/pulse
 
 # ── Runtime stage ──────────────────────────────────────────────────────��─────
 FROM alpine:3.21
