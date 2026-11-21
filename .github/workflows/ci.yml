@@ -110,14 +110,15 @@ jobs:
   docker:
     name: Docker
     runs-on: ubuntu-latest
-    # Only build and push images on pushes to main (not PRs).
+    # Pushes to main publish :develop (every merge). :latest is the newest
+    # release, published by release.yml when a v* tag is pushed.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [test, build, frontend]
     # A stuck build fails here instead of holding a runner for GitHub's
     # 6-hour default.
     timeout-minutes: 45
     # Newest push wins: an older build still running is cancelled, so it
-    # can never finish late and push an older image over :latest.
+    # can never finish late and push an older image over :develop.
     concurrency:
       group: docker-${{ github.ref }}
       cancel-in-progress: true
@@ -152,7 +153,7 @@ jobs:
           tags: |
             type=ref,event=branch
             type=sha,prefix=sha-
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=develop,enable={{is_default_branch}}
 
       - name: Build and push
         uses: docker/build-push-action@v5
