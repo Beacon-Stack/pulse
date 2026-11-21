@@ -19,3 +19,16 @@ auth:
 # Run: docker run -d -p 8191:8191 ghcr.io/flaresolverr/flaresolverr:latest
 flaresolverr:
   # url: "http://localhost:8191"
+
+# Dashboard — optional container stats and VPN panel.
+dashboard:
+  # docker_socket: "/var/run/docker.sock"   # container CPU/memory/network
+  # Gluetun's control server: VPN status, Rotate IP.
+  # gluetun_url: "http://vpn:8000"
+  # A Gluetun role with auth = "apikey" for PUT /v1/openvpn/status,
+  # GET /v1/vpn/settings and PUT /v1/vpn/settings. The settings routes
+  # can read the VPN credentials, so don't leave them on auth = "none".
+  # gluetun_api_key: ""
+  # Gluetun's servers/ directory, mounted read-only: the region list for
+  # Change region. Needs gluetun_api_key too.
+  # gluetun_servers_dir: "/gluetun-servers"

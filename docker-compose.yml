@@ -27,9 +27,19 @@ services:
       # the indexer URLs it hands them, so it must work from inside their
       # containers: use this host's IP or DNS name, not localhost.
       PULSE_SERVER_EXTERNAL_URL: http://192.168.1.10:9696
+
+      # Optional: a VPN panel for a Gluetun container (status, Rotate IP,
+      # Change region) and FlareSolverr for Cloudflare-protected indexers.
+      # Full setup, including Gluetun's side: https://beaconstack.io/install#vpn
+      # PULSE_DASHBOARD_GLUETUN_URL: http://vpn:8000
+      # PULSE_DASHBOARD_GLUETUN_API_KEY: ${GLUETUN_API_KEY}
+      # PULSE_DASHBOARD_GLUETUN_SERVERS_DIR: /gluetun-servers
+      # PULSE_FLARESOLVERR_URL: http://vpn:8191
     volumes:
       # Pulse's database and settings. Keep it on a local disk.
       - /path/to/config/pulse:/config
+      # With the VPN panel: Gluetun's server list, for Change region.
+      # - /path/to/gluetun/servers:/gluetun-servers:ro
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9696/health"]
       interval: 15s
