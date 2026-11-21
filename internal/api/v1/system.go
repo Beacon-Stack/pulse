@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/danielgtaylor/huma/v2"
+
+	"github.com/beacon-stack/pulse/internal/version"
 )
 
 type systemStatusBody struct {
@@ -25,7 +27,7 @@ func RegisterSystemRoutes(api huma.API, startTime time.Time) {
 	}, func(_ context.Context, _ *struct{}) (*struct{ Body systemStatusBody }, error) {
 		return &struct{ Body systemStatusBody }{Body: systemStatusBody{
 			Status:  "ok",
-			Version: "0.1.0",
+			Version: version.Version,
 			Uptime:  time.Since(startTime).Truncate(time.Second).String(),
 		}}, nil
 	})
