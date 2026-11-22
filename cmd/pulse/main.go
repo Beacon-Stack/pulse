@@ -23,15 +23,15 @@ import (
 	cfgstore "github.com/beacon-stack/pulse/internal/core/config"
 	"github.com/beacon-stack/pulse/internal/core/dashboard"
 	"github.com/beacon-stack/pulse/internal/core/dockerstats"
+	"github.com/beacon-stack/pulse/internal/core/downloadclient"
 	"github.com/beacon-stack/pulse/internal/core/gluetun"
 	"github.com/beacon-stack/pulse/internal/core/health"
 	"github.com/beacon-stack/pulse/internal/core/indexer"
+	"github.com/beacon-stack/pulse/internal/core/qualityprofile"
 	"github.com/beacon-stack/pulse/internal/core/registry"
+	"github.com/beacon-stack/pulse/internal/core/sharedsettings"
 	"github.com/beacon-stack/pulse/internal/core/tag"
 	"github.com/beacon-stack/pulse/internal/db"
-	"github.com/beacon-stack/pulse/internal/core/downloadclient"
-	"github.com/beacon-stack/pulse/internal/core/qualityprofile"
-	"github.com/beacon-stack/pulse/internal/core/sharedsettings"
 	dbgen "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/events"
 	"github.com/beacon-stack/pulse/internal/scraper"
@@ -342,23 +342,24 @@ func main() {
 	}
 
 	router := api.NewRouter(api.RouterConfig{
-		Auth:            cfg.Auth.APIKey,
-		Logger:          logger,
-		StartTime:       startTime,
-		RegistryService: registrySvc,
-		IndexerManager:  indexerMgr,
-		TagService:              tagSvc,
-		DownloadClientService:   dlClientSvc,
-		QualityProfileService:   qualityProfileSvc,
-		SharedSettingsService:   sharedSettingsSvc,
-		WSHub:           wsHub,
-		ScraperEngine:   scraperEngine,
-		Queries:         queries,
-		DashboardAggregator: dashAgg,
-		VPNRotator:      vpnRotator,
-		ExternalURL:     externalURL,
-		LogSystem:       logSystem,
-		DockerLogs:      dockerLogs,
+		Auth:                  cfg.Auth.APIKey,
+		Logger:                logger,
+		StartTime:             startTime,
+		DBPath:                cfg.Database.Path,
+		RegistryService:       registrySvc,
+		IndexerManager:        indexerMgr,
+		TagService:            tagSvc,
+		DownloadClientService: dlClientSvc,
+		QualityProfileService: qualityProfileSvc,
+		SharedSettingsService: sharedSettingsSvc,
+		WSHub:                 wsHub,
+		ScraperEngine:         scraperEngine,
+		Queries:               queries,
+		DashboardAggregator:   dashAgg,
+		VPNRotator:            vpnRotator,
+		ExternalURL:           externalURL,
+		LogSystem:             logSystem,
+		DockerLogs:            dockerLogs,
 	})
 
 	addr := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)

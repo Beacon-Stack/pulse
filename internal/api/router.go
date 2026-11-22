@@ -35,6 +35,7 @@ type RouterConfig struct {
 	Auth                  appconfig.Secret
 	Logger                *slog.Logger
 	StartTime             time.Time
+	DBPath                string // shown on the System page
 	RegistryService       *registry.Service
 	IndexerManager        *indexer.Manager
 	TagService            *tag.Service
@@ -123,7 +124,7 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	})
 
 	// Register route groups.
-	v1.RegisterSystemRoutes(humaAPI, cfg.StartTime)
+	v1.RegisterSystemRoutes(humaAPI, cfg.StartTime, cfg.DBPath)
 	v1.RegisterUpdateRoutes(humaAPI)
 	v1.RegisterRuntimeRoutes(humaAPI, cfg.StartTime)
 	v1.RegisterEnvRoutes(humaAPI)
