@@ -13,6 +13,7 @@ import {
   Server,
 } from "lucide-react";
 import Shell, { type NavItem } from "@beacon-shared/Shell";
+import UpdatedNotice from "@beacon-shared/UpdatedNotice";
 import { useSystemStatus } from "@/api/system";
 import { useWebSocket } from "@/api/websocket";
 import { applyTheme } from "@/theme";
@@ -100,6 +101,7 @@ export default function PulseShell() {
       settingsNav={settingsNav}
       collapsedStorageKey="sidebar-collapsed"
       sidebarFooterExtras={<HealthDot />}
+      overlay={<UpdatedNotice app="Pulse" />}
     />
   );
 }
