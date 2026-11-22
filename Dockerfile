@@ -2,7 +2,9 @@
 # The web UI is embedded in the binary (web/embed.go). web/static is
 # gitignored, so without this stage the published image served only a
 # "frontend not built" page.
-FROM node:22-alpine AS frontend
+# The UI is plain JS/CSS, the same for every platform, so build it once
+# on the runner's own platform instead of again under arm64 emulation.
+FROM --platform=$BUILDPLATFORM node:22-alpine AS frontend
 
 WORKDIR /app
 
@@ -17,7 +19,11 @@ RUN cd web/ui && npm run build
 # Output lands in /app/web/static/
 
 # ── Build stage ──────────────────────────────────────────────────────────────
-FROM golang:1.25-alpine AS build
+# Go cross-compiles: build natively and target the image's platform with
+# GOOS/GOARCH. Emulating arm64 made this step ~10x slower (466 s vs 48 s).
+FROM --platform=$BUILDPLATFORM golang:1.25-alpine AS build
+ARG TARGETOS
+ARG TARGETARCH
 
 WORKDIR /src
 COPY go.mod go.sum ./
@@ -30,7 +36,7 @@ COPY --from=frontend /app/web/static/ ./web/static/
 # newest published build.
 ARG VERSION=dev
 ARG BUILD_TIME=unknown
-RUN CGO_ENABLED=0 go build \
+RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH} go build \
       -ldflags "-X github.com/beacon-stack/pulse/internal/version.Version=${VERSION} \
                 -X github.com/beacon-stack/pulse/internal/version.BuildTime=${BUILD_TIME} -s -w" \
       -o /pulse ./cmd/pulse
