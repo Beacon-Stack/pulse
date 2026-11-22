@@ -194,20 +194,29 @@ function BookOpenIcon({ size = 16 }: { size?: number }) {
 
 // ── Internal: SidebarNavItem ─────────────────────────────────────────────────
 
+// exactOnly: a nav item lights up only on its own page when another
+// item lives under it (System and System → Logs, Settings and
+// Settings → System), so one item is highlighted at a time.
+function exactOnly(to: string, all: NavItem[]): boolean {
+  return to === "/" || all.some((other) => other.to.startsWith(`${to}/`));
+}
+
 function SidebarNavItem({
   item,
   collapsed,
   onClick,
+  end,
 }: {
   item: NavItem;
   collapsed: boolean;
   onClick?: () => void;
+  end: boolean;
 }) {
   const Icon = item.icon;
   return (
     <NavLink
       to={item.to}
-      end={item.to === "/"}
+      end={end}
       title={item.label}
       onClick={onClick}
       style={({ isActive }) => ({
@@ -298,6 +307,7 @@ function Sidebar({
 }) {
   const width = isMobile ? 240 : collapsed ? 60 : 240;
   const showLabels = !isMobile && !collapsed;
+  const allNav = [...mainNav, ...(settingsNav ?? [])];
 
   return (
     <nav
@@ -402,6 +412,7 @@ function Sidebar({
           <SidebarNavItem
             key={item.to}
             item={item}
+            end={exactOnly(item.to, allNav)}
             collapsed={!isMobile && collapsed}
             onClick={isMobile ? onClose : undefined}
           />
@@ -442,6 +453,7 @@ function Sidebar({
               <SidebarNavItem
                 key={item.to}
                 item={item}
+                end={exactOnly(item.to, allNav)}
                 collapsed={!isMobile && collapsed}
                 onClick={isMobile ? onClose : undefined}
               />

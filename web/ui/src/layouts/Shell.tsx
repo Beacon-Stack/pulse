@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import {
   Activity,
-  Cog,
+  Boxes,
   Download,
   FileText,
   FolderCog,
@@ -20,7 +20,7 @@ import { applyTheme } from "@/theme";
 
 const mainNav: NavItem[] = [
   { to: "/", icon: LayoutDashboard, label: "Dashboard" },
-  { to: "/services", icon: Server, label: "Services" },
+  { to: "/services", icon: Boxes, label: "Services" },
   { to: "/indexers", icon: Search, label: "Indexers" },
   { to: "/download-clients", icon: Download, label: "Download Clients" },
   { to: "/quality-profiles", icon: Gauge, label: "Quality Profiles" },
@@ -28,7 +28,7 @@ const mainNav: NavItem[] = [
 ];
 
 const settingsNav: NavItem[] = [
-  { to: "/settings/system", icon: Cog, label: "System" },
+  { to: "/settings/system", icon: Server, label: "System" },
   { to: "/settings/system/logs", icon: FileText, label: "Logs" },
   { to: "/settings/app", icon: Paintbrush, label: "App Settings" },
 ];
