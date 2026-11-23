@@ -197,13 +197,13 @@ func TestRunCycle(t *testing.T) {
 	if len(queries) != 1 {
 		t.Errorf("sites got different queries: %v", h.search.calls)
 	}
-	// One at a time, spaced out: 6h * 3/4 / 3 sites = 90 min, capped at 15.
+	// One at a time, ~90 s apart.
 	if len(h.sleeps) != 2 {
 		t.Errorf("sleeps = %v, want 2 gaps", h.sleeps)
 	}
 	for _, d := range h.sleeps {
-		if d < maxSpacing*3/4 || d > maxSpacing*5/4 {
-			t.Errorf("gap %v outside 15m ±25%%", d)
+		if d < probeSpacing*3/4 || d > probeSpacing*5/4 {
+			t.Errorf("gap %v outside 90s ±25%%", d)
 		}
 	}
 	st := h.p.Status()
@@ -243,6 +243,7 @@ func TestBackoffSchedule(t *testing.T) {
 	}{
 		{"never tested", nil, true},
 		{"healthy, tested last cycle", &siteHistory{last: now.Add(-6 * time.Hour)}, true},
+		{"healthy, tested an hour ago (Pulse restarted)", &siteHistory{last: now.Add(-time.Hour)}, false},
 		{"cloudflare, 6h ago", &siteHistory{last: now.Add(-6 * time.Hour), cloudflare: true}, false},
 		{"cloudflare, a day ago", &siteHistory{last: now.Add(-25 * time.Hour), cloudflare: true}, true},
 		{"rate limited, 6h ago", &siteHistory{last: now.Add(-6 * time.Hour), consecutiveFails: 1, lastErrorKind: "rate_limited"}, false},
@@ -303,6 +304,28 @@ func TestPickQuery(t *testing.T) {
 	}
 	if !found {
 		t.Errorf("fallback query = %q", got)
+	}
+}
+
+func TestRestartResumesRound(t *testing.T) {
+	h := newHarness(t)
+	ctx := context.Background()
+	h.p.RunCycle(ctx)
+	first := len(h.search.calls)
+	// Pulse restarts an hour later: nothing tested is due again yet.
+	*h.now = h.now.Add(time.Hour)
+	h.p.RunCycle(ctx)
+	if got := len(h.search.calls) - first; got != 0 {
+		t.Errorf("restart re-tested %d sites, want 0 (calls %v)", got, h.search.calls)
+	}
+	// A new site appearing (e.g. a newly connected service) is tested at once.
+	testCatalog = append(testCatalog, indexer.CatalogEntry{ID: "fresh", Name: "Fresh", Privacy: "public", Protocol: "torrent", Categories: []string{"Movies"}})
+	defer func() { testCatalog = testCatalog[:len(testCatalog)-1] }()
+	h.search.defs["fresh"] = true
+	*h.now = h.now.Add(time.Hour)
+	h.p.RunCycle(ctx)
+	if last := h.search.calls[len(h.search.calls)-1]; !strings.HasPrefix(last, "fresh:") || len(h.search.calls)-first != 1 {
+		t.Errorf("after adding a site, calls = %v; want only the new site tested", h.search.calls[first:])
 	}
 }
 
