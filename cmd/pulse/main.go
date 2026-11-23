@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/beacon-stack/pulse/pkg/notify"
 	"log/slog"
 	"net"
 	"net/http"
@@ -126,6 +127,14 @@ func main() {
 
 	// ── SQLC queries ─────────────────────────────────────────────────────
 	queries := dbgen.New(database.SQL)
+
+	// Notifications: Pulse broadcasts the apps' events on its channels.
+	notifyStore, err := notify.NewStore(context.Background(), database.SQL)
+	if err != nil {
+		logger.Error("notifications unavailable", "error", err)
+		os.Exit(1)
+	}
+	notifyOutbox := &notify.Outbox{App: "Pulse", Store: notifyStore, Log: logger}
 
 	// ── Core services ────────────────────────────────────────────────────
 	registrySvc := registry.NewService(queries, bus, logger)
@@ -346,6 +355,8 @@ func main() {
 		Logger:                logger,
 		StartTime:             startTime,
 		DBPath:                cfg.Database.Path,
+		NotifyStore:           notifyStore,
+		NotifyOutbox:          notifyOutbox,
 		RegistryService:       registrySvc,
 		IndexerManager:        indexerMgr,
 		TagService:            tagSvc,
