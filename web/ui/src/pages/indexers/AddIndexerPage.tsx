@@ -17,15 +17,17 @@ import {
   AlertCircle,
   Loader2,
   FlaskConical,
+  ListChecks,
 } from "lucide-react";
 import { useCatalog, useCatalogLanguages, useCatalogHealth, useTestCatalogIndexer } from "@/api/catalog";
 import { VerdictBadge, HealthLine } from "@/components/CatalogHealthBadge";
 import { langDisplay } from "@/lib/languages";
 import { useAddIndexerDefaults } from "@/api/ui-settings";
 import { timeAgo, timeUntil, verdictInfo } from "@/lib/catalogHealth";
-import { useIndexers, useCreateIndexer } from "@/api/indexers";
+import { useIndexers, useCreateIndexer, useIndexerStats } from "@/api/indexers";
+import IndexerStatsLine from "@/components/IndexerStatsLine";
 import { toast } from "sonner";
-import type { CatalogEntry, CatalogField, CatalogSiteHealth, CatalogHealthResponse } from "@/types";
+import type { CatalogEntry, CatalogField, CatalogSiteHealth, CatalogHealthResponse, IndexerStats } from "@/types";
 
 // ── Filter constants ─────────────────────────────────────────────────────────
 
@@ -122,6 +124,7 @@ export default function AddIndexerPage() {
     }
   });
   const [worksOnly, setWorksOnly] = useState(false);
+  const [addedOnly, setAddedOnly] = useState(false);
 
   // Drawer state
   const [selectedEntry, setSelectedEntry] = useState<CatalogEntry | null>(null);
@@ -166,6 +169,25 @@ export default function AddIndexerPage() {
     () => new Set((addedIndexers ?? []).map((i) => i.name.toLowerCase())),
     [addedIndexers]
   );
+  const addedCatalogIds = useMemo(() => new Set(healthData?.added ?? []), [healthData]);
+  const isAdded = useCallback(
+    (e: CatalogEntry) => addedNames.has(e.name.toLowerCase()) || addedCatalogIds.has(e.id),
+    [addedNames, addedCatalogIds]
+  );
+  // Added indexers' own record, for their real-search stats and settings link.
+  const { data: statsData } = useIndexerStats();
+  const addedIndexerFor = useCallback(
+    (e: CatalogEntry) => (addedIndexers ?? []).find((i) => i.name.toLowerCase() === e.name.toLowerCase()),
+    [addedIndexers]
+  );
+  const realStatsFor = useCallback(
+    (e: CatalogEntry): IndexerStats | undefined => {
+      const idx = addedIndexerFor(e);
+      return idx ? statsData?.indexers.find((s) => s.indexer_id === idx.id) : undefined;
+    },
+    [addedIndexerFor, statsData]
+  );
+  const addedTotal = useMemo(() => (catalogData?.entries ?? []).filter(isAdded).length, [catalogData, isAdded]);
 
   // Client-side filtering — all filters are AND'd, values within a filter are OR'd
   const filtered = useMemo(() => {
@@ -177,6 +199,7 @@ export default function AddIndexerPage() {
     if (categories.size > 0) entries = entries.filter((e) => e.categories.some((c) => categories.has(c)));
     if (langs.size > 0) entries = entries.filter((e) => langs.has(e.language));
     if (worksOnly) entries = entries.filter((e) => healthById.get(e.id)?.verdict === "works");
+    if (addedOnly) entries = entries.filter(isAdded);
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       entries = entries.filter(
@@ -211,8 +234,8 @@ export default function AddIndexerPage() {
       }
     };
     return [...entries].sort((a, b) => {
-      const aAdded = addedNames.has(a.name.toLowerCase());
-      const bAdded = addedNames.has(b.name.toLowerCase());
+      const aAdded = isAdded(a);
+      const bAdded = isAdded(b);
       if (aAdded !== bAdded) return aAdded ? 1 : -1;
       if (sortMode !== "name") {
         const ma = metric(a);
@@ -227,7 +250,7 @@ export default function AddIndexerPage() {
       }
       return a.name.localeCompare(b.name);
     });
-  }, [catalogData, protocols, privacies, categories, langs, searchQuery, addedNames, worksOnly, healthById, eligible, sortMode]);
+  }, [catalogData, protocols, privacies, categories, langs, searchQuery, isAdded, worksOnly, addedOnly, healthById, eligible, sortMode]);
 
   const changeSort = useCallback((mode: SortMode) => {
     setSortMode(mode);
@@ -238,7 +261,10 @@ export default function AddIndexerPage() {
     }
   }, []);
 
-  const activeFilterCount = protocols.size + privacies.size + categories.size + langs.size + (worksOnly ? 1 : 0);
+  const activeFilterCount =
+    protocols.size + privacies.size + categories.size + langs.size + (worksOnly ? 1 : 0) + (addedOnly ? 1 : 0);
+  // Added indexers the other filters are hiding while "Added" is on.
+  const addedHidden = addedOnly ? addedTotal - filtered.length : 0;
 
   const toggleView = useCallback((mode: "grid" | "list") => {
     setViewMode(mode);
@@ -254,6 +280,7 @@ export default function AddIndexerPage() {
     setLangOpen(false);
     setActivePresetName(null);
     setWorksOnly(false);
+    setAddedOnly(false);
   }, []);
 
   // Preset helpers
@@ -443,6 +470,16 @@ export default function AddIndexerPage() {
           <Check size={13} /> Works
         </button>
 
+        {addedTotal > 0 && (
+          <button
+            onClick={() => setAddedOnly(!addedOnly)}
+            title="Only the indexers you've already added"
+            style={addedOnly ? chipActive : chipInactive}
+          >
+            <ListChecks size={13} /> Added ({addedTotal})
+          </button>
+        )}
+
         {activeFilterCount > 0 && (
           <button onClick={clearFilters} style={{ ...chipBase, color: "var(--color-text-muted)", borderStyle: "dashed" }}>
             <X size={12} /> Clear all
@@ -500,6 +537,21 @@ export default function AddIndexerPage() {
         </div>
       )}
 
+      {addedHidden > 0 && (
+        <div style={{ marginBottom: 12, fontSize: 12, color: "var(--color-text-secondary)" }}>
+          {addedHidden} more added indexer{addedHidden === 1 ? " is" : "s are"} hidden by your other filters.{" "}
+          <button
+            onClick={() => {
+              clearFilters();
+              setAddedOnly(true);
+            }}
+            style={{ background: "none", border: "none", padding: 0, font: "inherit", color: "var(--color-accent)", cursor: "pointer" }}
+          >
+            Show all {addedTotal}
+          </button>
+        </div>
+      )}
+
       {/* Content */}
       {isLoading ? (
         <div style={{ padding: 80, textAlign: "center", color: "var(--color-text-muted)", fontSize: 13 }}>
@@ -522,13 +574,13 @@ export default function AddIndexerPage() {
       ) : viewMode === "grid" ? (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 10 }}>
           {filtered.map((entry) => (
-            <GridCard key={entry.id} entry={entry} isAdded={addedNames.has(entry.name.toLowerCase())} health={healthById.get(entry.id)} untested={eligible.has(entry.id)} onSelect={() => setSelectedEntry(entry)} />
+            <GridCard key={entry.id} entry={entry} isAdded={isAdded(entry)} dim={isAdded(entry) && !addedOnly} realStats={realStatsFor(entry)} health={healthById.get(entry.id)} untested={eligible.has(entry.id)} onSelect={() => setSelectedEntry(entry)} />
           ))}
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {filtered.map((entry) => (
-            <ListRow key={entry.id} entry={entry} isAdded={addedNames.has(entry.name.toLowerCase())} health={healthById.get(entry.id)} untested={eligible.has(entry.id)} onSelect={() => setSelectedEntry(entry)} />
+            <ListRow key={entry.id} entry={entry} isAdded={isAdded(entry)} dim={isAdded(entry) && !addedOnly} realStats={realStatsFor(entry)} health={healthById.get(entry.id)} untested={eligible.has(entry.id)} onSelect={() => setSelectedEntry(entry)} />
           ))}
         </div>
       )}
@@ -537,7 +589,8 @@ export default function AddIndexerPage() {
       {selectedEntry && (
         <ConfigDrawer
           entry={selectedEntry}
-          isAdded={addedNames.has(selectedEntry.name.toLowerCase())}
+          isAdded={isAdded(selectedEntry)}
+          addedIndexerId={addedIndexerFor(selectedEntry)?.id}
           health={healthById.get(selectedEntry.id)}
           onClose={() => setSelectedEntry(null)}
         />
@@ -551,12 +604,16 @@ export default function AddIndexerPage() {
 interface CardProps {
   entry: CatalogEntry;
   isAdded: boolean;
+  // Faded look for added indexers mixed into the catalog (not in "Added" view).
+  dim: boolean;
+  // Real-search stats for an added indexer.
+  realStats?: IndexerStats;
   health?: CatalogSiteHealth;
   untested: boolean;
   onSelect: () => void;
 }
 
-function GridCard({ entry, isAdded, health, untested, onSelect }: CardProps) {
+function GridCard({ entry, isAdded, dim, realStats, health, untested, onSelect }: CardProps) {
   return (
     <button
       onClick={onSelect}
@@ -566,11 +623,11 @@ function GridCard({ entry, isAdded, health, untested, onSelect }: CardProps) {
         padding: 16,
         borderRadius: 8,
         border: "1px solid var(--color-border-subtle)",
-        background: isAdded ? "var(--color-bg-base)" : "var(--color-bg-surface)",
+        background: dim ? "var(--color-bg-base)" : "var(--color-bg-surface)",
         cursor: "pointer",
         textAlign: "left",
         transition: "border-color 120ms ease, box-shadow 120ms ease",
-        opacity: isAdded ? 0.6 : 1,
+        opacity: dim ? 0.6 : 1,
         position: "relative",
         minHeight: 140,
       }}
@@ -630,6 +687,7 @@ function GridCard({ entry, isAdded, health, untested, onSelect }: CardProps) {
           <HealthLine health={health} />
         </div>
       )}
+      {isAdded && !dim && <IndexerStatsLine stats={realStats} windowDays={30} />}
 
       {/* Categories */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 3, marginTop: 10 }}>
@@ -655,7 +713,7 @@ function GridCard({ entry, isAdded, health, untested, onSelect }: CardProps) {
 
 // ── List Row ─────────────────────────────────────────────────────────────────
 
-function ListRow({ entry, isAdded, health, untested, onSelect }: CardProps) {
+function ListRow({ entry, isAdded, dim, health, untested, onSelect }: CardProps) {
   return (
     <button
       onClick={onSelect}
@@ -666,15 +724,15 @@ function ListRow({ entry, isAdded, health, untested, onSelect }: CardProps) {
         padding: "10px 16px",
         borderRadius: 6,
         border: "1px solid transparent",
-        background: isAdded ? "var(--color-bg-base)" : "transparent",
+        background: dim ? "var(--color-bg-base)" : "transparent",
         cursor: "pointer",
         textAlign: "left",
         transition: "background 100ms ease",
-        opacity: isAdded ? 0.6 : 1,
+        opacity: dim ? 0.6 : 1,
         width: "100%",
       }}
       onMouseEnter={(e) => { e.currentTarget.style.background = "var(--color-bg-surface)"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.background = isAdded ? "var(--color-bg-base)" : "transparent"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = dim ? "var(--color-bg-base)" : "transparent"; }}
     >
       <span style={{ fontSize: 14, fontWeight: 500, color: "var(--color-text-primary)", width: 180, flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
         {entry.name}
@@ -706,11 +764,13 @@ function ListRow({ entry, isAdded, health, untested, onSelect }: CardProps) {
 function ConfigDrawer({
   entry,
   isAdded,
+  addedIndexerId,
   health,
   onClose,
 }: {
   entry: CatalogEntry;
   isAdded: boolean;
+  addedIndexerId?: string;
   health?: CatalogSiteHealth;
   onClose: () => void;
 }) {
@@ -883,7 +943,16 @@ function ConfigDrawer({
                 <Check size={14} /> This indexer has already been added
               </div>
               <p style={{ margin: "4px 0 0", fontSize: 12, color: "var(--color-text-secondary)" }}>
-                You can add another instance with a different configuration if needed.
+                {addedIndexerId ? (
+                  <>
+                    <Link to={`/indexers/${addedIndexerId}`} style={{ color: "var(--color-accent)" }}>
+                      Open its settings and stats
+                    </Link>
+                    , or add another instance with a different configuration below.
+                  </>
+                ) : (
+                  "You can add another instance with a different configuration if needed."
+                )}
               </p>
             </div>
           )}
