@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/beacon-stack/pulse/pkg/healthcheck"
 	"github.com/beacon-stack/pulse/pkg/notify"
 	"log/slog"
 	"net"
@@ -42,6 +43,9 @@ import (
 )
 
 func main() {
+	// "pulse healthcheck" (and the wget link) answer the container health
+	// check and exit; the image has no shell or wget of its own.
+	healthcheck.Run(os.Args, "http://127.0.0.1:"+envOr("PULSE_SERVER_PORT", "9696")+"/health")
 	configPath := flag.String("config", "", "path to config.yaml")
 	flag.Parse()
 
@@ -519,4 +523,12 @@ func parseHostPort(apiURL string) (string, int) {
 	}
 	port, _ := strconv.Atoi(portStr)
 	return host, port
+}
+
+// envOr returns the environment variable, or def when it's unset.
+func envOr(key, def string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return def
 }

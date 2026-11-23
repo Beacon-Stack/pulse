@@ -41,28 +41,36 @@ RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH} go build \
                 -X github.com/beacon-stack/pulse/internal/version.BuildTime=${BUILD_TIME} -s -w" \
       -o /pulse ./cmd/pulse
 
-# ── Runtime stage ──────────────────────────────────────────────────────��─────
-FROM alpine:3.21
+# Files for the final image, which has no shell to make them: the config
+# folder (owned by the app's user) and a "wget" link to the app, so
+# compose health checks written for the old image keep working.
+RUN mkdir -p /rootfs/config /rootfs/usr/bin && ln -s /app/pulse /rootfs/usr/bin/wget
 
-RUN apk add --no-cache ca-certificates tzdata
-RUN adduser -D -h /app pulse
 
+# ── Final stage ───────────────────────────────────────────────────────────────
+# Distroless: the app, CA certificates, timezone data and /tmp. No shell,
+# no package manager, nothing to patch. Pinned by digest; bump on purpose.
+FROM gcr.io/distroless/static-debian12@sha256:d75cdd72874d4790092fcb1b058493ecf6bb5bf2b2b897045b00ff01d91843f2
 WORKDIR /app
-COPY --from=build /pulse .
 
-USER pulse
+COPY --from=build /pulse /app/pulse
+COPY --from=build /rootfs/usr/bin/ /usr/bin/
+COPY --from=build --chown=1000:1000 /rootfs/config /config
 
-EXPOSE 9696
-
-VOLUME ["/config"]
-
-# Defaults for the published image. The database is a SQLite file under
-# /config; the API key is generated on first run and stored in that DB.
-# Override any of these via the container's `environment:` block — env
-# always beats Dockerfile ENV.
 ENV PULSE_DATABASE_PATH=/config/pulse.db \
     PULSE_SERVER_EXTERNAL_URL=http://pulse:9696 \
     PULSE_LOG_LEVEL=info \
-    TZ=UTC
+    TZ=UTC \
+    HOME=/config
 
-ENTRYPOINT ["./pulse"]
+VOLUME ["/config"]
+
+EXPOSE 9696
+
+# The same user ID as the old Alpine image, so existing /config folders
+# keep working.
+USER 1000:1000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 CMD ["/app/pulse", "healthcheck"]
+
+ENTRYPOINT ["/app/pulse"]
