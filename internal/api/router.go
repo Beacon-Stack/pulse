@@ -18,6 +18,7 @@ import (
 	v1 "github.com/beacon-stack/pulse/internal/api/v1"
 	"github.com/beacon-stack/pulse/internal/api/ws"
 	appconfig "github.com/beacon-stack/pulse/internal/config"
+	cfgstore "github.com/beacon-stack/pulse/internal/core/config"
 	"github.com/beacon-stack/pulse/internal/core/dashboard"
 	"github.com/beacon-stack/pulse/internal/core/downloadclient"
 	"github.com/beacon-stack/pulse/internal/core/gluetun"
@@ -48,6 +49,7 @@ type RouterConfig struct {
 	SharedSettingsService *sharedsettings.Service
 	ScraperEngine         *scraper.Engine
 	CatalogProber         *indexerprobe.Prober // nil leaves the catalog tester API out
+	ConfigStore           *cfgstore.Store      // nil leaves the UI settings API out
 	Queries               db.Querier
 	DashboardAggregator   *dashboard.Aggregator
 	VPNRotator            *gluetun.Rotator // nil when gluetun is not configured
@@ -174,6 +176,9 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	v1.RegisterCatalogRoutes(humaAPI)
 	if cfg.CatalogProber != nil {
 		v1.RegisterCatalogHealthRoutes(humaAPI, cfg.CatalogProber)
+	}
+	if cfg.ConfigStore != nil {
+		v1.RegisterUISettingsRoutes(humaAPI, cfg.ConfigStore)
 	}
 
 	if cfg.DashboardAggregator != nil {
