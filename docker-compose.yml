@@ -35,6 +35,10 @@ services:
       # PULSE_DASHBOARD_GLUETUN_API_KEY: ${GLUETUN_API_KEY}
       # PULSE_DASHBOARD_GLUETUN_SERVERS_DIR: /gluetun-servers
       # PULSE_FLARESOLVERR_URL: http://vpn:8191
+      # Send Pulse's indexer searches and .torrent downloads through the
+      # VPN as well (Gluetun with HTTPPROXY=on). If the VPN is down they
+      # fail rather than use this machine's own IP.
+      # PULSE_SCRAPER_PROXY_URL: http://vpn:8888
     volumes:
       # Pulse's database and settings. Keep it on a local disk.
       - /path/to/config/pulse:/config
