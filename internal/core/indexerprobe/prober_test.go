@@ -411,18 +411,39 @@ func TestVerdicts(t *testing.T) {
 }
 
 func TestScoreOrdering(t *testing.T) {
-	mk := func(seeders, ms int, unique float64, cf float64) *SiteHealth {
-		h := &SiteHealth{Verdict: VerdictWorks, SuccessRate: 1, MedianSeeders: seeders, MedianMs: ms, Comparisons: 1, UniqueShare: unique, BehindCloudflare: cf}
-		h.Score = score(h)
-		return h
+	mk := func(seeders int, results float64, ms int, unique float64, cf float64) int {
+		h := &SiteHealth{Verdict: VerdictWorks, SuccessRate: 1, MedianSeeders: seeders, AvgResults: results,
+			MedianMs: ms, Comparisons: 1, UniqueShare: unique, BehindCloudflare: cf}
+		return score(h)
 	}
-	bigFast := mk(800, 1500, 0.3, 0)
-	smallFast := mk(5, 1500, 0.3, 0)
-	bigSlowCF := mk(800, 45000, 0.3, 1)
-	if bigFast.Score <= bigSlowCF.Score || bigFast.Score <= smallFast.Score {
-		t.Errorf("scores: big+fast %d, big+slow+CF %d, small+fast %d", bigFast.Score, bigSlowCF.Score, smallFast.Score)
+	// Real numbers from a live install.
+	torrentdownload := mk(102, 49, 584, 0.4, 0)
+	kickass := mk(126, 100, 15666, 0.4, 1)
+	limetorrents := mk(25, 40, 6043, 0.4, 0)
+	nonameClub := mk(3, 50, 587, 1, 0)        // fast, all unique, nearly no seeders
+	internetArchive := mk(1, 100, 1106, 1, 0) // ditto
+	yts := mk(0, 2, 441, 0, 0)
+
+	order := []struct {
+		name  string
+		score int
+	}{
+		{"torrentdownload", torrentdownload}, {"kickasstorrents", kickass}, {"limetorrents", limetorrents},
+		{"noname-club", nonameClub}, {"internet archive", internetArchive}, {"yts", yts},
 	}
-	if bigFast.Score > 100 || smallFast.Score < 1 {
-		t.Errorf("scores out of range: %d %d", bigFast.Score, smallFast.Score)
+	for i := 1; i < len(order); i++ {
+		if order[i-1].score < order[i].score {
+			t.Errorf("%s (%d) should rank above %s (%d)", order[i-1].name, order[i-1].score, order[i].name, order[i].score)
+		}
+	}
+	// A well-seeded site always beats a nearly dead one, however fast.
+	if nonameClub > lowSeedersCap || internetArchive > lowSeedersCap {
+		t.Errorf("low-seeder sites scored %d and %d, want at most %v", nonameClub, internetArchive, lowSeedersCap)
+	}
+	if limetorrents <= int(lowSeedersCap) {
+		t.Errorf("limetorrents (25 seeders) scored %d, want above the low-seeder cap", limetorrents)
+	}
+	if torrentdownload > 100 || yts < 1 {
+		t.Errorf("scores out of range: %d %d", torrentdownload, yts)
 	}
 }
