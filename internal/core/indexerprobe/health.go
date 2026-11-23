@@ -128,9 +128,38 @@ func verdict(h *SiteHealth) string {
 	}
 }
 
-// score ranks working sites by seeders (up to 35), results only they find
-// (up to 20) and speed (up to 15) on top of a base for working at all,
-// scaled by reliability, with a small cost for needing FlareSolverr.
+// Score weights: the best chance of getting good content quickly. Seeders
+// matter most (well-seeded torrents download fast and actually finish),
+// then how much a site finds, then how fast it searches; results nobody
+// else has are a small bonus.
+const (
+	seedersPoints = 55.0
+	resultsPoints = 15.0
+	speedPoints   = 15.0
+	uniquePoints  = 10.0
+	basePoints    = 5.0
+
+	seedersFull = 200 // typical seeders for full seeder points
+	resultsFull = 50  // results per search for full result points
+
+	// lowSeeders: a site whose best results typically have fewer seeders
+	// than this can't score above lowSeedersCap, however fast it is, so
+	// it never outranks a well-seeded site.
+	lowSeeders    = 5
+	lowSeedersCap = 35.0
+)
+
+// logShare maps n onto 0–1 on a log scale, reaching 1 at full.
+func logShare(n, full int) float64 {
+	if n <= 0 {
+		return 0
+	}
+	return math.Min(1, math.Log10(1+float64(n))/math.Log10(1+float64(full)))
+}
+
+// score ranks sites (0–100). Only working sites score above a few points;
+// see the weights above. Scaled by reliability, with a small cost for
+// needing FlareSolverr (slower, and it can fail).
 func score(h *SiteHealth) int {
 	switch h.Verdict {
 	case VerdictWorks:
@@ -141,22 +170,26 @@ func score(h *SiteHealth) int {
 	default:
 		return 0
 	}
-	s := 30.0
-	s += math.Min(35, 12*math.Log10(1+float64(h.MedianSeeders)))
-	if h.Comparisons > 0 {
-		s += 20 * h.UniqueShare
-	} else {
-		s += 5 // unknown: assume a little
-	}
+	s := basePoints
+	s += seedersPoints * logShare(h.MedianSeeders, seedersFull)
+	s += resultsPoints * logShare(int(math.Round(h.AvgResults)), resultsFull)
 	switch {
 	case h.MedianMs <= 3000:
-		s += 15
+		s += speedPoints
 	case h.MedianMs < 60000:
-		s += 15 * float64(60000-h.MedianMs) / 57000
+		s += speedPoints * float64(60000-h.MedianMs) / 57000
+	}
+	if h.Comparisons > 0 {
+		s += uniquePoints * h.UniqueShare
+	} else {
+		s += uniquePoints * 0.3 // unknown: assume a little
+	}
+	if h.MedianSeeders < lowSeeders {
+		s = math.Min(s, lowSeedersCap)
 	}
 	s *= 0.5 + 0.5*h.SuccessRate
 	if h.BehindCloudflare >= 0.5 {
-		s -= 5
+		s -= 3
 	}
 	return int(math.Round(math.Max(1, math.Min(100, s))))
 }
