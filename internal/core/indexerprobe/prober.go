@@ -22,25 +22,30 @@ import (
 //   - eligible = public torrent indexers in a category a connected service
 //     wants (Prism → Movies, Pilot → TV), not already added, needing no
 //     settings without defaults. Private sites are never contacted.
-//   - one search per site per cycle, one site at a time, spread across the
-//     cycle with jitter; the same query for every site, so results compare.
+//   - one search per site per cycle, one site at a time, ~90 s apart with
+//     jitter; the same query for every site, so results compare. A site
+//     tested in the last 5½ hours is skipped, so restarts resume a round.
 //   - sites failing 3 cycles in a row drop to daily, and to weekly after a
 //     week; rate-limited (HTTP 429) and Cloudflare sites to daily.
 //   - a Cloudflare site waits while FlareSolverr is busy with a real search.
 const (
 	DefaultInterval = 6 * time.Hour
-	StartDelay      = 10 * time.Minute
+	StartDelay      = 3 * time.Minute
 
-	probeTimeout    = 3 * time.Minute
-	manualCooldown  = 10 * time.Minute
-	retention       = 30 * 24 * time.Hour
-	failingAfter    = 3
-	weeklyAfter     = 7 * 24 * time.Hour
-	slowSiteEvery   = 24 * time.Hour
-	solverWaitMax   = 10 * time.Minute
-	solverPoll      = 15 * time.Second
-	minSpacing      = 20 * time.Second
-	maxSpacing      = 15 * time.Minute
+	probeTimeout   = 3 * time.Minute
+	manualCooldown = 10 * time.Minute
+	retention      = 30 * 24 * time.Hour
+	failingAfter   = 3
+	weeklyAfter    = 7 * 24 * time.Hour
+	slowSiteEvery  = 24 * time.Hour
+	solverWaitMax  = 10 * time.Minute
+	solverPoll     = 15 * time.Second
+	// probeSpacing is the gap between sites (±25%). Each site still gets
+	// one search per round, so this only paces Pulse's own work.
+	probeSpacing = 90 * time.Second
+	// freshFor: a site tested this recently is skipped, so a Pulse restart
+	// resumes a round instead of starting over.
+	freshFor        = DefaultInterval - 30*time.Minute
 	recentQueryPool = 20
 	maxErrorMessage = 300
 )
@@ -276,7 +281,7 @@ func due(h *siteHistory, now time.Time) bool {
 	case h.consecutiveFails >= failingAfter, h.lastErrorKind == "rate_limited", h.cloudflare:
 		return since >= slowSiteEvery
 	default:
-		return true
+		return since >= freshFor
 	}
 }
 
@@ -368,11 +373,7 @@ func (p *Prober) RunCycle(ctx context.Context) {
 	}()
 	p.logger.Info("catalog tester: cycle starting", "sites", len(dueTargets), "eligible", len(targets), "query", query)
 
-	spacing := minSpacing
-	if len(dueTargets) > 0 {
-		spacing = p.interval * 3 / 4 / time.Duration(len(dueTargets))
-	}
-	spacing = min(max(spacing, minSpacing), maxSpacing)
+	spacing := probeSpacing
 
 	found := make(map[string][]indexer.ReleaseID)
 	rowIDs := make(map[string]int64)
