@@ -51,12 +51,14 @@ type Querier interface {
 	GetSharedMediaHandling(ctx context.Context) (SharedMediaHandling, error)
 	GetTag(ctx context.Context, id string) (Tag, error)
 	GetTagByName(ctx context.Context, name string) (Tag, error)
+	InsertCatalogProbe(ctx context.Context, arg InsertCatalogProbeParams) (int64, error)
 	InsertOverlapEvent(ctx context.Context, arg InsertOverlapEventParams) error
 	InsertSearchEvent(ctx context.Context, arg InsertSearchEventParams) error
 	ListAllConfig(ctx context.Context) ([]ConfigEntry, error)
 	ListAssignmentsByIndexer(ctx context.Context, indexerID string) ([]IndexerAssignment, error)
 	ListAssignmentsByService(ctx context.Context, serviceID string) ([]IndexerAssignment, error)
 	ListCapabilities(ctx context.Context, serviceID string) ([]string, error)
+	ListCatalogProbesSince(ctx context.Context, at string) ([]CatalogProbe, error)
 	ListConfigByNamespace(ctx context.Context, namespace string) ([]ConfigEntry, error)
 	ListConfigNamespaces(ctx context.Context) ([]string, error)
 	ListDownloadClients(ctx context.Context) ([]DownloadClient, error)
@@ -73,6 +75,8 @@ type Querier interface {
 	ListOnlineServices(ctx context.Context) ([]Service, error)
 	ListOverlapEventsSince(ctx context.Context, at string) ([]IndexerOverlapEvent, error)
 	ListQualityProfiles(ctx context.Context) ([]QualityProfile, error)
+	// Distinct recent real queries of one mode, newest first.
+	ListRecentQueries(ctx context.Context, arg ListRecentQueriesParams) ([]ListRecentQueriesRow, error)
 	ListSearchEventsSince(ctx context.Context, at string) ([]IndexerSearchEvent, error)
 	ListServiceTagIDs(ctx context.Context, serviceID string) ([]string, error)
 	ListServices(ctx context.Context) ([]Service, error)
@@ -81,8 +85,10 @@ type Querier interface {
 	ListSubscribersByNamespace(ctx context.Context, namespace string) ([]Service, error)
 	ListSubscriptionsByService(ctx context.Context, serviceID string) ([]string, error)
 	ListTags(ctx context.Context) ([]Tag, error)
+	PruneCatalogProbes(ctx context.Context, at string) error
 	PruneOverlapEvents(ctx context.Context, at string) error
 	PruneSearchEvents(ctx context.Context, at string) error
+	SetCatalogProbeUnique(ctx context.Context, arg SetCatalogProbeUniqueParams) error
 	SetConfigEntry(ctx context.Context, arg SetConfigEntryParams) (ConfigEntry, error)
 	SetIndexerHealth(ctx context.Context, arg SetIndexerHealthParams) error
 	SetIndexerSearchHealth(ctx context.Context, arg SetIndexerSearchHealthParams) error

@@ -49,6 +49,10 @@ type SearchEvent struct {
 	Seeders    []int
 	Challenged bool
 	Solved     bool
+	// Query is the composed search keywords; Mode is "movie", "tv" or
+	// "search". Kept so the catalog tester can reuse recent real queries.
+	Query string
+	Mode  string
 }
 
 // ReleaseID identifies a release across indexers. Hash is the lower-case
@@ -165,6 +169,8 @@ func (s *Stats) RecordSearch(ctx context.Context, ev SearchEvent) {
 		MedianSeeders: int64(topMedian(ev.Seeders, seederSample)),
 		Challenged:    ev.Challenged,
 		Solved:        ev.Challenged && ev.Solved,
+		Query:         ev.Query,
+		Mode:          ev.Mode,
 	})
 	if err != nil {
 		s.logger.Warn("indexer stats: recording search failed", "indexer", ev.IndexerID, "error", err)
@@ -196,6 +202,40 @@ func (s *Stats) NoteResults(indexerID, queryKey string, releases []ReleaseID) {
 	for _, r := range releases {
 		set.add(r)
 	}
+}
+
+// UniqueCounts returns, for each source, how many of its releases no other
+// source returned. Needs at least two sources; otherwise it returns nil.
+func UniqueCounts(bySource map[string][]ReleaseID) map[string]int {
+	if len(bySource) < 2 {
+		return nil
+	}
+	sets := make(map[string]*releaseSet, len(bySource))
+	for id, releases := range bySource {
+		set := newReleaseSet()
+		for _, r := range releases {
+			set.add(r)
+		}
+		sets[id] = set
+	}
+	out := make(map[string]int, len(sets))
+	for id, own := range sets {
+		n := 0
+		for r := range own.items {
+			elsewhere := false
+			for other, set := range sets {
+				if other != id && set.has(r) {
+					elsewhere = true
+					break
+				}
+			}
+			if !elsewhere {
+				n++
+			}
+		}
+		out[id] = n
+	}
+	return out
 }
 
 // FlushOverlap finalizes query groups whose window has closed.
@@ -447,6 +487,12 @@ func percentile(xs []int, p int) int {
 		rank = 1
 	}
 	return sorted[rank-1]
+}
+
+// TopMedian is the typical seed count of the best-seeded results: the median
+// of the seederSample largest values.
+func TopMedian(seeders []int) int {
+	return topMedian(seeders, seederSample)
 }
 
 // topMedian is the median of the n largest values in xs.

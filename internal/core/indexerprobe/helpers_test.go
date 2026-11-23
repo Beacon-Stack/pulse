@@ -1,4 +1,4 @@
-package v1
+package indexerprobe
 
 import (
 	"context"
@@ -22,11 +22,11 @@ func TestReleaseID(t *testing.T) {
 		{"no hash", scraper.SearchResult{Download: "https://example.org/t/1.torrent"}, ""},
 	}
 	for _, c := range cases {
-		if got := releaseID(c.res).Hash; got != c.hash {
+		if got := ReleaseIDOf(c.res).Hash; got != c.hash {
 			t.Errorf("%s: hash = %q, want %q", c.name, got, c.hash)
 		}
 	}
-	id := releaseID(scraper.SearchResult{Title: "Dune.Part.Two (2024) 1080p", Size: 42})
+	id := ReleaseIDOf(scraper.SearchResult{Title: "Dune.Part.Two (2024) 1080p", Size: 42})
 	if id.Title != "dune part two 2024 1080p" || id.Size != 42 {
 		t.Errorf("title/size = %q/%d", id.Title, id.Size)
 	}
@@ -48,12 +48,13 @@ func TestSearchErrorKind(t *testing.T) {
 		{errors.New("Cloudflare has blocked this request (code 1020)"), "ip_banned"},
 		{errors.New("HTTP request failed: dial tcp: no such host"), "unreachable"},
 		{errors.New("HTTP 502"), "http_error"},
+		{errors.New("HTTP 429"), "rate_limited"},
 		{errors.New(`HTTP request failed: Get "https://1337x.to/": proxyconnect tcp: dial tcp: lookup vpn: no such host`), "proxy_down"},
 		{errors.New("parsing HTML: bad selector"), "other"},
 	}
 	for _, c := range cases {
-		if got := searchErrorKind(c.err); got != c.want {
-			t.Errorf("searchErrorKind(%v) = %q, want %q", c.err, got, c.want)
+		if got := ErrorKind(c.err); got != c.want {
+			t.Errorf("ErrorKind(%v) = %q, want %q", c.err, got, c.want)
 		}
 	}
 }
