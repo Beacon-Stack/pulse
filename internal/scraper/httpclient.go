@@ -6,6 +6,8 @@ import (
 	"net/url"
 	"sync"
 	"time"
+
+	"github.com/beacon-stack/pulse/internal/sitenet"
 )
 
 // RateLimitedClient is an HTTP client with per-host rate limiting.
@@ -26,8 +28,9 @@ func NewRateLimitedClient(delay time.Duration) *RateLimitedClient {
 	}
 	return &RateLimitedClient{
 		client: &http.Client{
-			Timeout: 30 * time.Second,
-			Jar:     jar,
+			Transport: sitenet.Transport(),
+			Timeout:   30 * time.Second,
+			Jar:       jar,
 		},
 		delay: delay,
 		cfUA:  make(map[string]string),

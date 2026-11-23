@@ -9,6 +9,7 @@ type Config struct {
 	Log          LogConfig          `mapstructure:"log"`
 	Auth         AuthConfig         `mapstructure:"auth"`
 	FlareSolverr FlareSolverrConfig `mapstructure:"flaresolverr"`
+	Scraper      ScraperConfig      `mapstructure:"scraper"`
 	Dashboard    DashboardConfig    `mapstructure:"dashboard"`
 
 	// ConfigFile is the path of the config file that was loaded, if any.
@@ -51,6 +52,16 @@ type DashboardConfig struct {
 // FlareSolverrConfig holds optional FlareSolverr proxy settings.
 // When URL is set, Pulse will use FlareSolverr to bypass Cloudflare
 // challenges on protected indexer sites.
+// ScraperConfig controls how Pulse reaches indexer sites.
+type ScraperConfig struct {
+	// ProxyURL routes every request to an indexer site (searches, .torrent
+	// downloads, connection tests) through this HTTP proxy, e.g. a Gluetun
+	// container's "http://vpn:8888". There is no fallback: if the proxy is
+	// down, site requests fail rather than leave from the host's own IP.
+	// Local addresses always connect directly. Empty means direct.
+	ProxyURL string `mapstructure:"proxy_url"`
+}
+
 type FlareSolverrConfig struct {
 	// URL is the FlareSolverr endpoint (e.g., "http://localhost:8191").
 	// Empty means disabled.

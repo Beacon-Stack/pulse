@@ -21,6 +21,7 @@ import (
 	"github.com/beacon-stack/pulse/internal/core/indexer"
 	db "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/scraper"
+	"github.com/beacon-stack/pulse/internal/sitenet"
 	"github.com/beacon-stack/pulse/internal/torznab"
 )
 
@@ -130,6 +131,8 @@ func searchErrorKind(err error) string {
 		return "cloudflare_no_solver"
 	case strings.Contains(msg, "flaresolverr"):
 		return "cloudflare_solve_failed"
+	case sitenet.IsProxyError(err):
+		return "proxy_down"
 	case strings.Contains(msg, "http request failed"):
 		return "unreachable"
 	case strings.HasPrefix(msg, "http ") || strings.Contains(msg, ": http "):
@@ -341,6 +344,10 @@ func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, ru
 	}
 }
 
+// siteClient fetches .torrent files from indexer sites, through the
+// scraper proxy when one is configured.
+var siteClient = sitenet.Client(0)
+
 // backgroundSearchBudget bounds a detached scrape after every client has
 // disconnected. Generous: a CF-walled multi-page definition needs a
 // FlareSolverr solve per page.
@@ -496,7 +503,7 @@ func (h *TorznabHandler) HandleDownload(w http.ResponseWriter, r *http.Request) 
 	}
 	proxyReq.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
 
-	proxyResp, err := http.DefaultClient.Do(proxyReq)
+	proxyResp, err := siteClient.Do(proxyReq)
 	if err != nil {
 		http.Error(w, "download failed", http.StatusBadGateway)
 		return
