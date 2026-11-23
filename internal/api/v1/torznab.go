@@ -82,31 +82,37 @@ func (h *TorznabHandler) noteResults(indexerID, keywords string, results []scrap
 	if h.mgr == nil {
 		return
 	}
-	keys := make([]string, len(results))
+	ids := make([]indexer.ReleaseID, len(results))
 	for i, res := range results {
-		keys[i] = releaseKey(res)
+		ids[i] = releaseID(res)
 	}
-	h.mgr.Stats().NoteResults(indexerID, strings.ToLower(strings.TrimSpace(keywords)), keys)
+	h.mgr.Stats().NoteResults(indexerID, strings.ToLower(strings.TrimSpace(keywords)), ids)
 }
 
 var btihRe = regexp.MustCompile(`(?i)urn:btih:([a-z0-9]+)`)
 
-// releaseKey identifies a release across indexers: its info hash when known
-// (directly or from the magnet link), else its normalized title and size.
-func releaseKey(res scraper.SearchResult) string {
-	if res.InfoHash != "" {
-		return "h:" + strings.ToLower(res.InfoHash)
+// releaseID identifies a release across indexers: its info hash when known
+// (directly or from a magnet link), plus its normalized title and size so
+// indexers that don't expose hashes can still be matched.
+func releaseID(res scraper.SearchResult) indexer.ReleaseID {
+	hash := strings.ToLower(res.InfoHash)
+	if hash == "" {
+		for _, link := range []string{res.MagnetURI, res.Download} {
+			if m := btihRe.FindStringSubmatch(link); m != nil {
+				hash = strings.ToLower(m[1])
+				break
+			}
+		}
 	}
-	if m := btihRe.FindStringSubmatch(res.MagnetURI); m != nil {
-		return "h:" + strings.ToLower(m[1])
-	}
-	if m := btihRe.FindStringSubmatch(res.Download); m != nil {
-		return "h:" + strings.ToLower(m[1])
-	}
-	title := strings.Join(strings.FieldsFunc(strings.ToLower(res.Title), func(r rune) bool {
+	return indexer.ReleaseID{Hash: hash, Title: normalizeTitle(res.Title), Size: res.Size}
+}
+
+// normalizeTitle lower-cases a release title and reduces it to words, so
+// "Big.Buck.Bunny.2008" and "Big Buck Bunny (2008)" compare equal.
+func normalizeTitle(title string) string {
+	return strings.Join(strings.FieldsFunc(strings.ToLower(title), func(r rune) bool {
 		return (r < 'a' || r > 'z') && (r < '0' || r > '9')
 	}), " ")
-	return fmt.Sprintf("t:%s|%d", title, res.Size)
 }
 
 // searchErrorKind classifies a search error for the stats ("" on success).

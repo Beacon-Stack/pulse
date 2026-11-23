@@ -9,27 +9,30 @@ import (
 	"github.com/beacon-stack/pulse/internal/scraper"
 )
 
-func TestReleaseKey(t *testing.T) {
+func TestReleaseID(t *testing.T) {
 	hash := "ABCDEF0123456789ABCDEF0123456789ABCDEF01"
+	want := "abcdef0123456789abcdef0123456789abcdef01"
 	cases := []struct {
 		name string
 		res  scraper.SearchResult
-		want string
+		hash string
 	}{
-		{"info hash", scraper.SearchResult{InfoHash: hash}, "h:abcdef0123456789abcdef0123456789abcdef01"},
-		{"magnet", scraper.SearchResult{MagnetURI: "magnet:?xt=urn:btih:" + hash + "&dn=x"}, "h:abcdef0123456789abcdef0123456789abcdef01"},
-		{"title fallback", scraper.SearchResult{Title: "Dune.Part.Two (2024) 1080p", Size: 42}, "t:dune part two 2024 1080p|42"},
+		{"info hash", scraper.SearchResult{InfoHash: hash}, want},
+		{"magnet", scraper.SearchResult{MagnetURI: "magnet:?xt=urn:btih:" + hash + "&dn=x"}, want},
+		{"no hash", scraper.SearchResult{Download: "https://example.org/t/1.torrent"}, ""},
 	}
 	for _, c := range cases {
-		if got := releaseKey(c.res); got != c.want {
-			t.Errorf("%s: releaseKey = %q, want %q", c.name, got, c.want)
+		if got := releaseID(c.res).Hash; got != c.hash {
+			t.Errorf("%s: hash = %q, want %q", c.name, got, c.hash)
 		}
 	}
-	// The same release listed by two indexers with different punctuation matches.
-	a := releaseKey(scraper.SearchResult{Title: "Dune.Part.Two.2024.1080p", Size: 7})
-	b := releaseKey(scraper.SearchResult{Title: "Dune Part Two 2024 1080p", Size: 7})
-	if a != b {
-		t.Errorf("title fallback keys differ: %q vs %q", a, b)
+	id := releaseID(scraper.SearchResult{Title: "Dune.Part.Two (2024) 1080p", Size: 42})
+	if id.Title != "dune part two 2024 1080p" || id.Size != 42 {
+		t.Errorf("title/size = %q/%d", id.Title, id.Size)
+	}
+	// The same release listed with different punctuation normalizes alike.
+	if normalizeTitle("Big.Buck.Bunny.2008.720p") != normalizeTitle("Big Buck Bunny (2008) 720p") {
+		t.Error("titles with different punctuation should normalize equal")
 	}
 }
 

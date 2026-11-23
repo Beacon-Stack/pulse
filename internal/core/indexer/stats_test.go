@@ -75,11 +75,11 @@ func TestStats_UniqueResults(t *testing.T) {
 	s, now := newTestStats(t, "a", "b", "c")
 
 	// a finds x,y,z; b finds y,z; c finds z,w. Unique: a=1 (x), b=0, c=1 (w).
-	s.NoteResults("a", "dune", []string{"x", "y", "z"})
-	s.NoteResults("b", "dune", []string{"y", "z"})
-	s.NoteResults("c", "dune", []string{"z", "w"})
+	s.NoteResults("a", "dune", []ReleaseID{{Hash: "x"}, {Hash: "y"}, {Hash: "z"}})
+	s.NoteResults("b", "dune", []ReleaseID{{Hash: "y"}, {Hash: "z"}})
+	s.NoteResults("c", "dune", []ReleaseID{{Hash: "z"}, {Hash: "w"}})
 	// A query only one indexer answered has nothing to compare against.
-	s.NoteResults("a", "alien", []string{"q"})
+	s.NoteResults("a", "alien", []ReleaseID{{Hash: "q"}})
 
 	// Still inside the window: nothing finalized yet.
 	s.FlushOverlap(ctx)
@@ -122,14 +122,56 @@ func TestStats_RepeatedAnswersMerge(t *testing.T) {
 	ctx := context.Background()
 	s, now := newTestStats(t, "a", "b")
 	// A retry (e.g. a cache hit after a timeout) must not double count.
-	s.NoteResults("a", "dune", []string{"x"})
-	s.NoteResults("a", "dune", []string{"x", "y"})
-	s.NoteResults("b", "dune", []string{"x"})
+	s.NoteResults("a", "dune", []ReleaseID{{Hash: "x"}})
+	s.NoteResults("a", "dune", []ReleaseID{{Hash: "x"}, {Hash: "y"}})
+	s.NoteResults("b", "dune", []ReleaseID{{Hash: "x"}})
 	*now = now.Add(overlapWindow + time.Second)
 	s.FlushOverlap(ctx)
 	got, _ := s.Summarize(ctx)
 	if st := got["a"]; st == nil || st.AvgUnique != 1 || st.UniqueShare != 0.5 {
 		t.Errorf("a = %+v, want 1 unique of 2", st)
+	}
+}
+
+func TestStats_MatchesByTitleWhenHashMissing(t *testing.T) {
+	ctx := context.Background()
+	s, now := newTestStats(t, "x1337", "tpb")
+	// Seen live: 1337x gives no hash and a rounded size; TPB gives both.
+	s.NoteResults("x1337", "big buck bunny", []ReleaseID{
+		{Title: "big buck bunny 2008 720p bluray nhd x264 nhanc3", Size: 219571814},
+		{Title: "big buck bunny 4k uhd hfr 60 fps flac webrip 2160p x265 zmac", Size: 645608243},
+	})
+	s.NoteResults("tpb", "big buck bunny", []ReleaseID{
+		{Hash: "a9df29de65", Title: "big buck bunny 2008 720p bluray nhd x264 nhanc3", Size: 219538056},
+		{Hash: "c39fe3eefb", Title: "big buck bunny bdrip xvid medic", Size: 183567938},
+		// Same title, very different size: a different release.
+		{Hash: "ffffffffff", Title: "big buck bunny 4k uhd hfr 60 fps flac webrip 2160p x265 zmac", Size: 900000000},
+	})
+	*now = now.Add(overlapWindow + time.Second)
+	s.FlushOverlap(ctx)
+	got, _ := s.Summarize(ctx)
+	if st := got["x1337"]; st == nil || st.AvgUnique != 1 {
+		t.Errorf("1337x = %+v, want 1 unique (the 4K release)", st)
+	}
+	if st := got["tpb"]; st == nil || st.AvgUnique != 2 {
+		t.Errorf("tpb = %+v, want 2 unique (XviD and the 900 MB 4K)", st)
+	}
+}
+
+func TestSameSize(t *testing.T) {
+	cases := []struct {
+		a, b int64
+		want bool
+	}{
+		{219571814, 219538056, true}, // rounded "209.4 MB" vs exact
+		{100, 0, true},               // unknown size matches
+		{1000, 1021, false},          // 2.1% apart
+		{645608243, 900000000, false},
+	}
+	for _, c := range cases {
+		if got := sameSize(c.a, c.b); got != c.want {
+			t.Errorf("sameSize(%d, %d) = %v, want %v", c.a, c.b, got, c.want)
+		}
 	}
 }
 

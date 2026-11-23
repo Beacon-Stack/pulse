@@ -51,9 +51,84 @@ type SearchEvent struct {
 	Solved     bool
 }
 
+// ReleaseID identifies a release across indexers. Hash is the lower-case
+// info hash when the indexer gives one (many HTML indexers don't: their
+// magnet links live on detail pages); Title is the normalized title and
+// Size is in bytes (0 when unknown).
+type ReleaseID struct {
+	Hash  string
+	Title string
+	Size  int64
+}
+
+// sizeTolerance is how far apart two sizes may be and still be the same
+// release: HTML indexers show rounded sizes ("209.4 MB").
+const sizeTolerance = 0.02
+
+func sameSize(a, b int64) bool {
+	if a == 0 || b == 0 {
+		return true
+	}
+	diff, larger := a-b, a
+	if diff < 0 {
+		diff = -diff
+	}
+	if b > larger {
+		larger = b
+	}
+	return float64(diff) <= sizeTolerance*float64(larger)
+}
+
+// releaseSet is one indexer's answers to a query, indexed for matching.
+type releaseSet struct {
+	items  map[ReleaseID]struct{}
+	hashes map[string]struct{}
+	titles map[string][]int64
+}
+
+func newReleaseSet() *releaseSet {
+	return &releaseSet{
+		items:  make(map[ReleaseID]struct{}),
+		hashes: make(map[string]struct{}),
+		titles: make(map[string][]int64),
+	}
+}
+
+func (rs *releaseSet) add(r ReleaseID) {
+	if r.Hash == "" && r.Title == "" {
+		return
+	}
+	if _, dup := rs.items[r]; dup {
+		return
+	}
+	rs.items[r] = struct{}{}
+	if r.Hash != "" {
+		rs.hashes[r.Hash] = struct{}{}
+	}
+	if r.Title != "" {
+		rs.titles[r.Title] = append(rs.titles[r.Title], r.Size)
+	}
+}
+
+// has reports whether the set contains the same release as r: the same
+// info hash, or the same title at about the same size.
+func (rs *releaseSet) has(r ReleaseID) bool {
+	if r.Hash != "" {
+		if _, ok := rs.hashes[r.Hash]; ok {
+			return true
+		}
+	}
+	for _, size := range rs.titles[r.Title] {
+		if r.Title != "" && sameSize(size, r.Size) {
+			return true
+		}
+	}
+	return false
+}
+
 type overlapGroup struct {
 	first     time.Time
-	byIndexer map[string]map[string]struct{}
+	byIndexer map[string]*releaseSet
 }
 
 // Stats records and summarizes per-indexer search stats.
@@ -97,10 +172,9 @@ func (s *Stats) RecordSearch(ctx context.Context, ev SearchEvent) {
 }
 
 // NoteResults registers the results an indexer returned for a query, for
-// the overlap comparison. keys identify releases across indexers (info
-// hash, or a title+size fallback). Called for every answer served,
-// including cache hits, so all indexers asked the same query are compared.
-func (s *Stats) NoteResults(indexerID, queryKey string, keys []string) {
+// the overlap comparison. Called for every answer served, including cache
+// hits, so all indexers asked the same query are compared.
+func (s *Stats) NoteResults(indexerID, queryKey string, releases []ReleaseID) {
 	if queryKey == "" {
 		return
 	}
@@ -111,18 +185,16 @@ func (s *Stats) NoteResults(indexerID, queryKey string, keys []string) {
 		if len(s.groups) >= maxOverlapGroups {
 			s.flushLocked(context.Background(), time.Time{}, true)
 		}
-		g = &overlapGroup{first: s.now(), byIndexer: make(map[string]map[string]struct{})}
+		g = &overlapGroup{first: s.now(), byIndexer: make(map[string]*releaseSet)}
 		s.groups[queryKey] = g
 	}
 	set := g.byIndexer[indexerID]
 	if set == nil {
-		set = make(map[string]struct{}, len(keys))
+		set = newReleaseSet()
 		g.byIndexer[indexerID] = set
 	}
-	for _, k := range keys {
-		if k != "" {
-			set[k] = struct{}{}
-		}
+	for _, r := range releases {
+		set.add(r)
 	}
 }
 
@@ -155,13 +227,13 @@ func (s *Stats) flushLocked(ctx context.Context, cutoff time.Time, oldestHalf bo
 		}
 		for id, own := range g.byIndexer {
 			unique := 0
-			for k := range own {
+			for r := range own.items {
 				seenElsewhere := false
 				for other, set := range g.byIndexer {
 					if other == id {
 						continue
 					}
-					if _, ok := set[k]; ok {
+					if set.has(r) {
 						seenElsewhere = true
 						break
 					}
@@ -173,7 +245,7 @@ func (s *Stats) flushLocked(ctx context.Context, cutoff time.Time, oldestHalf bo
 			err := s.q.InsertOverlapEvent(ctx, db.InsertOverlapEventParams{
 				IndexerID:     id,
 				At:            at,
-				Results:       int64(len(own)),
+				Results:       int64(len(own.items)),
 				UniqueResults: int64(unique),
 				ComparedWith:  int64(len(g.byIndexer) - 1),
 			})
