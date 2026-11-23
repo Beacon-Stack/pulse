@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -22,9 +23,10 @@ const (
 
 // FlareSolverr is a client for the FlareSolverr Cloudflare bypass proxy.
 type FlareSolverr struct {
-	apiURL string
-	client *http.Client
-	logger *slog.Logger
+	inFlight atomic.Int32 // solves running now; see Busy
+	apiURL   string
+	client   *http.Client
+	logger   *slog.Logger
 
 	mu       sync.RWMutex
 	sessions map[string]*cfSession // domain → session
@@ -87,6 +89,8 @@ func NewFlareSolverr(apiURL string, logger *slog.Logger) *FlareSolverr {
 // Solve sends a URL to FlareSolverr to bypass Cloudflare and returns the
 // page HTML, cookies, and user agent string.
 func (f *FlareSolverr) Solve(ctx context.Context, targetURL string) (html string, cookies []fsCookie, userAgent string, err error) {
+	f.inFlight.Add(1)
+	defer f.inFlight.Add(-1)
 	html, cookies, userAgent, err = f.solve(ctx, targetURL)
 	// Count FlareSolverr's own verdicts only; see challenges.go.
 	switch {
@@ -96,6 +100,13 @@ func (f *FlareSolverr) Solve(ctx context.Context, targetURL string) (html string
 		f.stats.record(extractDomainFromURL(targetURL), false, err.Error())
 	}
 	return html, cookies, userAgent, err
+}
+
+// Busy reports whether a solve is running right now. Background work (the
+// catalog tester) waits for it so real searches get FlareSolverr first.
+// Nil-safe: no FlareSolverr is never busy.
+func (f *FlareSolverr) Busy() bool {
+	return f != nil && f.inFlight.Load() > 0
 }
 
 // ChallengeTroubles lists sites whose Cloudflare challenges keep failing

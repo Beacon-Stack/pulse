@@ -15,11 +15,14 @@ import {
   Check,
   AlertCircle,
   Loader2,
+  FlaskConical,
 } from "lucide-react";
-import { useCatalog, useCatalogLanguages } from "@/api/catalog";
+import { useCatalog, useCatalogLanguages, useCatalogHealth, useTestCatalogIndexer } from "@/api/catalog";
+import { VerdictBadge, HealthLine } from "@/components/CatalogHealthBadge";
+import { timeAgo, timeUntil, verdictInfo } from "@/lib/catalogHealth";
 import { useIndexers, useCreateIndexer } from "@/api/indexers";
 import { toast } from "sonner";
-import type { CatalogEntry, CatalogField } from "@/types";
+import type { CatalogEntry, CatalogField, CatalogSiteHealth, CatalogHealthResponse } from "@/types";
 
 // ── Filter constants ─────────────────────────────────────────────────────────
 
@@ -138,6 +141,15 @@ export default function AddIndexerPage() {
     (localStorage.getItem("add-indexer-view") as "grid" | "list") || "grid"
   );
   const [activePresetName, setActivePresetName] = useState<string | null>(null);
+  // "recommended" ranks by the background tester's results; "name" is A–Z.
+  const [sortMode, setSortMode] = useState<"recommended" | "name">(() => {
+    try {
+      return localStorage.getItem("add-indexer-sort") === "name" ? "name" : "recommended";
+    } catch {
+      return "recommended";
+    }
+  });
+  const [worksOnly, setWorksOnly] = useState(false);
 
   // Drawer state
   const [selectedEntry, setSelectedEntry] = useState<CatalogEntry | null>(null);
@@ -146,6 +158,13 @@ export default function AddIndexerPage() {
   const { data: catalogData, isLoading, isError, refetch } = useCatalog();
   const { data: addedIndexers } = useIndexers();
   const { data: availableLangs } = useCatalogLanguages();
+  const { data: healthData } = useCatalogHealth();
+
+  const healthById = useMemo(
+    () => new Map((healthData?.sites ?? []).map((h) => [h.catalog_id, h])),
+    [healthData]
+  );
+  const eligible = useMemo(() => new Set(healthData?.eligible ?? []), [healthData]);
 
   const addedNames = useMemo(
     () => new Set((addedIndexers ?? []).map((i) => i.name.toLowerCase())),
@@ -161,6 +180,7 @@ export default function AddIndexerPage() {
     if (privacies.size > 0) entries = entries.filter((e) => privacies.has(e.privacy));
     if (categories.size > 0) entries = entries.filter((e) => e.categories.some((c) => categories.has(c)));
     if (langs.size > 0) entries = entries.filter((e) => langs.has(e.language));
+    if (worksOnly) entries = entries.filter((e) => healthById.get(e.id)?.verdict === "works");
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       entries = entries.filter(
@@ -171,15 +191,35 @@ export default function AddIndexerPage() {
       );
     }
 
+    // Recommended: tested sites by score, then ones waiting to be tested,
+    // then the rest (private, other categories); added ones always last.
+    const rank = (e: CatalogEntry) => {
+      const h = healthById.get(e.id);
+      if (h) return h.score;
+      return eligible.has(e.id) ? 0.5 : -1;
+    };
     return [...entries].sort((a, b) => {
       const aAdded = addedNames.has(a.name.toLowerCase());
       const bAdded = addedNames.has(b.name.toLowerCase());
       if (aAdded !== bAdded) return aAdded ? 1 : -1;
+      if (sortMode === "recommended") {
+        const diff = rank(b) - rank(a);
+        if (diff !== 0) return diff;
+      }
       return a.name.localeCompare(b.name);
     });
-  }, [catalogData, protocols, privacies, categories, langs, searchQuery, addedNames]);
+  }, [catalogData, protocols, privacies, categories, langs, searchQuery, addedNames, worksOnly, healthById, eligible, sortMode]);
 
-  const activeFilterCount = protocols.size + privacies.size + categories.size + langs.size;
+  const changeSort = useCallback((mode: "recommended" | "name") => {
+    setSortMode(mode);
+    try {
+      localStorage.setItem("add-indexer-sort", mode);
+    } catch {
+      // private mode: the choice just isn't remembered
+    }
+  }, []);
+
+  const activeFilterCount = protocols.size + privacies.size + categories.size + langs.size + (worksOnly ? 1 : 0);
 
   const toggleView = useCallback((mode: "grid" | "list") => {
     setViewMode(mode);
@@ -194,6 +234,7 @@ export default function AddIndexerPage() {
     setLangs(new Set());
     setLangOpen(false);
     setActivePresetName(null);
+    setWorksOnly(false);
   }, []);
 
   // Preset helpers
@@ -231,6 +272,7 @@ export default function AddIndexerPage() {
             </span>
           )}
         </p>
+        {healthData && <TesterStatusLine data={healthData} />}
       </div>
 
       {/* Search + view toggle */}
@@ -291,6 +333,19 @@ export default function AddIndexerPage() {
           }}
           activePresetName={activePresetName}
         />
+
+        <div style={{ display: "flex", gap: 2, background: "var(--color-bg-elevated)", borderRadius: 6, padding: 2, border: "1px solid var(--color-border-subtle)" }}>
+          {(["recommended", "name"] as const).map((mode) => (
+            <button
+              key={mode}
+              onClick={() => changeSort(mode)}
+              title={mode === "recommended" ? "Best first, from background test searches" : "Alphabetical"}
+              style={{ padding: "5px 10px", borderRadius: 4, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 500, background: sortMode === mode ? "var(--color-accent-muted)" : "transparent", color: sortMode === mode ? "var(--color-accent)" : "var(--color-text-muted)" }}
+            >
+              {mode === "recommended" ? "Recommended" : "A–Z"}
+            </button>
+          ))}
+        </div>
 
         <div style={{ display: "flex", gap: 2, background: "var(--color-bg-elevated)", borderRadius: 6, padding: 2, border: "1px solid var(--color-border-subtle)" }}>
           <button onClick={() => toggleView("grid")} title="Grid view" style={{ display: "flex", padding: 6, borderRadius: 4, border: "none", cursor: "pointer", background: viewMode === "grid" ? "var(--color-accent-muted)" : "transparent", color: viewMode === "grid" ? "var(--color-accent)" : "var(--color-text-muted)" }}>
@@ -358,6 +413,14 @@ export default function AddIndexerPage() {
           </button>
         )}
 
+        <button
+          onClick={() => setWorksOnly(!worksOnly)}
+          title="Only indexers whose last background test search found results"
+          style={worksOnly ? chipActive : chipInactive}
+        >
+          <Check size={13} /> Works
+        </button>
+
         {activeFilterCount > 0 && (
           <button onClick={clearFilters} style={{ ...chipBase, color: "var(--color-text-muted)", borderStyle: "dashed" }}>
             <X size={12} /> Clear all
@@ -422,13 +485,13 @@ export default function AddIndexerPage() {
       ) : viewMode === "grid" ? (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 10 }}>
           {filtered.map((entry) => (
-            <GridCard key={entry.id} entry={entry} isAdded={addedNames.has(entry.name.toLowerCase())} onSelect={() => setSelectedEntry(entry)} />
+            <GridCard key={entry.id} entry={entry} isAdded={addedNames.has(entry.name.toLowerCase())} health={healthById.get(entry.id)} untested={eligible.has(entry.id)} onSelect={() => setSelectedEntry(entry)} />
           ))}
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {filtered.map((entry) => (
-            <ListRow key={entry.id} entry={entry} isAdded={addedNames.has(entry.name.toLowerCase())} onSelect={() => setSelectedEntry(entry)} />
+            <ListRow key={entry.id} entry={entry} isAdded={addedNames.has(entry.name.toLowerCase())} health={healthById.get(entry.id)} untested={eligible.has(entry.id)} onSelect={() => setSelectedEntry(entry)} />
           ))}
         </div>
       )}
@@ -438,6 +501,7 @@ export default function AddIndexerPage() {
         <ConfigDrawer
           entry={selectedEntry}
           isAdded={addedNames.has(selectedEntry.name.toLowerCase())}
+          health={healthById.get(selectedEntry.id)}
           onClose={() => setSelectedEntry(null)}
         />
       )}
@@ -447,7 +511,15 @@ export default function AddIndexerPage() {
 
 // ── Grid Card ────────────────────────────────────────────────────────────────
 
-function GridCard({ entry, isAdded, onSelect }: { entry: CatalogEntry; isAdded: boolean; onSelect: () => void }) {
+interface CardProps {
+  entry: CatalogEntry;
+  isAdded: boolean;
+  health?: CatalogSiteHealth;
+  untested: boolean;
+  onSelect: () => void;
+}
+
+function GridCard({ entry, isAdded, health, untested, onSelect }: CardProps) {
   return (
     <button
       onClick={onSelect}
@@ -481,10 +553,12 @@ function GridCard({ entry, isAdded, onSelect }: { entry: CatalogEntry; isAdded: 
         <span style={{ fontSize: 14, fontWeight: 600, color: "var(--color-text-primary)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {entry.name}
         </span>
-        {isAdded && (
+        {isAdded ? (
           <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 10, fontWeight: 600, color: "var(--color-success)", background: "color-mix(in srgb, var(--color-success) 12%, transparent)", padding: "2px 6px", borderRadius: 3 }}>
             <Check size={10} /> Added
           </span>
+        ) : (
+          <VerdictBadge health={health} untested={untested} />
         )}
       </div>
 
@@ -514,6 +588,12 @@ function GridCard({ entry, isAdded, onSelect }: { entry: CatalogEntry; isAdded: 
         {entry.description}
       </p>
 
+      {!isAdded && health && (
+        <div style={{ marginTop: 8 }}>
+          <HealthLine health={health} />
+        </div>
+      )}
+
       {/* Categories */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 3, marginTop: 10 }}>
         {entry.categories.map((cat) => (
@@ -538,7 +618,7 @@ function GridCard({ entry, isAdded, onSelect }: { entry: CatalogEntry; isAdded: 
 
 // ── List Row ─────────────────────────────────────────────────────────────────
 
-function ListRow({ entry, isAdded, onSelect }: { entry: CatalogEntry; isAdded: boolean; onSelect: () => void }) {
+function ListRow({ entry, isAdded, health, untested, onSelect }: CardProps) {
   return (
     <button
       onClick={onSelect}
@@ -572,6 +652,7 @@ function ListRow({ entry, isAdded, onSelect }: { entry: CatalogEntry; isAdded: b
       <span style={{ flex: 1, fontSize: 12, color: "var(--color-text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginLeft: 8 }}>
         {entry.description}
       </span>
+      {!isAdded && <VerdictBadge health={health} untested={untested} />}
       {isAdded ? (
         <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 10, fontWeight: 600, color: "var(--color-success)", flexShrink: 0 }}>
           <Check size={10} /> Added
@@ -588,10 +669,12 @@ function ListRow({ entry, isAdded, onSelect }: { entry: CatalogEntry; isAdded: b
 function ConfigDrawer({
   entry,
   isAdded,
+  health,
   onClose,
 }: {
   entry: CatalogEntry;
   isAdded: boolean;
+  health?: CatalogSiteHealth;
   onClose: () => void;
 }) {
   const createIndexer = useCreateIndexer();
@@ -732,6 +815,8 @@ function ConfigDrawer({
               </span>
             ))}
           </div>
+
+          {!isAdded && entry.privacy === "public" && <TestResults entryId={entry.id} health={health} />}
 
           {/* URLs */}
           {entry.urls.length > 0 && (
@@ -919,5 +1004,71 @@ function PrivacyBadge({ privacy }: { privacy: string }) {
     }}>
       {privacy}
     </span>
+  );
+}
+
+// ── Background tester ───────────────────────────────────────────────────────
+
+function TesterStatusLine({ data }: { data: CatalogHealthResponse }) {
+  const st = data.status;
+  const cats = st.wanted_categories.length > 0 ? st.wanted_categories.join(" and ") : "your";
+  let progress: string;
+  if (st.running) {
+    progress = `Testing now: ${st.done} of ${st.total} checked${st.query ? `, searching for “${st.query}”` : ""}.`;
+  } else if (!st.last_cycle_ended_at) {
+    progress = st.next_cycle_at ? `First tests start ${timeUntil(st.next_cycle_at)}.` : "";
+  } else {
+    progress = `Last round ${timeAgo(st.last_cycle_ended_at)}; next ${timeUntil(st.next_cycle_at)}.`;
+  }
+  const working = data.sites.filter((s) => s.verdict === "works").length;
+  return (
+    <p style={{ margin: "6px 0 0", fontSize: 12, color: "var(--color-text-muted)", display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+      <FlaskConical size={13} />
+      <span>
+        Public {cats} indexers are test-searched every {st.interval_hours} hours.{" "}
+        {data.sites.length > 0 && `${working} of ${data.eligible.length} work. `}
+        {progress}
+      </span>
+    </p>
+  );
+}
+
+function TestResults({ entryId, health }: { entryId: string; health?: CatalogSiteHealth }) {
+  const test = useTestCatalogIndexer();
+  const sectionTitle: React.CSSProperties = { fontSize: 11, fontWeight: 600, color: "var(--color-text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 };
+  return (
+    <div style={{ marginBottom: 20, padding: 12, borderRadius: 8, border: "1px solid var(--color-border-subtle)", background: "var(--color-bg-base)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, ...sectionTitle }}>
+        <span style={{ flex: 1 }}>Test results</span>
+        <button
+          onClick={() => test.mutate(entryId)}
+          disabled={test.isPending}
+          title="Run one test search now. Sites behind Cloudflare can take a minute or two."
+          style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "4px 10px", borderRadius: 6, border: "1px solid var(--color-border-default)", background: "var(--color-bg-elevated)", color: "var(--color-text-secondary)", fontSize: 12, fontWeight: 500, textTransform: "none", letterSpacing: 0, cursor: test.isPending ? "wait" : "pointer" }}
+        >
+          {test.isPending ? <Loader2 size={12} style={{ animation: "spin 1s linear infinite" }} /> : <FlaskConical size={12} />}
+          {test.isPending ? "Testing..." : "Test now"}
+        </button>
+      </div>
+      {health ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 12, color: "var(--color-text-secondary)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <VerdictBadge health={health} />
+            <span>{verdictInfo[health.verdict].help}</span>
+          </div>
+          <HealthLine health={health} />
+          <div style={{ color: "var(--color-text-muted)" }}>
+            {health.tests} test{health.tests === 1 ? "" : "s"} in the last 30 days, {health.failures} failed. Last test {timeAgo(health.last_test_at)}.
+          </div>
+          {health.last_error && health.consecutive_failures > 0 && (
+            <div style={{ color: "var(--color-danger)", fontFamily: "var(--font-family-mono)", fontSize: 11, wordBreak: "break-word" }}>{health.last_error}</div>
+          )}
+        </div>
+      ) : (
+        <div style={{ fontSize: 12, color: "var(--color-text-muted)" }}>
+          Not tested yet. Test it now, or wait for the next background round.
+        </div>
+      )}
+    </div>
   );
 }

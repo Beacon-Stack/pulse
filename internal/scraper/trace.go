@@ -49,3 +49,9 @@ func (t *Trace) Challenge() (challenged, solved bool) {
 	defer t.mu.Unlock()
 	return t.challenged, t.solved
 }
+
+// NoteChallengeForTest records a challenge on t from outside the package.
+// For tests that fake a search; the runner records challenges itself.
+func NoteChallengeForTest(t *Trace, solved bool) {
+	t.noteChallenge(solved)
+}

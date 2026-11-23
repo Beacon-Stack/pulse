@@ -4,6 +4,25 @@
 
 package db
 
+type CatalogProbe struct {
+	ID            int64  `json:"id"`
+	CatalogID     string `json:"catalogId"`
+	CycleID       string `json:"cycleId"`
+	At            string `json:"at"`
+	Query         string `json:"query"`
+	Manual        bool   `json:"manual"`
+	DurationMs    int64  `json:"durationMs"`
+	Ok            bool   `json:"ok"`
+	ErrorKind     string `json:"errorKind"`
+	ErrorMessage  string `json:"errorMessage"`
+	Results       int64  `json:"results"`
+	WithSeeders   int64  `json:"withSeeders"`
+	MedianSeeders int64  `json:"medianSeeders"`
+	UniqueResults int64  `json:"uniqueResults"`
+	Challenged    bool   `json:"challenged"`
+	Solved        bool   `json:"solved"`
+}
+
 type ConfigEntry struct {
 	ID        string `json:"id"`
 	Namespace string `json:"namespace"`
@@ -92,6 +111,8 @@ type IndexerSearchEvent struct {
 	MedianSeeders int64  `json:"medianSeeders"`
 	Challenged    bool   `json:"challenged"`
 	Solved        bool   `json:"solved"`
+	Query         string `json:"query"`
+	Mode          string `json:"mode"`
 }
 
 type IndexerTag struct {

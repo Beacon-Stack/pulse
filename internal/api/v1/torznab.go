@@ -19,6 +19,7 @@ import (
 	"golang.org/x/sync/singleflight"
 
 	"github.com/beacon-stack/pulse/internal/core/indexer"
+	"github.com/beacon-stack/pulse/internal/core/indexerprobe"
 	db "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/scraper"
 	"github.com/beacon-stack/pulse/internal/sitenet"
@@ -57,7 +58,7 @@ func (h *TorznabHandler) recordSearchOutcome(indexerID string, searchErr error) 
 // recordSearchStats stores one real scrape in the per-indexer stats. A
 // search cut short by shutdown is not the indexer's fault and is skipped;
 // running out the background budget counts as a timeout.
-func (h *TorznabHandler) recordSearchStats(indexerID string, started time.Time, results []scraper.SearchResult, searchErr error, trace *scraper.Trace) {
+func (h *TorznabHandler) recordSearchStats(indexerID, keywords, mode string, started time.Time, results []scraper.SearchResult, searchErr error, trace *scraper.Trace) {
 	if h.mgr == nil || errors.Is(searchErr, context.Canceled) {
 		return
 	}
@@ -70,10 +71,12 @@ func (h *TorznabHandler) recordSearchStats(indexerID string, started time.Time, 
 		IndexerID:  indexerID,
 		At:         started,
 		Duration:   time.Since(started),
-		ErrorKind:  searchErrorKind(searchErr),
+		ErrorKind:  indexerprobe.ErrorKind(searchErr),
 		Seeders:    seeders,
 		Challenged: challenged,
 		Solved:     solved,
+		Query:      keywords,
+		Mode:       indexerprobe.SearchMode(mode),
 	}
 	go h.mgr.Stats().RecordSearch(context.Background(), ev)
 }
@@ -85,61 +88,9 @@ func (h *TorznabHandler) noteResults(indexerID, keywords string, results []scrap
 	}
 	ids := make([]indexer.ReleaseID, len(results))
 	for i, res := range results {
-		ids[i] = releaseID(res)
+		ids[i] = indexerprobe.ReleaseIDOf(res)
 	}
 	h.mgr.Stats().NoteResults(indexerID, strings.ToLower(strings.TrimSpace(keywords)), ids)
-}
-
-var btihRe = regexp.MustCompile(`(?i)urn:btih:([a-z0-9]+)`)
-
-// releaseID identifies a release across indexers: its info hash when known
-// (directly or from a magnet link), plus its normalized title and size so
-// indexers that don't expose hashes can still be matched.
-func releaseID(res scraper.SearchResult) indexer.ReleaseID {
-	hash := strings.ToLower(res.InfoHash)
-	if hash == "" {
-		for _, link := range []string{res.MagnetURI, res.Download} {
-			if m := btihRe.FindStringSubmatch(link); m != nil {
-				hash = strings.ToLower(m[1])
-				break
-			}
-		}
-	}
-	return indexer.ReleaseID{Hash: hash, Title: normalizeTitle(res.Title), Size: res.Size}
-}
-
-// normalizeTitle lower-cases a release title and reduces it to words, so
-// "Big.Buck.Bunny.2008" and "Big Buck Bunny (2008)" compare equal.
-func normalizeTitle(title string) string {
-	return strings.Join(strings.FieldsFunc(strings.ToLower(title), func(r rune) bool {
-		return (r < 'a' || r > 'z') && (r < '0' || r > '9')
-	}), " ")
-}
-
-// searchErrorKind classifies a search error for the stats ("" on success).
-func searchErrorKind(err error) string {
-	if err == nil {
-		return ""
-	}
-	msg := strings.ToLower(err.Error())
-	switch {
-	case errors.Is(err, context.DeadlineExceeded):
-		return "timeout"
-	case indexer.IsLikelyIPBan(msg):
-		return "ip_banned"
-	case scraper.IsCloudflareError(err):
-		return "cloudflare_no_solver"
-	case strings.Contains(msg, "flaresolverr"):
-		return "cloudflare_solve_failed"
-	case sitenet.IsProxyError(err):
-		return "proxy_down"
-	case strings.Contains(msg, "http request failed"):
-		return "unreachable"
-	case strings.HasPrefix(msg, "http ") || strings.Contains(msg, ": http "):
-		return "http_error"
-	default:
-		return "other"
-	}
 }
 
 // RegisterTorznabRoutes registers the Torznab proxy endpoint on the chi router.
@@ -314,7 +265,7 @@ func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, ru
 			Categories: cats,
 		})
 		h.recordSearchOutcome(idx.ID, err)
-		h.recordSearchStats(idx.ID, started, results, err, trace)
+		h.recordSearchStats(idx.ID, keywords, t, started, results, err, trace)
 		if err != nil {
 			h.logger.Warn("torznab: search failed",
 				"indexer", idx.Name, "query", keywords, "error", err)

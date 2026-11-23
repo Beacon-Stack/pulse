@@ -9,6 +9,53 @@ import (
 	"context"
 )
 
+const insertCatalogProbe = `-- name: InsertCatalogProbe :one
+INSERT INTO catalog_probes
+    (catalog_id, cycle_id, at, query, manual, duration_ms, ok, error_kind, error_message,
+     results, with_seeders, median_seeders, challenged, solved)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+RETURNING id
+`
+
+type InsertCatalogProbeParams struct {
+	CatalogID     string `json:"catalogId"`
+	CycleID       string `json:"cycleId"`
+	At            string `json:"at"`
+	Query         string `json:"query"`
+	Manual        bool   `json:"manual"`
+	DurationMs    int64  `json:"durationMs"`
+	Ok            bool   `json:"ok"`
+	ErrorKind     string `json:"errorKind"`
+	ErrorMessage  string `json:"errorMessage"`
+	Results       int64  `json:"results"`
+	WithSeeders   int64  `json:"withSeeders"`
+	MedianSeeders int64  `json:"medianSeeders"`
+	Challenged    bool   `json:"challenged"`
+	Solved        bool   `json:"solved"`
+}
+
+func (q *Queries) InsertCatalogProbe(ctx context.Context, arg InsertCatalogProbeParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, insertCatalogProbe,
+		arg.CatalogID,
+		arg.CycleID,
+		arg.At,
+		arg.Query,
+		arg.Manual,
+		arg.DurationMs,
+		arg.Ok,
+		arg.ErrorKind,
+		arg.ErrorMessage,
+		arg.Results,
+		arg.WithSeeders,
+		arg.MedianSeeders,
+		arg.Challenged,
+		arg.Solved,
+	)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
 const insertOverlapEvent = `-- name: InsertOverlapEvent :exec
 INSERT INTO indexer_overlap_events (indexer_id, at, results, unique_results, compared_with)
 VALUES (?, ?, ?, ?, ?)
@@ -35,8 +82,8 @@ func (q *Queries) InsertOverlapEvent(ctx context.Context, arg InsertOverlapEvent
 
 const insertSearchEvent = `-- name: InsertSearchEvent :exec
 INSERT INTO indexer_search_events
-    (indexer_id, at, duration_ms, ok, error_kind, results, with_seeders, median_seeders, challenged, solved)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (indexer_id, at, duration_ms, ok, error_kind, results, with_seeders, median_seeders, challenged, solved, query, mode)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 type InsertSearchEventParams struct {
@@ -50,6 +97,8 @@ type InsertSearchEventParams struct {
 	MedianSeeders int64  `json:"medianSeeders"`
 	Challenged    bool   `json:"challenged"`
 	Solved        bool   `json:"solved"`
+	Query         string `json:"query"`
+	Mode          string `json:"mode"`
 }
 
 func (q *Queries) InsertSearchEvent(ctx context.Context, arg InsertSearchEventParams) error {
@@ -64,8 +113,54 @@ func (q *Queries) InsertSearchEvent(ctx context.Context, arg InsertSearchEventPa
 		arg.MedianSeeders,
 		arg.Challenged,
 		arg.Solved,
+		arg.Query,
+		arg.Mode,
 	)
 	return err
+}
+
+const listCatalogProbesSince = `-- name: ListCatalogProbesSince :many
+SELECT id, catalog_id, cycle_id, at, "query", manual, duration_ms, ok, error_kind, error_message, results, with_seeders, median_seeders, unique_results, challenged, solved FROM catalog_probes WHERE at >= ? ORDER BY catalog_id, at
+`
+
+func (q *Queries) ListCatalogProbesSince(ctx context.Context, at string) ([]CatalogProbe, error) {
+	rows, err := q.db.QueryContext(ctx, listCatalogProbesSince, at)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []CatalogProbe
+	for rows.Next() {
+		var i CatalogProbe
+		if err := rows.Scan(
+			&i.ID,
+			&i.CatalogID,
+			&i.CycleID,
+			&i.At,
+			&i.Query,
+			&i.Manual,
+			&i.DurationMs,
+			&i.Ok,
+			&i.ErrorKind,
+			&i.ErrorMessage,
+			&i.Results,
+			&i.WithSeeders,
+			&i.MedianSeeders,
+			&i.UniqueResults,
+			&i.Challenged,
+			&i.Solved,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listOverlapEventsSince = `-- name: ListOverlapEventsSince :many
@@ -102,8 +197,50 @@ func (q *Queries) ListOverlapEventsSince(ctx context.Context, at string) ([]Inde
 	return items, nil
 }
 
+const listRecentQueries = `-- name: ListRecentQueries :many
+SELECT query, MAX(at) AS last_at FROM indexer_search_events
+WHERE mode = ? AND query != '' AND ok
+GROUP BY query
+ORDER BY last_at DESC
+LIMIT ?
+`
+
+type ListRecentQueriesParams struct {
+	Mode  string `json:"mode"`
+	Limit int64  `json:"limit"`
+}
+
+type ListRecentQueriesRow struct {
+	Query  string      `json:"query"`
+	LastAt interface{} `json:"lastAt"`
+}
+
+// Distinct recent real queries of one mode, newest first.
+func (q *Queries) ListRecentQueries(ctx context.Context, arg ListRecentQueriesParams) ([]ListRecentQueriesRow, error) {
+	rows, err := q.db.QueryContext(ctx, listRecentQueries, arg.Mode, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListRecentQueriesRow
+	for rows.Next() {
+		var i ListRecentQueriesRow
+		if err := rows.Scan(&i.Query, &i.LastAt); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listSearchEventsSince = `-- name: ListSearchEventsSince :many
-SELECT id, indexer_id, at, duration_ms, ok, error_kind, results, with_seeders, median_seeders, challenged, solved FROM indexer_search_events WHERE at >= ? ORDER BY indexer_id, at
+SELECT id, indexer_id, at, duration_ms, ok, error_kind, results, with_seeders, median_seeders, challenged, solved, "query", mode FROM indexer_search_events WHERE at >= ? ORDER BY indexer_id, at
 `
 
 func (q *Queries) ListSearchEventsSince(ctx context.Context, at string) ([]IndexerSearchEvent, error) {
@@ -127,6 +264,8 @@ func (q *Queries) ListSearchEventsSince(ctx context.Context, at string) ([]Index
 			&i.MedianSeeders,
 			&i.Challenged,
 			&i.Solved,
+			&i.Query,
+			&i.Mode,
 		); err != nil {
 			return nil, err
 		}
@@ -139,6 +278,15 @@ func (q *Queries) ListSearchEventsSince(ctx context.Context, at string) ([]Index
 		return nil, err
 	}
 	return items, nil
+}
+
+const pruneCatalogProbes = `-- name: PruneCatalogProbes :exec
+DELETE FROM catalog_probes WHERE at < ?
+`
+
+func (q *Queries) PruneCatalogProbes(ctx context.Context, at string) error {
+	_, err := q.db.ExecContext(ctx, pruneCatalogProbes, at)
+	return err
 }
 
 const pruneOverlapEvents = `-- name: PruneOverlapEvents :exec
@@ -156,5 +304,19 @@ DELETE FROM indexer_search_events WHERE at < ?
 
 func (q *Queries) PruneSearchEvents(ctx context.Context, at string) error {
 	_, err := q.db.ExecContext(ctx, pruneSearchEvents, at)
+	return err
+}
+
+const setCatalogProbeUnique = `-- name: SetCatalogProbeUnique :exec
+UPDATE catalog_probes SET unique_results = ? WHERE id = ?
+`
+
+type SetCatalogProbeUniqueParams struct {
+	UniqueResults int64 `json:"uniqueResults"`
+	ID            int64 `json:"id"`
+}
+
+func (q *Queries) SetCatalogProbeUnique(ctx context.Context, arg SetCatalogProbeUniqueParams) error {
+	_, err := q.db.ExecContext(ctx, setCatalogProbeUnique, arg.UniqueResults, arg.ID)
 	return err
 }

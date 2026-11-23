@@ -29,6 +29,7 @@ import (
 	"github.com/beacon-stack/pulse/internal/core/gluetun"
 	"github.com/beacon-stack/pulse/internal/core/health"
 	"github.com/beacon-stack/pulse/internal/core/indexer"
+	"github.com/beacon-stack/pulse/internal/core/indexerprobe"
 	"github.com/beacon-stack/pulse/internal/core/qualityprofile"
 	"github.com/beacon-stack/pulse/internal/core/registry"
 	"github.com/beacon-stack/pulse/internal/core/sharedsettings"
@@ -315,6 +316,7 @@ func main() {
 
 	// ── Scraper engine ───────────────────────────────────────────────────
 	scraperEngine := scraper.NewEngine(logger, flaresolverr)
+	catalogProber := indexerprobe.New(queries, scraperEngine, indexer.Catalog, logger)
 
 	// ── WebSocket hub ────────────────────────────────────────────────────
 	wsHub := ws.NewHub(logger, []byte(cfg.Auth.APIKey.Value()))
@@ -395,6 +397,7 @@ func main() {
 		NotifyOutbox:          notifyOutbox,
 		RegistryService:       registrySvc,
 		IndexerManager:        indexerMgr,
+		CatalogProber:         catalogProber,
 		TagService:            tagSvc,
 		DownloadClientService: dlClientSvc,
 		QualityProfileService: qualityProfileSvc,
@@ -475,6 +478,10 @@ func main() {
 			}
 		}()
 	}
+
+	// Catalog tester: test-search public indexers that haven't been added,
+	// every 6 hours, so the add-indexer page can recommend ones that work.
+	go catalogProber.Run(ctx)
 
 	// Per-indexer search stats: finalize cross-indexer comparisons and
 	// prune rows older than 30 days.

@@ -1,6 +1,7 @@
 package scraper
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -123,6 +124,24 @@ func (e *Engine) GetRunner(catalogID string, settingsJSON string) (*Runner, erro
 	e.runners.Store(cacheKey, runner)
 
 	return runner, nil
+}
+
+// ProbeSearch runs one search against a catalog definition with its default
+// settings, for testing indexers that haven't been added. The trace reports
+// whether Cloudflare challenged it.
+func (e *Engine) ProbeSearch(ctx context.Context, catalogID, query string) ([]SearchResult, *Trace, error) {
+	trace := &Trace{}
+	r, err := e.GetRunner(catalogID, "{}")
+	if err != nil {
+		return nil, trace, err
+	}
+	results, err := r.SearchWithQuery(WithTrace(ctx, trace), SearchQuery{Keywords: query, Type: "search"})
+	return results, trace, err
+}
+
+// SolverBusy reports whether FlareSolverr is solving a challenge right now.
+func (e *Engine) SolverBusy() bool {
+	return e.flaresolverr.Busy()
 }
 
 // Cache returns the result cache.

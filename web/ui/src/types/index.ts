@@ -63,6 +63,50 @@ export interface IndexerStats {
   last_search?: string;
 }
 
+// Catalog tester (GET /api/v1/indexers/catalog/health): background test
+// searches against public indexers that haven't been added. Rates are 0–1.
+export type CatalogVerdict = "works" | "no_results" | "flaky" | "needs_flaresolverr" | "blocked" | "down";
+
+export interface CatalogSiteHealth {
+  catalog_id: string;
+  verdict: CatalogVerdict;
+  score: number;
+  tests: number;
+  failures: number;
+  success_rate: number;
+  median_ms: number;
+  avg_results: number;
+  median_seeders: number;
+  comparisons: number;
+  unique_share: number;
+  behind_cloudflare: number;
+  solve_rate: number;
+  consecutive_failures: number;
+  last_test_at: string;
+  last_ok_at?: string;
+  last_error_kind?: string;
+  last_error?: string;
+}
+
+export interface CatalogTesterStatus {
+  running: boolean;
+  cycle_started_at?: string;
+  last_cycle_ended_at?: string;
+  next_cycle_at?: string;
+  query?: string;
+  total: number;
+  done: number;
+  interval_hours: number;
+  wanted_categories: string[];
+}
+
+export interface CatalogHealthResponse {
+  status: CatalogTesterStatus;
+  sites: CatalogSiteHealth[];
+  eligible: string[];
+  added: string[];
+}
+
 export interface IndexerStatsResponse {
   window_days: number;
   indexers: IndexerStats[];

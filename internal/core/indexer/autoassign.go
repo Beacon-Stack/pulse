@@ -23,6 +23,12 @@ var categoryToCapability = map[string]string{
 
 // AutoAssigner handles automatic indexer-to-service assignment based on
 // category↔capability matching.
+// CapabilityForCategory is the service capability that wants indexers of a
+// catalog category ("Movies" → "content:movies"), or "".
+func CapabilityForCategory(category string) string {
+	return categoryToCapability[category]
+}
+
 type AutoAssigner struct {
 	q      db.Querier
 	pusher *Pusher
