@@ -481,9 +481,6 @@ func (r *Runner) executePath(ctx context.Context, path SearchPath, tmplCtx *Temp
 	if r.flaresolverr != nil && domain != "" {
 		if sess, ok := r.flaresolverr.GetSession(domain); ok {
 			r.client.ApplyCFSession(fullURL, sess.ToHTTPCookies(), sess.userAgent)
-			// A stored clearance session means the site is behind
-			// Cloudflare even if this request isn't challenged again.
-			traceFrom(ctx).noteChallenge(true)
 		}
 	}
 

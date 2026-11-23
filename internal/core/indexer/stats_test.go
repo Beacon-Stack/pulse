@@ -45,6 +45,7 @@ func TestStats_SummarizeSearches(t *testing.T) {
 	}
 	// Durations of successful searches only: 1s, 2s, 3s.
 	if st.MedianMs != 2000 || st.P90Ms != 3000 {
+		// 1s, 2s, 3s: the middle value.
 		t.Errorf("median/p90 = %d/%d ms, want 2000/3000", st.MedianMs, st.P90Ms)
 	}
 	if st.AvgResults != 4.0/3 {
@@ -53,9 +54,10 @@ func TestStats_SummarizeSearches(t *testing.T) {
 	if st.AvgWithSeeders != 1 {
 		t.Errorf("avg with seeders = %v, want 1", st.AvgWithSeeders)
 	}
-	// Per-search medians of searches with results: 10 (of 50,10,0) and 100.
-	if st.MedianSeeders != 10 {
-		t.Errorf("median seeders = %d, want 10", st.MedianSeeders)
+	// Per-search medians of searches with results: 10 (of 50,10,0) and 100;
+	// their median is the mean of the two.
+	if st.MedianSeeders != 55 {
+		t.Errorf("median seeders = %d, want 55", st.MedianSeeders)
 	}
 	if st.BehindCloudflare != 0.5 || st.SolveRate != 0.5 {
 		t.Errorf("cloudflare/solve = %v/%v, want 0.5/0.5", st.BehindCloudflare, st.SolveRate)
@@ -146,6 +148,12 @@ func TestStats_PruneDropsOldRows(t *testing.T) {
 func TestTopMedianAndPercentile(t *testing.T) {
 	if got := topMedian([]int{1, 2, 3, 100, 200}, 3); got != 100 {
 		t.Errorf("topMedian = %d, want 100 (median of 200,100,3)", got)
+	}
+	if got := median([]int{237, 0}); got != 118 {
+		t.Errorf("median of two = %d, want their mean 118", got)
+	}
+	if got := median([]int{3, 1, 2}); got != 2 {
+		t.Errorf("median of three = %d, want 2", got)
 	}
 	if got := percentile([]int{5}, 90); got != 5 {
 		t.Errorf("percentile of one = %d", got)

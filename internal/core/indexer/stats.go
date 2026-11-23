@@ -311,11 +311,11 @@ func (s *Stats) Summarize(ctx context.Context) (map[string]*IndexerStats, error)
 		st := out[id]
 		ok := st.Searches - st.Failures
 		st.SuccessRate = ratio(ok, st.Searches)
-		st.MedianMs = percentile(a.durations, 50)
+		st.MedianMs = median(a.durations)
 		st.P90Ms = percentile(a.durations, 90)
 		st.AvgResults = ratio(a.results, ok)
 		st.AvgWithSeeders = ratio(a.withSeeders, ok)
-		st.MedianSeeders = percentile(a.seeders, 50)
+		st.MedianSeeders = median(a.seeders)
 		st.BehindCloudflare = ratio(a.challenged, st.Searches)
 		st.SolveRate = ratio(a.solved, a.challenged)
 	}
@@ -346,6 +346,21 @@ func ratio(n, d int) float64 {
 		return 0
 	}
 	return float64(n) / float64(d)
+}
+
+// median returns the middle value of xs (the mean of the two middle values
+// for an even count), 0 if empty.
+func median(xs []int) int {
+	if len(xs) == 0 {
+		return 0
+	}
+	sorted := append([]int(nil), xs...)
+	sort.Ints(sorted)
+	mid := len(sorted) / 2
+	if len(sorted)%2 == 1 {
+		return sorted[mid]
+	}
+	return (sorted[mid-1] + sorted[mid]) / 2
 }
 
 // percentile returns the p-th percentile (nearest rank) of xs, 0 if empty.
