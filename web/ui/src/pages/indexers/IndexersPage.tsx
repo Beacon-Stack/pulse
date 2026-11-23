@@ -4,7 +4,8 @@ import { Plus, ChevronRight, FlaskConical, Check, AlertCircle, Loader2, Trash2, 
 import { useConfirm } from "@beacon-shared/ConfirmDialog";
 import PageHeader from "@/components/PageHeader";
 import Pill from "@/components/Pill";
-import { useIndexers, useDeleteIndexer } from "@/api/indexers";
+import { useIndexers, useDeleteIndexer, useIndexerStats } from "@/api/indexers";
+import IndexerStatsLine from "@/components/IndexerStatsLine";
 import { useCatalog } from "@/api/catalog";
 import { card } from "@/lib/styles";
 import type { Indexer } from "@/types";
@@ -30,6 +31,8 @@ export default function IndexersPage() {
   const { data: indexers, isLoading } = useIndexers();
   const deleteIndexer = useDeleteIndexer();
   const { data: catalogData } = useCatalog();
+  const { data: statsData } = useIndexerStats();
+  const statsById = new Map((statsData?.indexers ?? []).map((s) => [s.indexer_id, s]));
   const confirm = useConfirm();
 
   // Build a name→categories lookup from the catalog
@@ -373,6 +376,7 @@ export default function IndexersPage() {
                       </span>
                     )}
                   </div>
+                  <IndexerStatsLine stats={statsById.get(idx.id)} windowDays={statsData?.window_days ?? 30} />
                 </div>
 
                 <span style={{ fontSize: 12, color: "var(--color-text-muted)", fontFamily: "var(--font-family-mono)", flexShrink: 0 }}>

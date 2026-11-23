@@ -53,6 +53,86 @@ func (h *TorznabHandler) recordSearchOutcome(indexerID string, searchErr error) 
 	go h.mgr.RecordSearchOutcome(context.Background(), indexerID, searchErr)
 }
 
+// recordSearchStats stores one real scrape in the per-indexer stats. A
+// search cut short by shutdown is not the indexer's fault and is skipped;
+// running out the background budget counts as a timeout.
+func (h *TorznabHandler) recordSearchStats(indexerID string, started time.Time, results []scraper.SearchResult, searchErr error, trace *scraper.Trace) {
+	if h.mgr == nil || errors.Is(searchErr, context.Canceled) {
+		return
+	}
+	seeders := make([]int, len(results))
+	for i, res := range results {
+		seeders[i] = res.Seeders
+	}
+	challenged, solved := trace.Challenge()
+	ev := indexer.SearchEvent{
+		IndexerID:  indexerID,
+		At:         started,
+		Duration:   time.Since(started),
+		ErrorKind:  searchErrorKind(searchErr),
+		Seeders:    seeders,
+		Challenged: challenged,
+		Solved:     solved,
+	}
+	go h.mgr.Stats().RecordSearch(context.Background(), ev)
+}
+
+// noteResults hands a served answer to the cross-indexer overlap tracker.
+func (h *TorznabHandler) noteResults(indexerID, keywords string, results []scraper.SearchResult) {
+	if h.mgr == nil {
+		return
+	}
+	keys := make([]string, len(results))
+	for i, res := range results {
+		keys[i] = releaseKey(res)
+	}
+	h.mgr.Stats().NoteResults(indexerID, strings.ToLower(strings.TrimSpace(keywords)), keys)
+}
+
+var btihRe = regexp.MustCompile(`(?i)urn:btih:([a-z0-9]+)`)
+
+// releaseKey identifies a release across indexers: its info hash when known
+// (directly or from the magnet link), else its normalized title and size.
+func releaseKey(res scraper.SearchResult) string {
+	if res.InfoHash != "" {
+		return "h:" + strings.ToLower(res.InfoHash)
+	}
+	if m := btihRe.FindStringSubmatch(res.MagnetURI); m != nil {
+		return "h:" + strings.ToLower(m[1])
+	}
+	if m := btihRe.FindStringSubmatch(res.Download); m != nil {
+		return "h:" + strings.ToLower(m[1])
+	}
+	title := strings.Join(strings.FieldsFunc(strings.ToLower(res.Title), func(r rune) bool {
+		return (r < 'a' || r > 'z') && (r < '0' || r > '9')
+	}), " ")
+	return fmt.Sprintf("t:%s|%d", title, res.Size)
+}
+
+// searchErrorKind classifies a search error for the stats ("" on success).
+func searchErrorKind(err error) string {
+	if err == nil {
+		return ""
+	}
+	msg := strings.ToLower(err.Error())
+	switch {
+	case errors.Is(err, context.DeadlineExceeded):
+		return "timeout"
+	case indexer.IsLikelyIPBan(msg):
+		return "ip_banned"
+	case scraper.IsCloudflareError(err):
+		return "cloudflare_no_solver"
+	case strings.Contains(msg, "flaresolverr"):
+		return "cloudflare_solve_failed"
+	case strings.Contains(msg, "http request failed"):
+		return "unreachable"
+	case strings.HasPrefix(msg, "http ") || strings.Contains(msg, ": http "):
+		return "http_error"
+	default:
+		return "other"
+	}
+}
+
 // RegisterTorznabRoutes registers the Torznab proxy endpoint on the chi router.
 // This is registered directly on chi (not Huma) because Torznab uses XML, not JSON.
 func RegisterTorznabRoutes(r chi.Router, h *TorznabHandler) {
@@ -194,6 +274,7 @@ func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, ru
 	// zero-result query stayed perpetually one scrape behind.
 	cacheKey := fmt.Sprintf("%s:%s:%v", idx.ID, keywords, cats)
 	if cached, ok := h.engine.Cache().Get(cacheKey); ok {
+		h.noteResults(idx.ID, keywords, cached)
 		h.writeResults(w, r, idx, cached, limit, offset)
 		return
 	}
@@ -210,6 +291,9 @@ func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, ru
 	resCh := h.sf.DoChan(cacheKey, func() (interface{}, error) {
 		sctx, cancel := context.WithTimeout(context.WithoutCancel(r.Context()), backgroundSearchBudget)
 		defer cancel()
+		trace := &scraper.Trace{}
+		sctx = scraper.WithTrace(sctx, trace)
+		started := time.Now()
 		results, err := runner.SearchWithQuery(sctx, scraper.SearchQuery{
 			Keywords:   keywords,
 			Type:       t,
@@ -221,6 +305,7 @@ func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, ru
 			Categories: cats,
 		})
 		h.recordSearchOutcome(idx.ID, err)
+		h.recordSearchStats(idx.ID, started, results, err, trace)
 		if err != nil {
 			h.logger.Warn("torznab: search failed",
 				"indexer", idx.Name, "query", keywords, "error", err)
@@ -240,7 +325,9 @@ func (h *TorznabHandler) handleSearch(w http.ResponseWriter, r *http.Request, ru
 			h.xmlError(w, 100, "Search failed: "+res.Err.Error())
 			return
 		}
-		h.writeResults(w, r, idx, res.Val.([]scraper.SearchResult), limit, offset)
+		results := res.Val.([]scraper.SearchResult)
+		h.noteResults(idx.ID, keywords, results)
+		h.writeResults(w, r, idx, results, limit, offset)
 	case <-r.Context().Done():
 		// Client gave up — the shared scrape continues and will cache.
 		h.logger.Info("torznab: client disconnected, scrape continues in background",

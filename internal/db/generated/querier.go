@@ -51,6 +51,8 @@ type Querier interface {
 	GetSharedMediaHandling(ctx context.Context) (SharedMediaHandling, error)
 	GetTag(ctx context.Context, id string) (Tag, error)
 	GetTagByName(ctx context.Context, name string) (Tag, error)
+	InsertOverlapEvent(ctx context.Context, arg InsertOverlapEventParams) error
+	InsertSearchEvent(ctx context.Context, arg InsertSearchEventParams) error
 	ListAllConfig(ctx context.Context) ([]ConfigEntry, error)
 	ListAssignmentsByIndexer(ctx context.Context, indexerID string) ([]IndexerAssignment, error)
 	ListAssignmentsByService(ctx context.Context, serviceID string) ([]IndexerAssignment, error)
@@ -69,7 +71,9 @@ type Querier interface {
 	// drops its local copy.
 	ListIndexersForService(ctx context.Context, serviceID string) ([]Indexer, error)
 	ListOnlineServices(ctx context.Context) ([]Service, error)
+	ListOverlapEventsSince(ctx context.Context, at string) ([]IndexerOverlapEvent, error)
 	ListQualityProfiles(ctx context.Context) ([]QualityProfile, error)
+	ListSearchEventsSince(ctx context.Context, at string) ([]IndexerSearchEvent, error)
 	ListServiceTagIDs(ctx context.Context, serviceID string) ([]string, error)
 	ListServices(ctx context.Context) ([]Service, error)
 	ListServicesByCapability(ctx context.Context, capability string) ([]Service, error)
@@ -77,6 +81,8 @@ type Querier interface {
 	ListSubscribersByNamespace(ctx context.Context, namespace string) ([]Service, error)
 	ListSubscriptionsByService(ctx context.Context, serviceID string) ([]string, error)
 	ListTags(ctx context.Context) ([]Tag, error)
+	PruneOverlapEvents(ctx context.Context, at string) error
+	PruneSearchEvents(ctx context.Context, at string) error
 	SetConfigEntry(ctx context.Context, arg SetConfigEntryParams) (ConfigEntry, error)
 	SetIndexerHealth(ctx context.Context, arg SetIndexerHealthParams) error
 	SetIndexerSearchHealth(ctx context.Context, arg SetIndexerSearchHealthParams) error
