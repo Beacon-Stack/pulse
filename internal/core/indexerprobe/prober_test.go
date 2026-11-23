@@ -3,6 +3,7 @@ package indexerprobe
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -166,6 +167,17 @@ func TestEligible(t *testing.T) {
 	}
 	if !added["mine"] {
 		t.Errorf("added = %v, want mine", added)
+	}
+}
+
+func TestStatusListsAreNeverNull(t *testing.T) {
+	h := newHarness(t)
+	b, err := json.Marshal(h.p.Status()) // before any round has run
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(b), "null") {
+		t.Errorf("status JSON has a null: %s", b)
 	}
 }
 
