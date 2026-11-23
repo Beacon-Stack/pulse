@@ -398,6 +398,7 @@ func main() {
 		RegistryService:       registrySvc,
 		IndexerManager:        indexerMgr,
 		CatalogProber:         catalogProber,
+		ConfigStore:           configStore,
 		TagService:            tagSvc,
 		DownloadClientService: dlClientSvc,
 		QualityProfileService: qualityProfileSvc,

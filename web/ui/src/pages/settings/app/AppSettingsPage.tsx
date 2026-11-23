@@ -1,5 +1,6 @@
 import { useState } from "react";
 import PageHeader from "@/components/PageHeader";
+import AddIndexerDefaultsSettings from "@/components/AddIndexerDefaultsSettings";
 import { card, sectionHeader } from "@/lib/styles";
 import {
   THEME_PRESETS,
@@ -105,6 +106,10 @@ export default function AppSettingsPage() {
             </button>
           ))}
         </div>
+      </div>
+
+      <div style={{ ...card, marginTop: 16 }}>
+        <AddIndexerDefaultsSettings />
       </div>
     </div>
   );
