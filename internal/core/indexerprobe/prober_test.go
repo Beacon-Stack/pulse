@@ -101,6 +101,7 @@ var testCatalog = []indexer.CatalogEntry{
 		Settings: []indexer.Field{{Name: "cookie", Type: "text", Required: true}}},
 	{ID: "nodef", Name: "NoDef", Privacy: "public", Protocol: "torrent", Categories: []string{"Movies"}},
 	{ID: "mine", Name: "Mine", Privacy: "public", Protocol: "torrent", Categories: []string{"Movies"}},
+	{ID: "i2p", Name: "I2P", Privacy: "public", Protocol: "torrent", Categories: []string{"Movies"}, URLs: []string{"http://tracker2.postman.i2p/"}},
 }
 
 type harness struct {
@@ -123,7 +124,7 @@ func newHarness(t *testing.T) *harness {
 		},
 		errs:     map[string]error{"broken": errors.New("HTTP 502")},
 		cf:       map[string]bool{"slowcf": true},
-		defs:     map[string]bool{"good": true, "slowcf": true, "broken": true, "tvonly": true, "private": true, "setup": true, "mine": true},
+		defs:     map[string]bool{"good": true, "slowcf": true, "broken": true, "tvonly": true, "private": true, "setup": true, "mine": true, "i2p": true},
 		resolved: map[string]string{"Mine": "mine"},
 	}
 	now0 := time.Now().UTC().Format(time.RFC3339)
@@ -158,7 +159,7 @@ func TestEligible(t *testing.T) {
 		ids = append(ids, e.ID)
 	}
 	// Movies only (no TV service); not private, needing setup, without a
-	// definition, or already added.
+	// definition, already added, or I2P/Tor only.
 	if fmt.Sprint(ids) != "[broken good slowcf]" {
 		t.Errorf("eligible = %v, want [broken good slowcf]", ids)
 	}
@@ -231,6 +232,24 @@ func TestRunCycle(t *testing.T) {
 	}
 	if broken.LastErrorKind != "http_error" || broken.LastError != "HTTP 502" {
 		t.Errorf("broken error = %q/%q", broken.LastErrorKind, broken.LastError)
+	}
+}
+
+func TestNeedsOverlayNetwork(t *testing.T) {
+	cases := map[string]struct {
+		urls []string
+		want bool
+	}{
+		"i2p":          {[]string{"http://tracker2.postman.i2p/"}, true},
+		"onion":        {[]string{"http://abc.onion"}, true},
+		"clearnet too": {[]string{"http://x.onion/", "https://x.example/"}, false},
+		"clearnet":     {[]string{"https://1337x.to/"}, false},
+		"no urls":      {nil, false},
+	}
+	for name, c := range cases {
+		if got := NeedsOverlayNetwork(indexer.CatalogEntry{URLs: c.urls}); got != c.want {
+			t.Errorf("%s: %v, want %v", name, got, c.want)
+		}
 	}
 }
 

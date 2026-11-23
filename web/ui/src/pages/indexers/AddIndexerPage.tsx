@@ -20,10 +20,10 @@ import {
   ListChecks,
 } from "lucide-react";
 import { useCatalog, useCatalogLanguages, useCatalogHealth, useTestCatalogIndexer } from "@/api/catalog";
-import { VerdictBadge, HealthLine } from "@/components/CatalogHealthBadge";
+import { VerdictBadge, HealthLine, OverlayBadge } from "@/components/CatalogHealthBadge";
 import { langDisplay } from "@/lib/languages";
 import { useAddIndexerDefaults } from "@/api/ui-settings";
-import { timeAgo, timeUntil, verdictInfo } from "@/lib/catalogHealth";
+import { timeAgo, timeUntil, verdictInfo, needsOverlayNetwork } from "@/lib/catalogHealth";
 import { useIndexers, useCreateIndexer, useIndexerStats } from "@/api/indexers";
 import IndexerStatsLine from "@/components/IndexerStatsLine";
 import { toast } from "sonner";
@@ -213,6 +213,7 @@ export default function AddIndexerPage() {
     // Recommended: tested sites by score, then ones waiting to be tested,
     // then the rest (private, other categories); added ones always last.
     const rank = (e: CatalogEntry) => {
+      if (needsOverlayNetwork(e.urls)) return -2;
       const h = healthById.get(e.id);
       if (h) return h.score;
       return eligible.has(e.id) ? 0.5 : -1;
@@ -651,6 +652,8 @@ function GridCard({ entry, isAdded, dim, realStats, health, untested, onSelect }
           <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 10, fontWeight: 600, color: "var(--color-success)", background: "color-mix(in srgb, var(--color-success) 12%, transparent)", padding: "2px 6px", borderRadius: 3 }}>
             <Check size={10} /> Added
           </span>
+        ) : needsOverlayNetwork(entry.urls) ? (
+          <OverlayBadge />
         ) : (
           <VerdictBadge health={health} untested={untested} />
         )}
@@ -682,7 +685,7 @@ function GridCard({ entry, isAdded, dim, realStats, health, untested, onSelect }
         {entry.description}
       </p>
 
-      {!isAdded && health && (
+      {!isAdded && health && !needsOverlayNetwork(entry.urls) && (
         <div style={{ marginTop: 8 }}>
           <HealthLine health={health} />
         </div>
@@ -747,7 +750,7 @@ function ListRow({ entry, isAdded, dim, health, untested, onSelect }: CardProps)
       <span style={{ flex: 1, fontSize: 12, color: "var(--color-text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginLeft: 8 }}>
         {entry.description}
       </span>
-      {!isAdded && <VerdictBadge health={health} untested={untested} />}
+      {!isAdded && (needsOverlayNetwork(entry.urls) ? <OverlayBadge /> : <VerdictBadge health={health} untested={untested} />)}
       {isAdded ? (
         <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 10, fontWeight: 600, color: "var(--color-success)", flexShrink: 0 }}>
           <Check size={10} /> Added

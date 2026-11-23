@@ -198,7 +198,7 @@ func (p *Prober) Eligible(ctx context.Context) (targets []indexer.CatalogEntry, 
 	}
 
 	for _, e := range p.catalog() {
-		if e.Privacy != "public" || e.Protocol != "torrent" || added[e.ID] || needsSetup(e) {
+		if e.Privacy != "public" || e.Protocol != "torrent" || added[e.ID] || needsSetup(e) || NeedsOverlayNetwork(e) {
 			continue
 		}
 		if !anyWanted(e.Categories, wantedSet) || !p.search.HasDefinition(e.ID) {
@@ -228,6 +228,26 @@ func needsSetup(e indexer.CatalogEntry) bool {
 		}
 	}
 	return false
+}
+
+// NeedsOverlayNetwork reports whether every address of the indexer is an
+// I2P or Tor hidden service, which Pulse can't reach.
+func NeedsOverlayNetwork(e indexer.CatalogEntry) bool {
+	if len(e.URLs) == 0 {
+		return false
+	}
+	for _, u := range e.URLs {
+		host := strings.ToLower(u)
+		if i := strings.Index(host, "://"); i >= 0 {
+			host = host[i+3:]
+		}
+		host = strings.SplitN(host, "/", 2)[0]
+		host = strings.SplitN(host, ":", 2)[0]
+		if !strings.HasSuffix(host, ".i2p") && !strings.HasSuffix(host, ".onion") {
+			return false
+		}
+	}
+	return true
 }
 
 // siteHistory is what past tests say about a site, for scheduling.

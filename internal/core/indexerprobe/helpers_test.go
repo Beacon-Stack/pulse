@@ -49,6 +49,7 @@ func TestSearchErrorKind(t *testing.T) {
 		{errors.New("HTTP request failed: dial tcp: no such host"), "unreachable"},
 		{errors.New("HTTP 502"), "http_error"},
 		{errors.New("HTTP 429"), "rate_limited"},
+		{errors.New("HTTP 410"), "gone"},
 		{errors.New(`HTTP request failed: Get "https://1337x.to/": proxyconnect tcp: dial tcp: lookup vpn: no such host`), "proxy_down"},
 		{errors.New("parsing HTML: bad selector"), "other"},
 	}

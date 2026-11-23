@@ -15,11 +15,23 @@ type TemplateContext struct {
 	Config     map[string]string // user settings (sort, downloadlink, etc.)
 	Keywords   string            // search query (after keywordsfilters)
 	Query      QueryContext
-	Categories []string           // site category IDs
+	Categories []string          // site category IDs
 	Result     map[string]string // for self-referencing fields
 	True       bool
 	False      bool
 	Today      TodayContext
+
+	// siteBase is the site address this search runs against (a mirror
+	// when the primary is down). Not visible to templates.
+	siteBase string
+}
+
+// base returns the address this context's search runs against.
+func (c *TemplateContext) base(fallback string) string {
+	if c != nil && c.siteBase != "" {
+		return c.siteBase
+	}
+	return fallback
 }
 
 // QueryContext holds search query parameters.
@@ -62,14 +74,14 @@ func NewTemplateContext(config map[string]string, query string) *TemplateContext
 // Cardigann YAML often compares string config values with boolean literals
 // (e.g., `eq .Config.disablesort .False`).
 var templateFuncs = template.FuncMap{
-	"join":       strings.Join,
-	"replace":    strings.ReplaceAll,
-	"tolower":    strings.ToLower,
-	"toupper":    strings.ToUpper,
-	"trimspace":  strings.TrimSpace,
-	"contains":   strings.Contains,
-	"hasprefix":  strings.HasPrefix,
-	"hassuffix":  strings.HasSuffix,
+	"join":      strings.Join,
+	"replace":   strings.ReplaceAll,
+	"tolower":   strings.ToLower,
+	"toupper":   strings.ToUpper,
+	"trimspace": strings.TrimSpace,
+	"contains":  strings.Contains,
+	"hasprefix": strings.HasPrefix,
+	"hassuffix": strings.HasSuffix,
 	// Cardigann's calling convention is `re_replace <value> <pattern>
 	// <replacement>` (e.g. `re_replace .Config.sort "_" ""`). Getting this
 	// order wrong silently corrupts every definition that uses it.

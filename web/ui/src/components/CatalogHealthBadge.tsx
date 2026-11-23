@@ -35,6 +35,17 @@ export function VerdictBadge({ health, untested }: { health?: CatalogSiteHealth;
   );
 }
 
+export function OverlayBadge() {
+  return (
+    <span
+      title="Every address for this site is an I2P or Tor hidden service, which Pulse can't reach."
+      style={{ fontSize: 10, fontWeight: 600, padding: "2px 6px", borderRadius: 3, color: "var(--color-text-muted)", background: "var(--color-bg-subtle)", whiteSpace: "nowrap" }}
+    >
+      Needs I2P / Tor
+    </span>
+  );
+}
+
 export function HealthLine({ health }: { health?: CatalogSiteHealth }) {
   if (!health) return null;
   const parts = siteHealthParts(health);

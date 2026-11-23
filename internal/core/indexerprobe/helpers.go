@@ -74,6 +74,8 @@ func ErrorKind(err error) string {
 		return "unreachable"
 	case strings.Contains(msg, "http 429"):
 		return "rate_limited"
+	case strings.Contains(msg, "http 410"):
+		return "gone"
 	case strings.HasPrefix(msg, "http ") || strings.Contains(msg, ": http "):
 		return "http_error"
 	default:

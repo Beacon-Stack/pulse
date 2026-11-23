@@ -17,11 +17,22 @@ const errorLabels: Record<string, string> = {
   unreachable: "unreachable",
   http_error: "site error",
   rate_limited: "asked us to slow down",
+  gone: "site gone (410)",
   cloudflare_no_solver: "Cloudflare, no FlareSolverr",
   cloudflare_solve_failed: "Cloudflare not solved",
   ip_banned: "IP blocked",
   other: "error",
 };
+
+// True when every address is an I2P or Tor hidden service, which Pulse
+// can't reach (the tester skips these).
+export function needsOverlayNetwork(urls: string[]): boolean {
+  if (urls.length === 0) return false;
+  return urls.every((u) => {
+    const host = u.toLowerCase().replace(/^[a-z]+:\/\//, "").split("/")[0].split(":")[0];
+    return host.endsWith(".i2p") || host.endsWith(".onion");
+  });
+}
 
 export function errorLabel(kind?: string): string {
   return kind ? errorLabels[kind] ?? kind : "";
