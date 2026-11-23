@@ -37,6 +37,7 @@ import (
 	dbgen "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/events"
 	"github.com/beacon-stack/pulse/internal/scraper"
+	"github.com/beacon-stack/pulse/internal/sitenet"
 	"github.com/beacon-stack/pulse/pkg/log"
 	"github.com/beacon-stack/pulse/pkg/log/plugins/file"
 	"github.com/beacon-stack/pulse/pkg/log/plugins/loki"
@@ -296,6 +297,15 @@ func main() {
 	// ── Prowlarr-sourced indexer catalog ──────────────────────────────────
 	prowlarrCatalog := indexer.NewProwlarrCatalog(logger)
 	indexer.SetCatalogSource(prowlarrCatalog.Entries)
+
+	// ── Indexer site traffic (optional proxy) ────────────────────────────
+	if err := sitenet.SetProxy(cfg.Scraper.ProxyURL); err != nil {
+		logger.Error("scraper proxy", "error", err)
+		os.Exit(1)
+	}
+	if p := sitenet.Proxy(); p != nil {
+		logger.Info("indexer site requests go through proxy", "proxy", p.Redacted())
+	}
 
 	// ── FlareSolverr (optional) ───────────────────────────────────────────
 	flaresolverr := scraper.NewFlareSolverr(cfg.FlareSolverr.URL, logger)

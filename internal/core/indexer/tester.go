@@ -7,6 +7,8 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/beacon-stack/pulse/internal/sitenet"
 )
 
 // TestResult holds the outcome of probing an indexer.
@@ -21,7 +23,7 @@ type TestResult struct {
 func TestIndexer(ctx context.Context, kind, url, apiKey string) TestResult {
 	start := time.Now()
 
-	client := &http.Client{Timeout: 15 * time.Second}
+	client := sitenet.Client(15 * time.Second)
 
 	switch kind {
 	case "torznab", "newznab":
