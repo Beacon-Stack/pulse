@@ -31,6 +31,8 @@ import (
 	"net/url"
 	"sync"
 	"time"
+
+	"github.com/beacon-stack/pulse/pkg/notify"
 )
 
 // Config holds the settings for connecting to Pulse.
@@ -472,4 +474,26 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body any, r
 	}
 
 	return nil
+}
+
+// ── Notifications ────────────────────────────────────────────────────────────
+
+// NotifyHub returns Pulse as a notify.Hub, for an app's notify.Outbox:
+// events handed to it are broadcast on Pulse's channels.
+func (c *Client) NotifyHub() notify.Hub { return notifyHub{c} }
+
+type notifyHub struct{ c *Client }
+
+func (h notifyHub) Notify(ctx context.Context, e notify.Event) error {
+	return h.c.doRequest(ctx, http.MethodPost, "/api/v1/notifications/send", e, nil)
+}
+
+func (h notifyHub) Channels(ctx context.Context) (int, error) {
+	var st struct {
+		Enabled int `json:"enabled"`
+	}
+	if err := h.c.doRequest(ctx, http.MethodGet, "/api/v1/notifications/status", nil, &st); err != nil {
+		return 0, err
+	}
+	return st.Enabled, nil
 }

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import {
   Activity,
+  Bell,
   Boxes,
   Download,
   FileText,
@@ -25,6 +26,7 @@ const mainNav: NavItem[] = [
   { to: "/download-clients", icon: Download, label: "Download Clients" },
   { to: "/quality-profiles", icon: Gauge, label: "Quality Profiles" },
   { to: "/shared-settings", icon: FolderCog, label: "Shared Settings" },
+  { to: "/notifications", icon: Bell, label: "Notifications" },
 ];
 
 const settingsNav: NavItem[] = [

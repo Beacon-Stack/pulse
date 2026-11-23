@@ -3,6 +3,8 @@ package api
 import (
 	"crypto/subtle"
 	"github.com/beacon-stack/pulse/internal/version"
+	"github.com/beacon-stack/pulse/pkg/notify"
+	"github.com/beacon-stack/pulse/pkg/notify/notifyapi"
 	"log/slog"
 	"net/http"
 	"time"
@@ -54,6 +56,10 @@ type RouterConfig struct {
 	// /api/v1/system/logs/docker passthrough for full history.
 	LogSystem  *log.System
 	DockerLogs *log.DockerLogsReader
+	// Notifications: Pulse's own channels, which broadcast events the
+	// apps send it. Nil leaves the notifications API out.
+	NotifyStore  *notify.Store
+	NotifyOutbox *notify.Outbox
 }
 
 // NewRouter builds and returns the application HTTP handler.
@@ -125,6 +131,9 @@ func NewRouter(cfg RouterConfig) http.Handler {
 
 	// Register route groups.
 	v1.RegisterSystemRoutes(humaAPI, cfg.StartTime, cfg.DBPath)
+	if cfg.NotifyStore != nil && cfg.NotifyOutbox != nil {
+		notifyapi.Register(humaAPI, notifyapi.Options{App: "Pulse", Store: cfg.NotifyStore, Outbox: cfg.NotifyOutbox, Hub: true})
+	}
 	v1.RegisterUpdateRoutes(humaAPI)
 	v1.RegisterRuntimeRoutes(humaAPI, cfg.StartTime)
 	v1.RegisterEnvRoutes(humaAPI)

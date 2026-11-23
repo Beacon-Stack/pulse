@@ -16,6 +16,7 @@ import DownloadClientDetailPage from "@/pages/download-clients/DownloadClientDet
 import QualityProfilesPage from "@/pages/quality-profiles/QualityProfilesPage";
 import SharedSettingsPage from "@/pages/shared-settings/SharedSettingsPage";
 import SystemPage from "@/pages/settings/system/SystemPage";
+import Notifications from "@beacon-shared/Notifications";
 import LogsPage from "@/pages/settings/system/Logs";
 import AppSettingsPage from "@/pages/settings/app/AppSettingsPage";
 
@@ -51,6 +52,7 @@ export default function App() {
                 <Route path="download-clients/:id" element={<RouteEB><DownloadClientDetailPage /></RouteEB>} />
                 <Route path="quality-profiles" element={<RouteEB><QualityProfilesPage /></RouteEB>} />
                 <Route path="shared-settings" element={<RouteEB><SharedSettingsPage /></RouteEB>} />
+                <Route path="notifications" element={<RouteEB><Notifications /></RouteEB>} />
                 <Route path="settings">
                   <Route path="system" element={<RouteEB><SystemPage /></RouteEB>} />
                   <Route path="system/logs" element={<RouteEB><LogsPage /></RouteEB>} />
