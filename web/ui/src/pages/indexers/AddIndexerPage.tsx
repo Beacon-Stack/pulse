@@ -1011,7 +1011,8 @@ function PrivacyBadge({ privacy }: { privacy: string }) {
 
 function TesterStatusLine({ data }: { data: CatalogHealthResponse }) {
   const st = data.status;
-  const cats = st.wanted_categories.length > 0 ? st.wanted_categories.join(" and ") : "your";
+  const wanted = st.wanted_categories ?? [];
+  const scope = wanted.length > 0 ? `Public ${wanted.join(" and ")} indexers` : "Public indexers in your categories";
   let progress: string;
   if (st.running) {
     progress = `Testing now: ${st.done} of ${st.total} checked${st.query ? `, searching for “${st.query}”` : ""}.`;
@@ -1020,13 +1021,19 @@ function TesterStatusLine({ data }: { data: CatalogHealthResponse }) {
   } else {
     progress = `Last round ${timeAgo(st.last_cycle_ended_at)}; next ${timeUntil(st.next_cycle_at)}.`;
   }
-  const working = data.sites.filter((s) => s.verdict === "works").length;
+  const sites = data.sites ?? [];
+  const working = sites.filter((s) => s.verdict === "works").length;
+  const eligibleCount = (data.eligible ?? []).length;
+  const tested = sites.filter((s) => (data.eligible ?? []).includes(s.catalog_id)).length;
   return (
     <p style={{ margin: "6px 0 0", fontSize: 12, color: "var(--color-text-muted)", display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
       <FlaskConical size={13} />
       <span>
-        Public {cats} indexers are test-searched every {st.interval_hours} hours.{" "}
-        {data.sites.length > 0 && `${working} of ${data.eligible.length} work. `}
+        {scope} are test-searched every {st.interval_hours} hours.{" "}
+        {sites.length > 0 &&
+          (tested < eligibleCount
+            ? `${tested} of ${eligibleCount} tested so far, ${working} work. `
+            : `${working} of ${eligibleCount} work. `)}
         {progress}
       </span>
     </p>

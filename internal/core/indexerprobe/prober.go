@@ -131,7 +131,8 @@ func (p *Prober) Status() Status {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	s := p.status
-	s.WantedCategories = append([]string(nil), s.WantedCategories...)
+	// Never null in JSON: the UI reads .length before the first round.
+	s.WantedCategories = append([]string{}, s.WantedCategories...)
 	return s
 }
 
