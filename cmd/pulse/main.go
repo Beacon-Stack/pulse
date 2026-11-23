@@ -466,6 +466,10 @@ func main() {
 		}()
 	}
 
+	// Per-indexer search stats: finalize cross-indexer comparisons and
+	// prune rows older than 30 days.
+	go indexerMgr.Stats().Run(ctx)
+
 	healthTicker := time.NewTicker(30 * time.Second)
 	go func() {
 		for {

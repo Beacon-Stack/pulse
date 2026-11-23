@@ -71,6 +71,29 @@ type IndexerAssignment struct {
 	Overrides string `json:"overrides"`
 }
 
+type IndexerOverlapEvent struct {
+	ID            int64  `json:"id"`
+	IndexerID     string `json:"indexerId"`
+	At            string `json:"at"`
+	Results       int64  `json:"results"`
+	UniqueResults int64  `json:"uniqueResults"`
+	ComparedWith  int64  `json:"comparedWith"`
+}
+
+type IndexerSearchEvent struct {
+	ID            int64  `json:"id"`
+	IndexerID     string `json:"indexerId"`
+	At            string `json:"at"`
+	DurationMs    int64  `json:"durationMs"`
+	Ok            bool   `json:"ok"`
+	ErrorKind     string `json:"errorKind"`
+	Results       int64  `json:"results"`
+	WithSeeders   int64  `json:"withSeeders"`
+	MedianSeeders int64  `json:"medianSeeders"`
+	Challenged    bool   `json:"challenged"`
+	Solved        bool   `json:"solved"`
+}
+
 type IndexerTag struct {
 	IndexerID string `json:"indexerId"`
 	TagID     string `json:"tagId"`

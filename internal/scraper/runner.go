@@ -481,6 +481,9 @@ func (r *Runner) executePath(ctx context.Context, path SearchPath, tmplCtx *Temp
 	if r.flaresolverr != nil && domain != "" {
 		if sess, ok := r.flaresolverr.GetSession(domain); ok {
 			r.client.ApplyCFSession(fullURL, sess.ToHTTPCookies(), sess.userAgent)
+			// A stored clearance session means the site is behind
+			// Cloudflare even if this request isn't challenged again.
+			traceFrom(ctx).noteChallenge(true)
 		}
 	}
 
@@ -519,6 +522,7 @@ func (r *Runner) executePath(ctx context.Context, path SearchPath, tmplCtx *Temp
 				resp.Body.Close()
 				return r.solveWithFlareSolverr(ctx, fullURL, path, tmplCtx)
 			}
+			traceFrom(ctx).noteChallenge(false)
 			return nil, &CloudflareError{StatusCode: resp.StatusCode}
 		}
 		return nil, fmt.Errorf("HTTP %d", resp.StatusCode)
@@ -566,6 +570,7 @@ func (r *Runner) solveWithFlareSolverr(ctx context.Context, fullURL string, path
 	solveCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), flareSolveBudget)
 	defer cancel()
 	html, _, _, err := r.flaresolverr.Solve(solveCtx, fullURL)
+	traceFrom(ctx).noteChallenge(err == nil)
 	if err != nil {
 		return nil, fmt.Errorf("FlareSolverr failed: %w", err)
 	}

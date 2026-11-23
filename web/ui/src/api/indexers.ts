@@ -1,12 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { apiFetch } from "./client";
-import type { Indexer, CreateIndexerInput, IndexerAssignment } from "@/types";
+import type { Indexer, CreateIndexerInput, IndexerAssignment, IndexerStatsResponse } from "@/types";
 
 export function useIndexers() {
   return useQuery({
     queryKey: ["indexers"],
     queryFn: () => apiFetch<Indexer[]>("/indexers"),
+  });
+}
+
+// Stats from real searches; refreshed every minute while the page is open.
+export function useIndexerStats() {
+  return useQuery({
+    queryKey: ["indexers", "stats"],
+    queryFn: () => apiFetch<IndexerStatsResponse>("/indexers/stats"),
+    refetchInterval: 60_000,
   });
 }
 

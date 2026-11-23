@@ -42,6 +42,32 @@ export interface SetConfigInput {
 
 // ── Indexers ─────────────────────────────────────────────────────────────────
 
+// Per-indexer stats measured from real searches over the last 30 days
+// (GET /api/v1/indexers/stats). Rates are 0–1.
+export interface IndexerStats {
+  indexer_id: string;
+  searches: number;
+  failures: number;
+  success_rate: number;
+  median_ms: number;
+  p90_ms: number;
+  avg_results: number;
+  avg_with_seeders: number;
+  median_seeders: number;
+  behind_cloudflare: number;
+  solve_rate: number;
+  error_kinds?: Record<string, number>;
+  comparisons: number;
+  unique_share: number;
+  avg_unique: number;
+  last_search?: string;
+}
+
+export interface IndexerStatsResponse {
+  window_days: number;
+  indexers: IndexerStats[];
+}
+
 export interface Indexer {
   id: string;
   name: string;

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"sort"
 	"strings"
 
 	"github.com/danielgtaylor/huma/v2"
@@ -105,11 +106,43 @@ func toIndexerBody(row db.Indexer) indexerBody {
 // RegisterIndexerRoutes registers indexer management endpoints.
 // proxyBaseURL is the Pulse external URL used for Torznab proxy URL rewriting
 // (e.g., "http://pulse:9696"). If empty, URLs are not rewritten.
+type indexerStatsOutput struct {
+	Body struct {
+		// WindowDays is how far back the stats look.
+		WindowDays int                     `json:"window_days"`
+		Indexers   []*indexer.IndexerStats `json:"indexers"`
+	}
+}
+
 func RegisterIndexerRoutes(api huma.API, mgr *indexer.Manager, proxyBaseURL ...string) {
 	baseURL := ""
 	if len(proxyBaseURL) > 0 {
 		baseURL = strings.TrimRight(proxyBaseURL[0], "/")
 	}
+
+	huma.Register(api, huma.Operation{
+		OperationID: "indexer-stats",
+		Method:      http.MethodGet,
+		Path:        "/api/v1/indexers/stats",
+		Summary:     "Per-indexer search stats from the last 30 days",
+		Description: "Speed, results, seeders, Cloudflare and unique-result stats measured from real searches proxied through Pulse. Indexers with no recorded searches are omitted.",
+		Tags:        []string{"Indexers"},
+	}, func(ctx context.Context, _ *struct{}) (*indexerStatsOutput, error) {
+		byID, err := mgr.Stats().Summarize(ctx)
+		if err != nil {
+			return nil, huma.Error500InternalServerError("loading indexer stats", err)
+		}
+		out := &indexerStatsOutput{}
+		out.Body.WindowDays = 30
+		out.Body.Indexers = make([]*indexer.IndexerStats, 0, len(byID))
+		for _, st := range byID {
+			out.Body.Indexers = append(out.Body.Indexers, st)
+		}
+		sort.Slice(out.Body.Indexers, func(i, j int) bool {
+			return out.Body.Indexers[i].IndexerID < out.Body.Indexers[j].IndexerID
+		})
+		return out, nil
+	})
 	// POST /api/v1/indexers — create
 	huma.Register(api, huma.Operation{
 		OperationID:   "create-indexer",

@@ -42,6 +42,7 @@ type Manager struct {
 	bus          *events.Bus
 	pusher       *Pusher
 	autoAssigner *AutoAssigner
+	stats        *Stats
 	logger       *slog.Logger
 }
 
@@ -53,8 +54,14 @@ func NewManager(q db.Querier, bus *events.Bus, logger *slog.Logger) *Manager {
 		bus:          bus,
 		pusher:       pusher,
 		autoAssigner: NewAutoAssigner(q, pusher, logger),
+		stats:        NewStats(q, logger),
 		logger:       logger,
 	}
+}
+
+// Stats returns the per-indexer search stats recorder.
+func (m *Manager) Stats() *Stats {
+	return m.stats
 }
 
 // AutoAssigner returns the auto-assigner for use by other packages
