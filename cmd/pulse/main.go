@@ -135,6 +135,28 @@ func main() {
 		os.Exit(1)
 	}
 	notifyOutbox := &notify.Outbox{App: "Pulse", Store: notifyStore, Log: logger}
+	// Announce indexers that start failing (and recover), on Pulse's own
+	// channels.
+	go (&notify.HealthWatcher{Outbox: notifyOutbox, Check: func(ctx context.Context) []notify.Problem {
+		rows, err := queries.ListIndexers(ctx)
+		if err != nil {
+			return nil
+		}
+		var out []notify.Problem
+		for _, r := range rows {
+			if !r.Enabled || (r.HealthStatus != "failing" && r.HealthStatus != "definition_missing") {
+				continue
+			}
+			msg := "Indexer " + r.Name + " is failing"
+			if r.HealthStatus == "definition_missing" {
+				msg = "Indexer " + r.Name + " no longer has a definition and can't be searched"
+			} else if r.LastError != "" {
+				msg += ": " + r.LastError
+			}
+			out = append(out, notify.Problem{Key: "indexer:" + r.ID, Message: msg, Level: notify.LevelWarning})
+		}
+		return out
+	}}).Run(context.Background())
 
 	// ── Core services ────────────────────────────────────────────────────
 	registrySvc := registry.NewService(queries, bus, logger)
