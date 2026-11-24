@@ -19,6 +19,7 @@ import SystemPage from "@/pages/settings/system/SystemPage";
 import Notifications from "@beacon-shared/Notifications";
 import LogsPage from "@/pages/settings/system/Logs";
 import AppSettingsPage from "@/pages/settings/app/AppSettingsPage";
+import LoginPage from "@beacon-shared/LoginPage";
 
 function RouteEB({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
@@ -41,6 +42,7 @@ export default function App() {
         <BrowserRouter>
           <ErrorBoundary>
             <Routes>
+              <Route path="login" element={<LoginPage />} />
               <Route element={<Shell />}>
                 <Route index element={<RouteEB><Dashboard /></RouteEB>} />
                 <Route path="services" element={<RouteEB><ServicesPage /></RouteEB>} />

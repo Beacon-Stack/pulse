@@ -10,6 +10,7 @@ import {
   setThemePreset,
   type ThemeMode,
 } from "@/theme";
+import Security from "@beacon-shared/Security";
 
 export default function AppSettingsPage() {
   const [mode, setMode] = useState<ThemeMode>(getStoredMode);
@@ -110,6 +111,10 @@ export default function AppSettingsPage() {
 
       <div style={{ ...card, marginTop: 16 }}>
         <AddIndexerDefaultsSettings />
+      </div>
+
+      <div style={{ marginTop: 16 }}>
+        <Security />
       </div>
     </div>
   );

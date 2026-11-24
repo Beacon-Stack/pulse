@@ -73,7 +73,7 @@ func pulseWithNotifications(t *testing.T) *httptest.Server {
 		RegistryService: registry.NewService(queries, bus, logger),
 		IndexerManager:  indexer.NewManager(queries, bus, logger),
 		TagService:      tag.NewService(queries),
-		WSHub:           ws.NewHub(logger, []byte(testAPIKey)),
+		WSHub:           ws.NewHub(logger),
 		NotifyStore:     store,
 		NotifyOutbox:    &notify.Outbox{App: "Pulse", Store: store, Log: logger},
 	})

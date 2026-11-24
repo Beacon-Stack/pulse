@@ -39,7 +39,7 @@ func setupTestServer(t *testing.T) *httptest.Server {
 	bus := events.New(logger)
 	queries := dbgen.New(database.SQL)
 
-	wsHub := ws.NewHub(logger, []byte(testAPIKey))
+	wsHub := ws.NewHub(logger)
 	bus.Subscribe(wsHub.HandleEvent)
 
 	router := api.NewRouter(api.RouterConfig{

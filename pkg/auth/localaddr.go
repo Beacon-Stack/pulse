@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/http"
 	"net/netip"
+	"os"
 	"strings"
 )
 
@@ -154,6 +155,18 @@ func networkStrings(nets []netip.Prefix) []string {
 	out := make([]string, 0, len(nets))
 	for _, p := range nets {
 		out = append(out, p.String())
+	}
+	return out
+}
+
+// ListFromEnv reads a comma-separated list from an environment variable,
+// for apps that take AllowedHosts or LocalNetworks that way.
+func ListFromEnv(name string) []string {
+	var out []string
+	for _, v := range strings.Split(os.Getenv(name), ",") {
+		if v = strings.TrimSpace(v); v != "" {
+			out = append(out, v)
+		}
 	}
 	return out
 }
