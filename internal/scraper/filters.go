@@ -89,7 +89,7 @@ func applyFilter(value string, f FilterDef, ctx *TemplateContext) string {
 	}
 }
 
-// ── Filter implementations ───────────────────────────────────────────────────
+// Filter implementations
 
 func filterQuerystring(value, param string) string {
 	u, err := url.Parse(value)
@@ -249,7 +249,7 @@ func dotnetToGoFormat(format string) string {
 	return r.Replace(format)
 }
 
-// ── Argument helpers ─────────────────────────────────────────────────────────
+// Argument helpers
 
 // filterArgString extracts the first arg as a string and template-
 // evaluates it against ctx (when ctx is non-nil). Cardigann YAML routinely

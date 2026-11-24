@@ -18,7 +18,7 @@ type rotateClient interface {
 }
 
 // Rotation pacing. maxAttempts exists because the provider can reconnect
-// to the very same server (observed live: two PIA restarts, same IP);
+// to the very same server and hand back the same IP;
 // minInterval keeps a click-happy user (or a future automation bug) from
 // thrashing the tunnel — every rotation pauses torrent traffic and
 // invalidates every FlareSolverr session.

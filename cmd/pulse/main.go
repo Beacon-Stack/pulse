@@ -51,14 +51,14 @@ func main() {
 	configPath := flag.String("config", "", "path to config.yaml")
 	flag.Parse()
 
-	// ── Load configuration ───────────────────────────────────────────────
+	// Load configuration
 	cfg, err := config.Load(*configPath)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "pulse: %v\n", err)
 		os.Exit(1)
 	}
 
-	// ── Logger ───────────────────────────────────────────────────────────
+	// Logger
 	// Shared module from pulse/pkg/log: gives us stdout JSON, the
 	// in-memory ring buffer behind /api/v1/system/logs, and pluggable
 	// sinks (Loki, file, …). The stdout handler is always on; plugins
@@ -114,7 +114,7 @@ func main() {
 		logger.Info("loaded config file", "path", cfg.ConfigFile)
 	}
 
-	// ── Database ─────────────────────────────────────────────────────────
+	// Database
 	database, err := db.Open(cfg.Database)
 	if err != nil {
 		logger.Error("failed to open database", "error", err)
@@ -128,10 +128,10 @@ func main() {
 	}
 	logger.Info("database migrations complete")
 
-	// ── Event bus ────────────────────────────────────────────────────────
+	// Event bus
 	bus := events.New(logger)
 
-	// ── SQLC queries ─────────────────────────────────────────────────────
+	// SQLC queries
 	queries := dbgen.New(database.SQL)
 
 	// Notifications: Pulse broadcasts the apps' events on its channels.
@@ -164,7 +164,7 @@ func main() {
 		return out
 	}}).Run(context.Background())
 
-	// ── Core services ────────────────────────────────────────────────────
+	// Core services
 	registrySvc := registry.NewService(queries, bus, logger)
 	configStore := cfgstore.NewStore(queries, bus, logger)
 	indexerMgr := indexer.NewManager(queries, bus, logger)
@@ -295,11 +295,11 @@ func main() {
 			"name", svcInfo.Name, "host", host, "port", port)
 	})
 
-	// ── Prowlarr-sourced indexer catalog ──────────────────────────────────
+	// Prowlarr-sourced indexer catalog
 	prowlarrCatalog := indexer.NewProwlarrCatalog(logger)
 	indexer.SetCatalogSource(prowlarrCatalog.Entries)
 
-	// ── Indexer site traffic (optional proxy) ────────────────────────────
+	// Indexer site traffic (optional proxy)
 	if err := sitenet.SetProxy(cfg.Scraper.ProxyURL); err != nil {
 		logger.Error("scraper proxy", "error", err)
 		os.Exit(1)
@@ -308,21 +308,21 @@ func main() {
 		logger.Info("indexer site requests go through proxy", "proxy", p.Redacted())
 	}
 
-	// ── FlareSolverr (optional) ───────────────────────────────────────────
+	// FlareSolverr (optional)
 	flaresolverr := scraper.NewFlareSolverr(cfg.FlareSolverr.URL, logger)
 	if flaresolverr != nil {
 		logger.Info("FlareSolverr configured", "url", cfg.FlareSolverr.URL)
 	}
 
-	// ── Scraper engine ───────────────────────────────────────────────────
+	// Scraper engine
 	scraperEngine := scraper.NewEngine(logger, flaresolverr)
 	catalogProber := indexerprobe.New(queries, scraperEngine, indexer.Catalog, logger)
 
-	// ── WebSocket hub ────────────────────────────────────────────────────
+	// WebSocket hub
 	wsHub := ws.NewHub(logger, []byte(cfg.Auth.APIKey.Value()))
 	bus.Subscribe(wsHub.HandleEvent)
 
-	// ── HTTP router ──────────────────────────────────────────────────────
+	// HTTP router
 	// Compute external URL for Torznab proxy URL rewriting.
 	externalURL := cfg.Server.ExternalURL
 	if externalURL == "" {
@@ -422,7 +422,7 @@ func main() {
 		IdleTimeout:  120 * time.Second,
 	}
 
-	// ── Background services ─────────────────────────────────────────────
+	// Background services
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -500,7 +500,7 @@ func main() {
 		}
 	}()
 
-	// ── Start server ─────────────────────────────────────────────────────
+	// Start server
 	go func() {
 		logger.Info("pulse listening", "addr", addr)
 		logger.Info("API docs available", "url", fmt.Sprintf("http://%s/api/docs", addr))
@@ -511,7 +511,7 @@ func main() {
 		}
 	}()
 
-	// ── Graceful shutdown ────────────────────────────────────────────────
+	// Graceful shutdown
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit

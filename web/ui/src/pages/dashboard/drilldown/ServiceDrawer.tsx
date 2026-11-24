@@ -113,7 +113,7 @@ export default function ServiceDrawer({ serviceId, onClose }: ServiceDrawerProps
   );
 }
 
-// ── 3 gauges row ────────────────────────────────────────────────────────────
+// 3 gauges row
 
 function GaugesRow({
   container,
@@ -270,7 +270,7 @@ function GaugeBlock({
   );
 }
 
-// ── Host info ───────────────────────────────────────────────────────────────
+// Host info
 
 function HostSection({ runtime }: { runtime: RuntimeStats | null }) {
   if (!runtime) {
@@ -304,7 +304,7 @@ function formatUptime(seconds: number): string {
   return `${days}d ${hours % 24}h`;
 }
 
-// ── Env ─────────────────────────────────────────────────────────────────────
+// Env
 
 function EnvSection({ env }: { env: EnvEntry[] | null }) {
   if (!env || env.length === 0) {
@@ -357,7 +357,7 @@ function EnvSection({ env }: { env: EnvEntry[] | null }) {
   );
 }
 
-// ── Logs ────────────────────────────────────────────────────────────────────
+// Logs
 
 const logLevelColor: Record<string, string> = {
   DEBUG: "var(--color-text-muted)",
@@ -452,7 +452,7 @@ function formatLogTime(iso: string): string {
   return `${h}:${m}:${s}`;
 }
 
-// ── Service-specific ────────────────────────────────────────────────────────
+// Service-specific
 
 interface HaulSpecifics {
   stats?: {
@@ -549,7 +549,7 @@ function QueueSection({ s }: { s: QueueSpecifics }) {
   );
 }
 
-// ── Shared bits ─────────────────────────────────────────────────────────────
+// Shared bits
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (

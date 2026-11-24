@@ -43,7 +43,7 @@ type CatalogFilter struct {
 	Language string `json:"language,omitempty"`
 }
 
-// ── Global catalog reference ─────────────────────────────────────────────────
+// Global catalog reference
 // Set once at startup via SetCatalogSource. Defaults to the static builtin.
 
 var (

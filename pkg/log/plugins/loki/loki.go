@@ -121,7 +121,7 @@ func (p *Plugin) Close(ctx context.Context) error {
 	}
 }
 
-// ── slog.Handler implementation ────────────────────────────────────────────
+// slog.Handler implementation
 
 type record struct {
 	t     time.Time
@@ -198,7 +198,7 @@ func (h *handler) WithGroup(name string) slog.Handler {
 	}
 }
 
-// ── Batcher loop ───────────────────────────────────────────────────────────
+// Batcher loop
 
 func (h *handler) run() {
 	defer close(h.doneCh)

@@ -1,4 +1,4 @@
-// ── Services ─────────────────────────────────────────────────────────────────
+// Services
 
 export interface Service {
   id: string;
@@ -25,9 +25,9 @@ export interface RegisterServiceInput {
   metadata?: string;
 }
 
-// ── Config ───────────────────────────────────────────────────────────────────
+// Config
 
-// ── Indexers ─────────────────────────────────────────────────────────────────
+// Indexers
 
 // Per-indexer stats measured from real searches over the last 30 days
 // (GET /api/v1/indexers/stats). Rates are 0–1.
@@ -137,7 +137,7 @@ export interface IndexerAssignment {
   overrides: string;
 }
 
-// ── Catalog ──────────────────────────────────────────────────────────────────
+// Catalog
 
 interface CatalogFieldOption {
   name: string;
@@ -172,7 +172,7 @@ export interface CatalogResponse {
   total: number;
 }
 
-// ── System ───────────────────────────────────────────────────────────────────
+// System
 
 export interface SystemStatus {
   status: string;
