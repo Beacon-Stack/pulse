@@ -30,6 +30,7 @@ import (
 	"net/http"
 	"net/netip"
 	"net/url"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -107,6 +108,10 @@ type Options struct {
 	// AllowedHosts are extra host names the app may be opened under
 	// without a login from the local network (see host.go).
 	AllowedHosts []string
+	// LocalNetworks are address ranges (CIDR) from the app's config file
+	// or environment that always count as local, on top of the ones in
+	// Settings. They can't be removed from the settings page.
+	LocalNetworks []string
 	// Store, when set, is where SetSettings persists changes.
 	Store Store
 }
@@ -129,9 +134,11 @@ type Auth struct {
 	limiter    *attemptLimiter
 	store      Store
 
+	fixedNets []netip.Prefix // from Options.LocalNetworks
+
 	mu           sync.RWMutex
 	settings     Settings
-	localNets    []netip.Prefix
+	localNets    []netip.Prefix // fixedNets plus the ones in settings
 	signKey      []byte
 	allowedHosts []string
 }
@@ -157,8 +164,29 @@ func New(opts Options, settings Settings) *Auth {
 		store:        opts.Store,
 		allowedHosts: append([]string(nil), opts.AllowedHosts...),
 	}
+	for _, n := range opts.LocalNetworks {
+		if p, err := parseNetwork(n); err == nil && p.Bits() >= 8 {
+			a.fixedNets = append(a.fixedNets, p)
+		}
+	}
 	a.apply(settings)
 	return a
+}
+
+// Open builds an Auth whose settings live in dir/auth.json. When nothing
+// has been saved there yet it starts from seed (for example values an
+// older version kept in the app's config file).
+func Open(opts Options, dir string, seed Settings) (*Auth, error) {
+	store := FileStore{Path: filepath.Join(dir, "auth.json")}
+	settings, found, err := store.Load()
+	if err != nil {
+		return nil, fmt.Errorf("reading %s: %w", store.Path, err)
+	}
+	if !found {
+		settings = seed
+	}
+	opts.Store = store
+	return New(opts, settings), nil
 }
 
 // CookieName is the name of the session cookie.
@@ -214,7 +242,7 @@ func (a *Auth) apply(s Settings) {
 	mac.Write([]byte(a.cookieName + "-" + sessionVersion + "\x00" + s.PasswordHash))
 	a.mu.Lock()
 	a.settings = s
-	a.localNets = nets
+	a.localNets = append(append([]netip.Prefix(nil), a.fixedNets...), nets...)
 	a.signKey = mac.Sum(nil)
 	a.mu.Unlock()
 }
@@ -421,6 +449,7 @@ func (a *Auth) WouldLockOut(ctx context.Context, next Settings) bool {
 	if err != nil {
 		return false
 	}
+	nets = append(nets, a.fixedNets...)
 	return len(c.addrs) > 0 && !allLocal(c.addrs, nets)
 }
 

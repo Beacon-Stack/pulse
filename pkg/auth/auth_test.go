@@ -405,3 +405,33 @@ func TestFileStore(t *testing.T) {
 		t.Error("bad networks must not be saved")
 	}
 }
+
+// Ranges from the app's config always count, and Open reads what was
+// saved, falling back to the seed the first time.
+func TestOpenAndFixedNetworks(t *testing.T) {
+	dir := t.TempDir()
+	seed := withLogin(t, RequiredOutside)
+	a, err := Open(Options{App: "Prism", APIKey: testKey, LocalNetworks: []string{"203.0.113.0/24"}}, dir, seed)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if a.Settings().Username != "admin" {
+		t.Fatal("first start should use the seed")
+	}
+	if method(a, request("GET", wanClient)) != MethodLocal {
+		t.Fatal("a range from the config should count as local")
+	}
+	if err := a.SetSettings(Settings{}); err != nil {
+		t.Fatal(err)
+	}
+	if method(a, request("GET", wanClient)) != MethodLocal {
+		t.Fatal("config ranges stay after the settings change")
+	}
+	b, err := Open(Options{App: "Prism", APIKey: testKey}, dir, seed)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if b.Settings().Username != "" || b.Settings().Mode() != RequiredNone {
+		t.Fatalf("second start should use what was saved, not the seed: %+v", b.Settings())
+	}
+}
