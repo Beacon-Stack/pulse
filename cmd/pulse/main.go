@@ -5,8 +5,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/beacon-stack/pulse/pkg/healthcheck"
-	"github.com/beacon-stack/pulse/pkg/notify"
 	"log/slog"
 	"net"
 	"net/http"
@@ -18,6 +16,10 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/beacon-stack/pulse/pkg/auth"
+	"github.com/beacon-stack/pulse/pkg/healthcheck"
+	"github.com/beacon-stack/pulse/pkg/notify"
 
 	"github.com/beacon-stack/pulse/internal/api"
 	"github.com/beacon-stack/pulse/internal/api/ws"
@@ -319,7 +321,7 @@ func main() {
 	catalogProber := indexerprobe.New(queries, scraperEngine, indexer.Catalog, logger)
 
 	// WebSocket hub
-	wsHub := ws.NewHub(logger, []byte(cfg.Auth.APIKey.Value()))
+	wsHub := ws.NewHub(logger)
 	bus.Subscribe(wsHub.HandleEvent)
 
 	// HTTP router
@@ -388,8 +390,29 @@ func main() {
 		}
 	}
 
+	// Who may use the app. Settings live in auth.json beside the database.
+	gate, err := auth.Open(auth.Options{
+		App:           "Pulse",
+		APIKey:        cfg.Auth.APIKey.Value(),
+		AllowedHosts:  auth.ListFromEnv("PULSE_SERVER_ALLOWED_HOSTS"),
+		LocalNetworks: auth.ListFromEnv("PULSE_AUTH_LOCAL_NETWORKS"),
+	}, filepath.Dir(cfg.Database.Path), auth.Settings{})
+	if err != nil {
+		logger.Error("failed to load login settings", "error", err)
+		os.Exit(1)
+	}
+	switch gate.Settings().Mode() {
+	case auth.RequiredEverywhere:
+		logger.Info("a login is required from every address")
+	case auth.RequiredOutside:
+		logger.Info("the local network needs no login; other addresses log in")
+	default:
+		logger.Info("no login: the local network gets in, other addresses are refused")
+	}
+
 	router := api.NewRouter(api.RouterConfig{
 		Auth:                  cfg.Auth.APIKey,
+		Gate:                  gate,
 		Logger:                logger,
 		StartTime:             startTime,
 		DBPath:                cfg.Database.Path,
@@ -504,7 +527,6 @@ func main() {
 	go func() {
 		logger.Info("pulse listening", "addr", addr)
 		logger.Info("API docs available", "url", fmt.Sprintf("http://%s/api/docs", addr))
-		logger.Info("API key", "key", cfg.Auth.APIKey.Value())
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			logger.Error("server error", "error", err)
 			os.Exit(1)

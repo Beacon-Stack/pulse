@@ -166,6 +166,20 @@ client.Subscribe(ctx, "media", func(ns, key, value string) {
 
 Pilot and Prism both register with Pulse and pull their indexers, quality profiles, and shared settings from it. Haul registers too, so Pulse can show its health and send notifications on its behalf.
 
+## Access and login
+
+By default Pulse needs no login: devices on your local network get in, and connections from anywhere else are refused. You can change that in Settings → App Settings → Security:
+
+- **None** (default): the local network only, no login.
+- **Login, except on my local network**: anyone outside it needs the username and password.
+- **Login for everyone**.
+
+"Local" means the private address ranges (192.168.x.x, 10.x.x.x, 172.16–31.x.x). If your network uses other addresses, or Pulse sees a different address for your devices (some VPNs and container setups), add the range in the same place or set `PULSE_AUTH_LOCAL_NETWORKS` (comma-separated). The settings page shows the address Pulse sees for you.
+
+No login is only safe while Pulse can't be reached from the internet. If you forward a port or publish it through a proxy, choose a login.
+
+Scripts and the other Beacon apps use the API key, which works whichever option is chosen. If you open Pulse through your own domain name without a login, list the name in `PULSE_SERVER_ALLOWED_HOSTS`.
+
 ## Privacy
 
 Pulse collects nothing: no telemetry, no analytics, no crash reporting. It connects to:

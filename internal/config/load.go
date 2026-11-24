@@ -34,6 +34,9 @@ func Load(configPath string) (*Config, error) {
 	v.SetDefault("server.port", 9696)
 	v.SetDefault("server.external_url", "")
 	v.SetDefault("database.path", filepath.Join(dir, "pulse.db"))
+	// Without a default, viper doesn't know the key exists and ignores
+	// PULSE_AUTH_API_KEY unless a config file happens to mention it.
+	v.SetDefault("auth.api_key", "")
 	v.SetDefault("auth.api_key_file", "")
 	v.SetDefault("log.level", "info")
 	v.SetDefault("log.format", "json")

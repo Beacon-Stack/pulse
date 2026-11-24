@@ -13,8 +13,8 @@
 // "Local" means loopback, the private address ranges, link-local, and
 // any extra ranges the owner lists (Settings.LocalNetworks).
 //
-// An X-Api-Key header with the app's API key is accepted in every mode:
-// it is how scripts and the other apps get in.
+// The app's API key, in an X-Api-Key header or an apikey query parameter,
+// is accepted in every mode: it is how scripts and the other apps get in.
 package auth
 
 import (
@@ -304,10 +304,17 @@ const (
 
 func (a *Auth) authenticate(r *http.Request) (Method, string) {
 	if key := r.Header.Get("X-Api-Key"); key != "" {
-		if len(a.apiKey) > 0 && subtle.ConstantTimeCompare([]byte(key), a.apiKey) == 1 {
+		if a.keyMatches(key) {
 			return MethodAPIKey, ""
 		}
 		return MethodNone, reasonBadKey
+	}
+	// The key may also come as ?apikey=, the Sonarr/Radarr convention that
+	// dashboards built for those apps use. A value that isn't this app's
+	// key is ignored, not refused: Torznab clients put an indexer's own
+	// key in the same parameter.
+	if key := r.URL.Query().Get("apikey"); key != "" && a.keyMatches(key) {
+		return MethodAPIKey, ""
 	}
 	mode := a.Settings().Mode()
 	if mode != RequiredNone {
@@ -332,6 +339,10 @@ func (a *Auth) authenticate(r *http.Request) (Method, string) {
 		return MethodNone, reasonUntrusted
 	}
 	return MethodLocal, ""
+}
+
+func (a *Auth) keyMatches(key string) bool {
+	return len(a.apiKey) > 0 && subtle.ConstantTimeCompare([]byte(key), a.apiKey) == 1
 }
 
 func (a *Auth) refusal(r *http.Request, reason string) string {
@@ -486,17 +497,26 @@ func crossSiteSafe(r *http.Request) bool {
 	case "same-origin", "none":
 		return true
 	case "":
-		// Not a browser, or an older one without Fetch Metadata. Fall
-		// back to Origin for anything that can change state.
-		if r.Method == http.MethodGet || r.Method == http.MethodHead || r.Method == http.MethodOptions {
-			return true
-		}
+		// Not a browser, an older one without Fetch Metadata, or a
+		// WebSocket handshake (browsers don't all send Fetch Metadata on
+		// those). Fall back to Origin.
 		origin := r.Header.Get("Origin")
 		if origin == "" {
 			return true
 		}
 		u, err := url.Parse(origin)
-		return err == nil && u.Host == r.Host
+		if err != nil {
+			return false
+		}
+		if strings.EqualFold(r.Header.Get("Upgrade"), "websocket") {
+			// Same machine, any port: a dev server proxying the socket
+			// has its own port. Another site has another name.
+			return strings.EqualFold(u.Hostname(), hostName(r.Host))
+		}
+		if r.Method == http.MethodGet || r.Method == http.MethodHead || r.Method == http.MethodOptions {
+			return true
+		}
+		return u.Host == r.Host
 	default: // "same-site", "cross-site", or anything unexpected
 		return false
 	}

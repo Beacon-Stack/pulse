@@ -1,11 +1,14 @@
 package auth
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // FileStore keeps the login settings in one JSON file next to the app's
@@ -59,4 +62,30 @@ func (f FileStore) Save(s Settings) error {
 		return err
 	}
 	return os.Rename(tmp.Name(), f.Path)
+}
+
+// LoadOrCreateKey returns the API key kept in path, making a new random
+// one the first time. Apps that aren't given a key in their config use
+// it so the key, and with it every login session, survives a restart.
+func LoadOrCreateKey(path string) (key string, created bool, err error) {
+	b, err := os.ReadFile(path)
+	if err == nil {
+		if k := strings.TrimSpace(string(b)); k != "" {
+			return k, false, nil
+		}
+	} else if !errors.Is(err, fs.ErrNotExist) {
+		return "", false, err
+	}
+	raw := make([]byte, 32)
+	if _, err := rand.Read(raw); err != nil {
+		return "", false, err
+	}
+	key = hex.EncodeToString(raw)
+	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
+		return "", false, err
+	}
+	if err := os.WriteFile(path, []byte(key+"\n"), 0o600); err != nil {
+		return "", false, err
+	}
+	return key, true, nil
 }

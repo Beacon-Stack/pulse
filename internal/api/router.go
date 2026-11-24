@@ -1,10 +1,12 @@
 package api
 
 import (
-	"crypto/subtle"
 	"log/slog"
 	"net/http"
 	"time"
+
+	"github.com/beacon-stack/pulse/pkg/auth"
+	"github.com/beacon-stack/pulse/pkg/auth/authapi"
 
 	"github.com/beacon-stack/pulse/internal/version"
 	"github.com/beacon-stack/pulse/pkg/notify"
@@ -37,6 +39,9 @@ import (
 
 // RouterConfig holds everything the router needs to function.
 type RouterConfig struct {
+	// Gate decides who may use the app. When nil, one is built from Auth
+	// with default settings: no login, local network only.
+	Gate                  *auth.Auth
 	Auth                  appconfig.Secret
 	Logger                *slog.Logger
 	StartTime             time.Time
@@ -77,16 +82,30 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	r.Use(middleware.RequestLogger(cfg.Logger))
 	r.Use(middleware.Recovery(cfg.Logger))
 
-	// WebSocket — auth handled inside the hub.
+	// Who may use the app (pkg/auth): by default the local network without
+	// a login. Login, logout and status are the only open /api routes.
+	gate := cfg.Gate
+	if gate == nil {
+		gate = auth.New(auth.Options{App: "Pulse", APIKey: cfg.Auth.Value()}, auth.Settings{})
+	}
+	r.Get("/api/v1/auth/status", gate.StatusHandler())
+	r.Post("/api/v1/auth/login", gate.LoginHandler())
+	r.Post("/api/v1/auth/logout", gate.LogoutHandler())
+
+	// Everything registered on protected goes through the gate. It is
+	// attached per route, not by path prefix, so nothing routes around it.
+	protected := r.With(gate.Middleware)
+
+	// WebSocket. On chi directly so the upgrade bypasses huma.
 	if cfg.WSHub != nil {
-		r.Get("/api/v1/ws", cfg.WSHub.ServeHTTP)
+		protected.Get("/api/v1/ws", cfg.WSHub.ServeHTTP)
 	}
 
-	// Torznab proxy — registered directly on chi (XML responses, not JSON).
-	// Auth is via the apikey query parameter (standard Torznab auth).
+	// Torznab proxy, on chi directly (XML responses, not JSON). The apps
+	// reach it over the container network, which counts as local.
 	if cfg.ScraperEngine != nil && cfg.Queries != nil {
 		torznabHandler := v1.NewTorznabHandler(cfg.ScraperEngine, cfg.Queries, cfg.IndexerManager, cfg.ExternalURL, cfg.Logger)
-		v1.RegisterTorznabRoutes(r, torznabHandler)
+		v1.RegisterTorznabRoutes(protected, torznabHandler)
 	}
 
 	// Unauthenticated health check for container probes.
@@ -103,7 +122,7 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	humaConfig.Info.Description = "Pulse — centralized control plane for the Arr ecosystem. " +
 		"Manages service registration, discovery, shared configuration, and indexer assignment."
 
-	humaAPI := humachi.New(r, humaConfig)
+	humaAPI := humachi.New(protected, humaConfig)
 
 	// Security scheme for docs UI.
 	oapi := humaAPI.OpenAPI()
@@ -120,19 +139,7 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	}
 	oapi.Security = []map[string][]string{{"ApiKeyAuth": {}}}
 
-	// Auth middleware.
-	apiKeyBytes := []byte(cfg.Auth.Value())
-	humaAPI.UseMiddleware(func(ctx huma.Context, next func(huma.Context)) {
-		if ctx.Header("Sec-Fetch-Site") == "same-origin" {
-			next(ctx)
-			return
-		}
-		if len(apiKeyBytes) > 0 && subtle.ConstantTimeCompare([]byte(ctx.Header("X-Api-Key")), apiKeyBytes) == 1 {
-			next(ctx)
-			return
-		}
-		_ = huma.WriteErr(humaAPI, ctx, http.StatusUnauthorized, "A valid X-Api-Key header is required.")
-	})
+	authapi.Register(humaAPI, gate)
 
 	// Register route groups.
 	v1.RegisterSystemRoutes(humaAPI, cfg.StartTime, cfg.DBPath)

@@ -4,7 +4,6 @@ package ws
 
 import (
 	"context"
-	"crypto/subtle"
 	"encoding/json"
 	"log/slog"
 	"net/http"
@@ -26,15 +25,13 @@ type Hub struct {
 	mu      sync.Mutex
 	clients map[chan []byte]struct{}
 	logger  *slog.Logger
-	apiKey  []byte
 }
 
 // NewHub creates a Hub that broadcasts events to connected WebSocket clients.
-func NewHub(logger *slog.Logger, apiKey []byte) *Hub {
+func NewHub(logger *slog.Logger) *Hub {
 	return &Hub{
 		clients: make(map[chan []byte]struct{}),
 		logger:  logger,
-		apiKey:  apiKey,
 	}
 }
 
@@ -59,15 +56,9 @@ func (h *Hub) HandleEvent(_ context.Context, e events.Event) {
 }
 
 // ServeHTTP upgrades the connection to WebSocket and starts pumping events.
+// It has no authentication of its own: the router mounts it behind the
+// auth gate (pkg/auth), which also rejects cross-site handshakes.
 func (h *Hub) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// Auth: same-origin browser requests are trusted; external clients need API key.
-	if r.Header.Get("Sec-Fetch-Site") != "same-origin" {
-		if subtle.ConstantTimeCompare([]byte(r.Header.Get("X-Api-Key")), h.apiKey) != 1 {
-			http.Error(w, `{"status":401,"title":"Unauthorized"}`, http.StatusUnauthorized)
-			return
-		}
-	}
-
 	conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{
 		InsecureSkipVerify: true,
 		CompressionMode:    websocket.CompressionContextTakeover,

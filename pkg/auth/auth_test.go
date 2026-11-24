@@ -118,6 +118,23 @@ func TestEveryoneMustLogIn(t *testing.T) {
 	if method(a, r) != MethodAPIKey {
 		t.Fatal("API key should work in every mode")
 	}
+	r = httptest.NewRequest("GET", "/api/v3/movie?apikey="+testKey, nil)
+	r.RemoteAddr = wanClient
+	if method(a, r) != MethodAPIKey {
+		t.Fatal("the key as ?apikey= should work, as in Sonarr and Radarr")
+	}
+	// A different value in ?apikey= (a Torznab client sending an indexer's
+	// key) is ignored: it neither lets the request in nor gets it refused.
+	open := newAuth(Settings{})
+	r = httptest.NewRequest("GET", "/api/v1/torznab/x/api?t=search&apikey=some-indexer-key", nil)
+	r.RemoteAddr, r.Host = "172.18.0.4:1", "pulse:9696"
+	if method(open, r) != MethodLocal {
+		t.Fatal("an unrelated ?apikey= on the local network should fall through to the address rule")
+	}
+	r.RemoteAddr = wanClient
+	if method(open, r) != MethodNone {
+		t.Fatal("an unrelated ?apikey= from outside gets nobody in")
+	}
 	r = request("GET", lanClient)
 	r.Header.Set("X-Api-Key", "wrong")
 	if method(newAuth(Settings{}), r) != MethodNone {
@@ -433,5 +450,44 @@ func TestOpenAndFixedNetworks(t *testing.T) {
 	}
 	if b.Settings().Username != "" || b.Settings().Mode() != RequiredNone {
 		t.Fatalf("second start should use what was saved, not the seed: %+v", b.Settings())
+	}
+}
+
+// A page on another site opening a WebSocket to the app must be refused;
+// browsers mark those only with Origin.
+func TestCrossSiteWebSocketRefused(t *testing.T) {
+	a := newAuth(Settings{})
+	reached := 0
+	h := a.Middleware(http.HandlerFunc(func(http.ResponseWriter, *http.Request) { reached++ }))
+	ws := func(origin string) int {
+		r := request("GET", lanClient)
+		r.Header.Set("Upgrade", "websocket")
+		if origin != "" {
+			r.Header.Set("Origin", origin)
+		}
+		w := httptest.NewRecorder()
+		h.ServeHTTP(w, r)
+		return w.Code
+	}
+	if code := ws("http://evil.example.com"); code != http.StatusForbidden || reached != 0 {
+		t.Fatalf("socket from another site: %d", code)
+	}
+	ws("http://192.168.1.10:8383") // the app's own page
+	ws("http://192.168.1.10:5173") // a dev server on the same machine
+	ws("")                         // not a browser
+	if reached != 3 {
+		t.Fatalf("own-origin sockets let in: %d of 3", reached)
+	}
+}
+
+func TestLoadOrCreateKey(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "data", "api_key")
+	k1, created, err := LoadOrCreateKey(path)
+	if err != nil || !created || len(k1) != 64 {
+		t.Fatalf("first call: %q created=%v err=%v", k1, created, err)
+	}
+	k2, created, err := LoadOrCreateKey(path)
+	if err != nil || created || k2 != k1 {
+		t.Fatalf("second call should return the same key: %q created=%v err=%v", k2, created, err)
 	}
 }
