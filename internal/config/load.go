@@ -135,32 +135,6 @@ type APIKeyStore interface {
 	SetAPIKey(ctx context.Context, value string) error
 }
 
-// WriteDefault writes a default config file to the given path.
-func WriteDefault(path string) error {
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-		return err
-	}
-
-	key, _ := generateAPIKey()
-	content := fmt.Sprintf(`# Pulse configuration
-server:
-  host: "0.0.0.0"
-  port: 9696
-
-database:
-  path: "%s"
-
-log:
-  level: info
-  format: json
-
-auth:
-  api_key: "%s"
-`, filepath.Join(dataDir(), "pulse.db"), key)
-
-	return os.WriteFile(path, []byte(content), 0o600)
-}
-
 func generateAPIKey() (string, error) {
 	b := make([]byte, 32)
 	if _, err := rand.Read(b); err != nil {

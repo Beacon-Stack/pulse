@@ -12,11 +12,11 @@ import (
 // Engine is the top-level scraping coordinator. It manages definitions,
 // runners, and the result cache.
 type Engine struct {
-	rawStore     map[string][]byte  // catalog_id → raw YAML bytes
-	nameToID     map[string]string  // normalized name → catalog_id
-	urlToID      map[string]string  // domain → catalog_id
+	rawStore     map[string][]byte // catalog_id → raw YAML bytes
+	nameToID     map[string]string // normalized name → catalog_id
+	urlToID      map[string]string // domain → catalog_id
 	mu           sync.RWMutex
-	runners      sync.Map           // catalog_id + "\x00" + settings JSON → *Runner
+	runners      sync.Map // catalog_id + "\x00" + settings JSON → *Runner
 	cache        *ResultCache
 	flaresolverr *FlareSolverr
 	logger       *slog.Logger
@@ -191,13 +191,6 @@ func (e *Engine) ResolveCatalogID(name, url string) string {
 	}
 
 	return ""
-}
-
-// DefinitionCount returns how many definitions are loaded.
-func (e *Engine) DefinitionCount() int {
-	e.mu.RLock()
-	defer e.mu.RUnlock()
-	return len(e.rawStore)
 }
 
 // normalizeName strips spaces, dots, dashes and lowercases for fuzzy matching.

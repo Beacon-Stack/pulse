@@ -9,12 +9,6 @@ SELECT * FROM download_clients WHERE id = ?;
 -- name: ListDownloadClients :many
 SELECT * FROM download_clients ORDER BY priority ASC, name ASC;
 
--- name: ListEnabledDownloadClients :many
-SELECT * FROM download_clients WHERE enabled = TRUE ORDER BY priority ASC, name ASC;
-
--- name: ListDownloadClientsByProtocol :many
-SELECT * FROM download_clients WHERE protocol = ? ORDER BY priority ASC, name ASC;
-
 -- name: UpdateDownloadClient :one
 UPDATE download_clients SET
     name       = ?,

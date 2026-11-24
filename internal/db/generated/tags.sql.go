@@ -9,36 +9,6 @@ import (
 	"context"
 )
 
-const addIndexerTag = `-- name: AddIndexerTag :exec
-INSERT INTO indexer_tags (indexer_id, tag_id) VALUES (?, ?)
-ON CONFLICT DO NOTHING
-`
-
-type AddIndexerTagParams struct {
-	IndexerID string `json:"indexerId"`
-	TagID     string `json:"tagId"`
-}
-
-func (q *Queries) AddIndexerTag(ctx context.Context, arg AddIndexerTagParams) error {
-	_, err := q.db.ExecContext(ctx, addIndexerTag, arg.IndexerID, arg.TagID)
-	return err
-}
-
-const addServiceTag = `-- name: AddServiceTag :exec
-INSERT INTO service_tags (service_id, tag_id) VALUES (?, ?)
-ON CONFLICT DO NOTHING
-`
-
-type AddServiceTagParams struct {
-	ServiceID string `json:"serviceId"`
-	TagID     string `json:"tagId"`
-}
-
-func (q *Queries) AddServiceTag(ctx context.Context, arg AddServiceTagParams) error {
-	_, err := q.db.ExecContext(ctx, addServiceTag, arg.ServiceID, arg.TagID)
-	return err
-}
-
 const countIndexersForTag = `-- name: CountIndexersForTag :one
 SELECT COUNT(*) FROM indexer_tags WHERE tag_id = ?
 `
@@ -55,6 +25,8 @@ const countServicesForTag = `-- name: CountServicesForTag :one
 SELECT COUNT(*) FROM service_tags WHERE tag_id = ?
 `
 
+// Service tags
+// Indexer tags
 // Counts
 func (q *Queries) CountServicesForTag(ctx context.Context, tagID string) (int64, error) {
 	row := q.db.QueryRowContext(ctx, countServicesForTag, tagID)
@@ -88,82 +60,6 @@ func (q *Queries) DeleteTag(ctx context.Context, id string) error {
 	return err
 }
 
-const getTag = `-- name: GetTag :one
-SELECT id, name FROM tags WHERE id = ?
-`
-
-func (q *Queries) GetTag(ctx context.Context, id string) (Tag, error) {
-	row := q.db.QueryRowContext(ctx, getTag, id)
-	var i Tag
-	err := row.Scan(&i.ID, &i.Name)
-	return i, err
-}
-
-const getTagByName = `-- name: GetTagByName :one
-SELECT id, name FROM tags WHERE name = ?
-`
-
-func (q *Queries) GetTagByName(ctx context.Context, name string) (Tag, error) {
-	row := q.db.QueryRowContext(ctx, getTagByName, name)
-	var i Tag
-	err := row.Scan(&i.ID, &i.Name)
-	return i, err
-}
-
-const listIndexerTagIDs = `-- name: ListIndexerTagIDs :many
-SELECT tag_id FROM indexer_tags WHERE indexer_id = ?
-`
-
-func (q *Queries) ListIndexerTagIDs(ctx context.Context, indexerID string) ([]string, error) {
-	rows, err := q.db.QueryContext(ctx, listIndexerTagIDs, indexerID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []string
-	for rows.Next() {
-		var tag_id string
-		if err := rows.Scan(&tag_id); err != nil {
-			return nil, err
-		}
-		items = append(items, tag_id)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const listServiceTagIDs = `-- name: ListServiceTagIDs :many
-SELECT tag_id FROM service_tags WHERE service_id = ?
-`
-
-func (q *Queries) ListServiceTagIDs(ctx context.Context, serviceID string) ([]string, error) {
-	rows, err := q.db.QueryContext(ctx, listServiceTagIDs, serviceID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []string
-	for rows.Next() {
-		var tag_id string
-		if err := rows.Scan(&tag_id); err != nil {
-			return nil, err
-		}
-		items = append(items, tag_id)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const listTags = `-- name: ListTags :many
 SELECT id, name FROM tags ORDER BY name ASC
 `
@@ -189,28 +85,6 @@ func (q *Queries) ListTags(ctx context.Context) ([]Tag, error) {
 		return nil, err
 	}
 	return items, nil
-}
-
-const setIndexerTags = `-- name: SetIndexerTags :exec
-
-DELETE FROM indexer_tags WHERE indexer_id = ?
-`
-
-// Indexer tags
-func (q *Queries) SetIndexerTags(ctx context.Context, indexerID string) error {
-	_, err := q.db.ExecContext(ctx, setIndexerTags, indexerID)
-	return err
-}
-
-const setServiceTags = `-- name: SetServiceTags :exec
-
-DELETE FROM service_tags WHERE service_id = ?
-`
-
-// Service tags
-func (q *Queries) SetServiceTags(ctx context.Context, serviceID string) error {
-	_, err := q.db.ExecContext(ctx, setServiceTags, serviceID)
-	return err
 }
 
 const updateTag = `-- name: UpdateTag :one

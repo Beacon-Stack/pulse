@@ -27,19 +27,6 @@ export interface RegisterServiceInput {
 
 // ── Config ───────────────────────────────────────────────────────────────────
 
-export interface ConfigEntry {
-  namespace: string;
-  key: string;
-  value: string;
-  updated_at: string;
-}
-
-export interface SetConfigInput {
-  namespace: string;
-  key: string;
-  value: string;
-}
-
 // ── Indexers ─────────────────────────────────────────────────────────────────
 
 // Per-indexer stats measured from real searches over the last 30 days
@@ -88,7 +75,7 @@ export interface CatalogSiteHealth {
   last_error?: string;
 }
 
-export interface CatalogTesterStatus {
+interface CatalogTesterStatus {
   running: boolean;
   cycle_started_at?: string;
   last_cycle_ended_at?: string;
@@ -152,7 +139,7 @@ export interface IndexerAssignment {
 
 // ── Catalog ──────────────────────────────────────────────────────────────────
 
-export interface CatalogFieldOption {
+interface CatalogFieldOption {
   name: string;
   value: string;
 }

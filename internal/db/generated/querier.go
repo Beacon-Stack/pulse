@@ -11,79 +11,58 @@ import (
 type Querier interface {
 	// Capabilities
 	AddCapability(ctx context.Context, arg AddCapabilityParams) error
-	AddIndexerTag(ctx context.Context, arg AddIndexerTagParams) error
-	AddServiceTag(ctx context.Context, arg AddServiceTagParams) error
 	CountIndexersForTag(ctx context.Context, tagID string) (int64, error)
-	CountServicesByType(ctx context.Context, type_ string) (int64, error)
+	// Service tags
+	// Indexer tags
 	// Counts
 	CountServicesForTag(ctx context.Context, tagID string) (int64, error)
 	// Assignments
 	CreateAssignment(ctx context.Context, arg CreateAssignmentParams) (IndexerAssignment, error)
 	CreateDownloadClient(ctx context.Context, arg CreateDownloadClientParams) (DownloadClient, error)
-	CreateFilterPreset(ctx context.Context, arg CreateFilterPresetParams) (FilterPreset, error)
 	CreateIndexer(ctx context.Context, arg CreateIndexerParams) (Indexer, error)
 	CreateQualityProfile(ctx context.Context, arg CreateQualityProfileParams) (QualityProfile, error)
 	CreateService(ctx context.Context, arg CreateServiceParams) (Service, error)
 	CreateTag(ctx context.Context, arg CreateTagParams) (Tag, error)
 	DeleteAssignment(ctx context.Context, arg DeleteAssignmentParams) error
 	DeleteAssignmentsByIndexer(ctx context.Context, indexerID string) error
-	DeleteAssignmentsByService(ctx context.Context, serviceID string) error
 	DeleteCapabilities(ctx context.Context, serviceID string) error
 	DeleteConfigEntry(ctx context.Context, arg DeleteConfigEntryParams) error
-	DeleteConfigNamespace(ctx context.Context, namespace string) error
 	DeleteDownloadClient(ctx context.Context, id string) error
 	DeleteFilterPreset(ctx context.Context, id string) error
-	DeleteFilterPresetByName(ctx context.Context, name string) error
 	DeleteIndexer(ctx context.Context, id string) error
 	DeleteQualityProfile(ctx context.Context, id string) error
 	DeleteService(ctx context.Context, id string) error
-	DeleteSubscriptionsByService(ctx context.Context, serviceID string) error
 	DeleteTag(ctx context.Context, id string) error
-	GetAssignmentOverrides(ctx context.Context, arg GetAssignmentOverridesParams) (string, error)
 	GetConfigEntry(ctx context.Context, arg GetConfigEntryParams) (ConfigEntry, error)
 	GetDownloadClient(ctx context.Context, id string) (DownloadClient, error)
-	GetFilterPreset(ctx context.Context, id string) (FilterPreset, error)
-	GetFilterPresetByName(ctx context.Context, name string) (FilterPreset, error)
 	GetIndexer(ctx context.Context, id string) (Indexer, error)
 	GetQualityProfile(ctx context.Context, id string) (QualityProfile, error)
 	GetService(ctx context.Context, id string) (Service, error)
 	GetServiceByNameAndType(ctx context.Context, arg GetServiceByNameAndTypeParams) (Service, error)
 	GetSharedMediaHandling(ctx context.Context) (SharedMediaHandling, error)
-	GetTag(ctx context.Context, id string) (Tag, error)
-	GetTagByName(ctx context.Context, name string) (Tag, error)
 	InsertCatalogProbe(ctx context.Context, arg InsertCatalogProbeParams) (int64, error)
 	InsertOverlapEvent(ctx context.Context, arg InsertOverlapEventParams) error
 	InsertSearchEvent(ctx context.Context, arg InsertSearchEventParams) error
-	ListAllConfig(ctx context.Context) ([]ConfigEntry, error)
 	ListAssignmentsByIndexer(ctx context.Context, indexerID string) ([]IndexerAssignment, error)
 	ListAssignmentsByService(ctx context.Context, serviceID string) ([]IndexerAssignment, error)
 	ListCapabilities(ctx context.Context, serviceID string) ([]string, error)
 	ListCatalogProbesSince(ctx context.Context, at string) ([]CatalogProbe, error)
-	ListConfigByNamespace(ctx context.Context, namespace string) ([]ConfigEntry, error)
-	ListConfigNamespaces(ctx context.Context) ([]string, error)
 	ListDownloadClients(ctx context.Context) ([]DownloadClient, error)
-	ListDownloadClientsByProtocol(ctx context.Context, protocol string) ([]DownloadClient, error)
-	ListEnabledDownloadClients(ctx context.Context) ([]DownloadClient, error)
 	ListEnabledIndexers(ctx context.Context) ([]Indexer, error)
 	ListFilterPresets(ctx context.Context) ([]FilterPreset, error)
-	ListIndexerTagIDs(ctx context.Context, indexerID string) ([]string, error)
 	ListIndexers(ctx context.Context) ([]Indexer, error)
 	// Indexers whose catalog definition vanished can only fail searches, so
 	// they are withheld from services entirely; the service's next sync then
 	// drops its local copy.
 	ListIndexersForService(ctx context.Context, serviceID string) ([]Indexer, error)
-	ListOnlineServices(ctx context.Context) ([]Service, error)
 	ListOverlapEventsSince(ctx context.Context, at string) ([]IndexerOverlapEvent, error)
 	ListQualityProfiles(ctx context.Context) ([]QualityProfile, error)
 	// Distinct recent real queries of one mode, newest first.
 	ListRecentQueries(ctx context.Context, arg ListRecentQueriesParams) ([]ListRecentQueriesRow, error)
 	ListSearchEventsSince(ctx context.Context, at string) ([]IndexerSearchEvent, error)
-	ListServiceTagIDs(ctx context.Context, serviceID string) ([]string, error)
 	ListServices(ctx context.Context) ([]Service, error)
 	ListServicesByCapability(ctx context.Context, capability string) ([]Service, error)
 	ListServicesByType(ctx context.Context, type_ string) ([]Service, error)
-	ListSubscribersByNamespace(ctx context.Context, namespace string) ([]Service, error)
-	ListSubscriptionsByService(ctx context.Context, serviceID string) ([]string, error)
 	ListTags(ctx context.Context) ([]Tag, error)
 	PruneCatalogProbes(ctx context.Context, at string) error
 	PruneOverlapEvents(ctx context.Context, at string) error
@@ -92,15 +71,10 @@ type Querier interface {
 	SetConfigEntry(ctx context.Context, arg SetConfigEntryParams) (ConfigEntry, error)
 	SetIndexerHealth(ctx context.Context, arg SetIndexerHealthParams) error
 	SetIndexerSearchHealth(ctx context.Context, arg SetIndexerSearchHealthParams) error
-	// Indexer tags
-	SetIndexerTags(ctx context.Context, indexerID string) error
-	// Service tags
-	SetServiceTags(ctx context.Context, serviceID string) error
 	// Subscriptions
 	Subscribe(ctx context.Context, arg SubscribeParams) error
 	Unsubscribe(ctx context.Context, arg UnsubscribeParams) error
 	UpdateDownloadClient(ctx context.Context, arg UpdateDownloadClientParams) (DownloadClient, error)
-	UpdateFilterPreset(ctx context.Context, arg UpdateFilterPresetParams) (FilterPreset, error)
 	UpdateIndexer(ctx context.Context, arg UpdateIndexerParams) (Indexer, error)
 	UpdateQualityProfile(ctx context.Context, arg UpdateQualityProfileParams) (QualityProfile, error)
 	UpdateService(ctx context.Context, arg UpdateServiceParams) (Service, error)

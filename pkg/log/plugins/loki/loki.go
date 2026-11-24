@@ -46,9 +46,9 @@ type Config struct {
 	URL     string
 
 	// Auth (all optional)
-	TenantID     string
-	BasicUser    string
-	BasicPass    string
+	TenantID  string
+	BasicUser string
+	BasicPass string
 
 	// Batcher tuning. Defaults are reasonable for steady-state
 	// homelab traffic; bump MaxBatchSize for very chatty services.

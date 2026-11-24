@@ -34,7 +34,7 @@ export function needsOverlayNetwork(urls: string[]): boolean {
   });
 }
 
-export function errorLabel(kind?: string): string {
+function errorLabel(kind?: string): string {
   return kind ? errorLabels[kind] ?? kind : "";
 }
 

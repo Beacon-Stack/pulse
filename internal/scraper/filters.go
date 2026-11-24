@@ -240,7 +240,7 @@ func dotnetToGoFormat(format string) string {
 		"d", "2",
 		"HH", "15",
 		"hh", "03",
-		"htt", "03",     // Cardigann-specific: hour + am/pm
+		"htt", "03", // Cardigann-specific: hour + am/pm
 		"mm", "04",
 		"ss", "05",
 		"tt", "PM",

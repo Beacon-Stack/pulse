@@ -64,9 +64,6 @@ DELETE FROM indexer_assignments WHERE indexer_id = ? AND service_id = ?;
 -- name: DeleteAssignmentsByIndexer :exec
 DELETE FROM indexer_assignments WHERE indexer_id = ?;
 
--- name: DeleteAssignmentsByService :exec
-DELETE FROM indexer_assignments WHERE service_id = ?;
-
 -- name: ListIndexersForService :many
 -- Indexers whose catalog definition vanished can only fail searches, so
 -- they are withheld from services entirely; the service's next sync then
@@ -77,5 +74,3 @@ WHERE ia.service_id = ?
   AND i.health_status != 'definition_missing'
 ORDER BY i.priority ASC, i.name ASC;
 
--- name: GetAssignmentOverrides :one
-SELECT overrides FROM indexer_assignments WHERE indexer_id = ? AND service_id = ?;

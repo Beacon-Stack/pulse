@@ -5,6 +5,7 @@
 //   - registry.Service — the canonical list of registered services
 //   - dockerstats.Client — per-container CPU / memory / net (optional)
 //   - gluetun.Client — VPN status (optional)
+//
 // plus per-service /api/v1/stats and /api/v1/system/runtime fetched live.
 //
 // Every dependency may be nil (Docker socket not mounted, no Gluetun
@@ -34,11 +35,11 @@ const fanoutTimeout = 2 * time.Second
 
 // Aggregator builds dashboard payloads.
 type Aggregator struct {
-	Registry        *registry.Service
-	Docker          *dockerstats.Client
-	Gluetun         *gluetun.Client
-	HTTP            *http.Client
-	GluetunService  string // logical name used for the VPN container's stats card; default "vpn"
+	Registry       *registry.Service
+	Docker         *dockerstats.Client
+	Gluetun        *gluetun.Client
+	HTTP           *http.Client
+	GluetunService string // logical name used for the VPN container's stats card; default "vpn"
 }
 
 // New returns an aggregator with sane defaults.
@@ -87,24 +88,24 @@ type ActiveDownload struct {
 // Bundles items from both managers into a single feed so the dashboard
 // can show "what's being processed" without per-service silos.
 type ActiveImport struct {
-	ServiceID    string  `json:"service_id"`
-	ServiceName  string  `json:"service_name"`
-	Title        string  `json:"title"`
-	Status       string  `json:"status"`
-	Size         int64   `json:"size"`
-	Downloaded   int64   `json:"downloaded_bytes"`
-	Progress     float64 `json:"progress"` // 0-1, derived
-	GrabbedAt    string  `json:"grabbed_at"`
+	ServiceID   string  `json:"service_id"`
+	ServiceName string  `json:"service_name"`
+	Title       string  `json:"title"`
+	Status      string  `json:"status"`
+	Size        int64   `json:"size"`
+	Downloaded  int64   `json:"downloaded_bytes"`
+	Progress    float64 `json:"progress"` // 0-1, derived
+	GrabbedAt   string  `json:"grabbed_at"`
 }
 
 // ServiceSummary is a per-service card in the dashboard grid.
 type ServiceSummary struct {
-	ID        string           `json:"id"`
-	Name      string           `json:"name"`
-	Type      string           `json:"type"`
-	Status    string           `json:"status"`
-	Version   string           `json:"version"`
-	Container *ContainerStats  `json:"container,omitempty"`
+	ID        string          `json:"id"`
+	Name      string          `json:"name"`
+	Type      string          `json:"type"`
+	Status    string          `json:"status"`
+	Version   string          `json:"version"`
+	Container *ContainerStats `json:"container,omitempty"`
 }
 
 // ContainerStats is the dashboard-relevant subset of dockerstats.Stats.
@@ -200,9 +201,9 @@ func (a *Aggregator) Overview(ctx context.Context) (*Overview, error) {
 	}
 
 	var (
-		wg       sync.WaitGroup
-		mu       sync.Mutex
-		out      = &Overview{Services: make([]ServiceSummary, len(services))}
+		wg  sync.WaitGroup
+		mu  sync.Mutex
+		out = &Overview{Services: make([]ServiceSummary, len(services))}
 	)
 
 	for i, svc := range services {

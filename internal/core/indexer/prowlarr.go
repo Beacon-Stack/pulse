@@ -38,7 +38,7 @@ type prowlarrDef struct {
 	Name        string   `yaml:"name"`
 	Description string   `yaml:"description"`
 	Language    string   `yaml:"language"`
-	Type        string   `yaml:"type"`     // public, semi-private, private
+	Type        string   `yaml:"type"` // public, semi-private, private
 	Links       []string `yaml:"links"`
 	LegacyLinks []string `yaml:"legacylinks"`
 	Caps        struct {
@@ -56,9 +56,9 @@ type ProwlarrCatalog struct {
 	fetched   time.Time
 	client    *http.Client
 	logger    *slog.Logger
-	fallback  []CatalogEntry // static fallback if fetch fails
-	rawYAML   map[string][]byte // catalog_id → raw YAML bytes for the scraper engine
-	cachePath string            // on-disk copy of the last fetched zipball ("" disables)
+	fallback  []CatalogEntry          // static fallback if fetch fails
+	rawYAML   map[string][]byte       // catalog_id → raw YAML bytes for the scraper engine
+	cachePath string                  // on-disk copy of the last fetched zipball ("" disables)
 	onUpdate  func(map[string][]byte) // called whenever definitions are (re)loaded
 }
 
@@ -73,14 +73,6 @@ func NewProwlarrCatalog(logger *slog.Logger) *ProwlarrCatalog {
 		rawYAML:  make(map[string][]byte),
 	}
 	return pc
-}
-
-// RawYAML returns the raw YAML bytes for a catalog entry, used by the scraper engine.
-func (pc *ProwlarrCatalog) RawYAML(catalogID string) ([]byte, bool) {
-	pc.mu.RLock()
-	defer pc.mu.RUnlock()
-	raw, ok := pc.rawYAML[catalogID]
-	return raw, ok
 }
 
 // AllRawYAML returns all raw YAML bytes, keyed by catalog ID.

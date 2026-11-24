@@ -386,7 +386,6 @@ func (h *TorznabHandler) xmlError(w http.ResponseWriter, code int, description s
 	_ = xml.NewEncoder(w).Encode(torznabError{Code: code, Description: description})
 }
 
-
 // HandleDownload resolves a download URL from a detail page and redirects to it.
 // This proxies downloads through Pulse so the client doesn't need CF cookies
 // or tracker sessions. The detail page URL is passed via ?url= query param.
@@ -509,10 +508,10 @@ func (h *TorznabHandler) HandleTestSearch(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		if scraper.IsCloudflareError(err) {
 			writeJSON(w, TestSearchResult{
-				Success:     false,
-				Message:     "Blocked by Cloudflare — this indexer requires FlareSolverr to bypass browser verification",
-				Duration:    since(start),
-				Cloudflare:  true,
+				Success:    false,
+				Message:    "Blocked by Cloudflare — this indexer requires FlareSolverr to bypass browser verification",
+				Duration:   since(start),
+				Cloudflare: true,
 			})
 		} else {
 			writeJSON(w, TestSearchResult{Success: false, Message: "Search failed: " + err.Error(), Duration: since(start)})

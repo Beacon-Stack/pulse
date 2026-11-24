@@ -488,8 +488,8 @@ export const THEME_PRESETS: ThemePreset[] = [
   },
 ];
 
-export const DEFAULT_DARK_PRESET = "pulse";
-export const DEFAULT_LIGHT_PRESET = "beacon-light";
+const DEFAULT_DARK_PRESET = "pulse";
+const DEFAULT_LIGHT_PRESET = "beacon-light";
 
 const KEY_MODE = "pulse-theme-mode";
 const KEY_DARK = "pulse-theme-dark";
@@ -517,7 +517,7 @@ function applyPreset(preset: ThemePreset): void {
   root.style.setProperty("--color-danger", v["danger"]);
 }
 
-export function resolveMode(mode: ThemeMode): "dark" | "light" {
+function resolveMode(mode: ThemeMode): "dark" | "light" {
   if (mode === "system") return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
   return mode;
 }
@@ -533,7 +533,7 @@ export function getStoredPreset(resolvedMode: "dark" | "light"): string {
   return localStorage.getItem(key) ?? (resolvedMode === "dark" ? DEFAULT_DARK_PRESET : DEFAULT_LIGHT_PRESET);
 }
 
-export function findPreset(id: string): ThemePreset {
+function findPreset(id: string): ThemePreset {
   return THEME_PRESETS.find((p) => p.id === id) ?? THEME_PRESETS[0];
 }
 

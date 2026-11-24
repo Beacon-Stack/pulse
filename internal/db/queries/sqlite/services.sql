@@ -15,9 +15,6 @@ SELECT * FROM services ORDER BY type ASC, name ASC;
 -- name: ListServicesByType :many
 SELECT * FROM services WHERE type = ? ORDER BY name ASC;
 
--- name: ListOnlineServices :many
-SELECT * FROM services WHERE status = 'online' ORDER BY type ASC, name ASC;
-
 -- name: UpdateService :one
 UPDATE services SET
     name       = ?,
@@ -39,11 +36,7 @@ UPDATE services SET last_seen = ?, status = 'online' WHERE id = ?;
 -- name: DeleteService :exec
 DELETE FROM services WHERE id = ?;
 
--- name: CountServicesByType :one
-SELECT COUNT(*) FROM services WHERE type = ?;
-
 -- Capabilities
-
 -- name: AddCapability :exec
 INSERT INTO service_capabilities (id, service_id, capability)
 VALUES (?, ?, ?)

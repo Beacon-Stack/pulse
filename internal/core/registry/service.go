@@ -69,14 +69,14 @@ func (s *Service) Register(ctx context.Context, input ServiceInput) (*ServiceInf
 	if err == nil {
 		// Update existing registration.
 		row, err := s.q.UpdateService(ctx, db.UpdateServiceParams{
-			Name:     input.Name,
-			ApiUrl:   input.APIURL,
-			ApiKey:   input.APIKey,
+			Name:      input.Name,
+			ApiUrl:    input.APIURL,
+			ApiKey:    input.APIKey,
 			HealthUrl: input.HealthURL,
-			Version:  input.Version,
-			Metadata: input.Metadata,
-			LastSeen: now,
-			ID:       existing.ID,
+			Version:   input.Version,
+			Metadata:  input.Metadata,
+			LastSeen:  now,
+			ID:        existing.ID,
 		})
 		if err != nil {
 			return nil, fmt.Errorf("updating service: %w", err)
@@ -207,16 +207,6 @@ func (s *Service) ListByCapability(ctx context.Context, capability string) ([]Se
 func (s *Service) Heartbeat(ctx context.Context, id string) error {
 	now := time.Now().UTC().Format(time.RFC3339)
 	return s.q.UpdateServiceHeartbeat(ctx, db.UpdateServiceHeartbeatParams{
-		LastSeen: now,
-		ID:       id,
-	})
-}
-
-// UpdateStatus sets the status for a service.
-func (s *Service) UpdateStatus(ctx context.Context, id, status string) error {
-	now := time.Now().UTC().Format(time.RFC3339)
-	return s.q.UpdateServiceStatus(ctx, db.UpdateServiceStatusParams{
-		Status:   status,
 		LastSeen: now,
 		ID:       id,
 	})

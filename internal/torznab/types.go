@@ -31,8 +31,8 @@ type CapsLimits struct {
 }
 
 type CapsSearching struct {
-	Search     *CapsSearchType `xml:"search,omitempty"`
-	TVSearch   *CapsSearchType `xml:"tv-search,omitempty"`
+	Search      *CapsSearchType `xml:"search,omitempty"`
+	TVSearch    *CapsSearchType `xml:"tv-search,omitempty"`
 	MovieSearch *CapsSearchType `xml:"movie-search,omitempty"`
 }
 
@@ -46,20 +46,20 @@ type CapsCategories struct {
 }
 
 type CapsCategory struct {
-	ID     string           `xml:"id,attr"`
-	Name   string           `xml:"name,attr"`
-	Subcats []CapsCategory  `xml:"subcat,omitempty"`
+	ID      string         `xml:"id,attr"`
+	Name    string         `xml:"name,attr"`
+	Subcats []CapsCategory `xml:"subcat,omitempty"`
 }
 
 // ── Search results feed (returned for ?t=search etc.) ───────────────────────
 
 // Feed is the Torznab RSS search results feed.
 type Feed struct {
-	XMLName  xml.Name `xml:"rss"`
-	Version  string   `xml:"version,attr"`
-	AtomNS   string   `xml:"xmlns:atom,attr,omitempty"`
-	TorznabNS string  `xml:"xmlns:torznab,attr"`
-	Channel  Channel  `xml:"channel"`
+	XMLName   xml.Name `xml:"rss"`
+	Version   string   `xml:"version,attr"`
+	AtomNS    string   `xml:"xmlns:atom,attr,omitempty"`
+	TorznabNS string   `xml:"xmlns:torznab,attr"`
+	Channel   Channel  `xml:"channel"`
 }
 
 type Channel struct {
@@ -167,8 +167,8 @@ func NewFeed(title string, items []Item) Feed {
 // NewCaps creates a capabilities document from category mappings and search modes.
 func NewCaps(title string, cats []CapsCategory, modes map[string][]string) Caps {
 	caps := Caps{
-		Server: CapsServer{Title: title},
-		Limits: CapsLimits{Max: 100, Default: 50},
+		Server:     CapsServer{Title: title},
+		Limits:     CapsLimits{Max: 100, Default: 50},
 		Categories: CapsCategories{Categories: cats},
 	}
 
@@ -270,12 +270,6 @@ func parseRelativeDate(s string) (time.Time, bool) {
 		return time.Time{}, false
 	}
 	return now.Add(-total), true
-}
-
-// ResultToItem converts a scraper SearchResult to a Torznab Item.
-func ResultToItem(r interface{ GetTitle() string }, baseURL string) Item {
-	// This is a placeholder — the actual conversion is done in the handler
-	return Item{}
 }
 
 // SearchResultToItem converts a scraper.SearchResult to a torznab.Item.

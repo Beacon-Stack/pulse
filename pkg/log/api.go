@@ -20,7 +20,7 @@ import (
 // internal Entry but with json-friendly types.
 type logEntryBody struct {
 	Time    time.Time      `json:"time"`
-	Level   string         `json:"level"`   // "DEBUG" | "INFO" | "WARN" | "ERROR"
+	Level   string         `json:"level"` // "DEBUG" | "INFO" | "WARN" | "ERROR"
 	Message string         `json:"message"`
 	Fields  map[string]any `json:"fields,omitempty"`
 }

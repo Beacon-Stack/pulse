@@ -2,12 +2,13 @@ package api
 
 import (
 	"crypto/subtle"
-	"github.com/beacon-stack/pulse/internal/version"
-	"github.com/beacon-stack/pulse/pkg/notify"
-	"github.com/beacon-stack/pulse/pkg/notify/notifyapi"
 	"log/slog"
 	"net/http"
 	"time"
+
+	"github.com/beacon-stack/pulse/internal/version"
+	"github.com/beacon-stack/pulse/pkg/notify"
+	"github.com/beacon-stack/pulse/pkg/notify/notifyapi"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humachi"

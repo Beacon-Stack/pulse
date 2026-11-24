@@ -91,14 +91,14 @@ func TestFetchRuntime(t *testing.T) {
 			return
 		}
 		_ = json.NewEncoder(w).Encode(map[string]any{
-			"goroutines":         42,
-			"heap_alloc_bytes":   1024,
-			"heap_in_use_bytes":  2048,
-			"heap_objects":       100,
-			"num_gc":             5,
-			"last_gc_pause_ns":   1234,
-			"uptime_seconds":     999,
-			"go_version":         "go1.25",
+			"goroutines":        42,
+			"heap_alloc_bytes":  1024,
+			"heap_in_use_bytes": 2048,
+			"heap_objects":      100,
+			"num_gc":            5,
+			"last_gc_pause_ns":  1234,
+			"uptime_seconds":    999,
+			"go_version":        "go1.25",
 		})
 	}))
 	defer srv.Close()

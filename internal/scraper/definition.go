@@ -5,27 +5,27 @@ package scraper
 
 // Definition is the full parsed representation of a Prowlarr Cardigann YAML file.
 type Definition struct {
-	ID           string          `yaml:"id"`
-	Name         string          `yaml:"name"`
-	Description  string          `yaml:"description"`
-	Language     string          `yaml:"language"`
-	Type         string          `yaml:"type"`     // public, semi-private, private
-	Encoding     string          `yaml:"encoding"`
-	RequestDelay int             `yaml:"requestDelay"` // milliseconds
-	Links        []string        `yaml:"links"`
-	LegacyLinks  []string        `yaml:"legacylinks"`
-	Caps         CapsBlock       `yaml:"caps"`
-	Settings     []SettingField  `yaml:"settings"`
-	Login        *LoginBlock     `yaml:"login,omitempty"`
-	Search       SearchBlock     `yaml:"search"`
-	Download     DownloadBlock   `yaml:"download"`
+	ID           string         `yaml:"id"`
+	Name         string         `yaml:"name"`
+	Description  string         `yaml:"description"`
+	Language     string         `yaml:"language"`
+	Type         string         `yaml:"type"` // public, semi-private, private
+	Encoding     string         `yaml:"encoding"`
+	RequestDelay int            `yaml:"requestDelay"` // milliseconds
+	Links        []string       `yaml:"links"`
+	LegacyLinks  []string       `yaml:"legacylinks"`
+	Caps         CapsBlock      `yaml:"caps"`
+	Settings     []SettingField `yaml:"settings"`
+	Login        *LoginBlock    `yaml:"login,omitempty"`
+	Search       SearchBlock    `yaml:"search"`
+	Download     DownloadBlock  `yaml:"download"`
 }
 
 // CapsBlock describes what the indexer supports.
 type CapsBlock struct {
-	CategoryMappings []CategoryMapping      `yaml:"categorymappings"`
-	Modes            map[string][]string    `yaml:"modes"`
-	AllowRawSearch   bool                   `yaml:"allowrawsearch"`
+	CategoryMappings []CategoryMapping   `yaml:"categorymappings"`
+	Modes            map[string][]string `yaml:"modes"`
+	AllowRawSearch   bool                `yaml:"allowrawsearch"`
 }
 
 // CategoryMapping maps a site-specific category ID to a Newznab category.
@@ -47,11 +47,11 @@ type SettingField struct {
 
 // LoginBlock describes how to authenticate with a private tracker.
 type LoginBlock struct {
-	Path    string            `yaml:"path"`
-	Method  string            `yaml:"method"` // post, get, form, cookie
-	Inputs  map[string]string `yaml:"inputs"`
-	Error   []SelectorBlock   `yaml:"error"`
-	Test    *TestBlock        `yaml:"test"`
+	Path   string            `yaml:"path"`
+	Method string            `yaml:"method"` // post, get, form, cookie
+	Inputs map[string]string `yaml:"inputs"`
+	Error  []SelectorBlock   `yaml:"error"`
+	Test   *TestBlock        `yaml:"test"`
 }
 
 // TestBlock verifies a login succeeded.
@@ -87,12 +87,12 @@ type ResponseConfig struct {
 
 // RowsBlock defines how to find result rows in the response.
 type RowsBlock struct {
-	Selector  string `yaml:"selector"`
-	After     int    `yaml:"after"`
-	Remove    string `yaml:"remove"`
-	Multiple  bool   `yaml:"multiple"`
-	Count     *SelectorBlock `yaml:"count,omitempty"`
-	Filters   []FilterDef    `yaml:"filters"` // e.g. andmatch — client-side keyword guard
+	Selector string         `yaml:"selector"`
+	After    int            `yaml:"after"`
+	Remove   string         `yaml:"remove"`
+	Multiple bool           `yaml:"multiple"`
+	Count    *SelectorBlock `yaml:"count,omitempty"`
+	Filters  []FilterDef    `yaml:"filters"` // e.g. andmatch — client-side keyword guard
 }
 
 // FieldBlock defines how to extract a single field from a result row.
@@ -127,16 +127,16 @@ type DownloadBlock struct {
 // SearchResult is a single result from a search execution.
 type SearchResult struct {
 	Title                string
-	Details              string  // URL to the detail page
-	Download             string  // .torrent URL or magnet URI
+	Details              string // URL to the detail page
+	Download             string // .torrent URL or magnet URI
 	MagnetURI            string
 	InfoHash             string
 	Size                 int64
 	Seeders              int
 	Leechers             int
 	Grabs                int
-	Date                 string  // RFC3339 or raw
-	Category             string  // Newznab category ID
+	Date                 string // RFC3339 or raw
+	Category             string // Newznab category ID
 	DownloadVolumeFactor float64
 	UploadVolumeFactor   float64
 	Description          string

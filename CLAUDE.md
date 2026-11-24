@@ -1,162 +1,53 @@
-# Beacon Pulse
+# Pulse: notes for Claude Code
 
-Centralized control plane for the Arr ecosystem — service registry, discovery, shared config, and indexer management.
+Pulse is the Beacon stack's hub: a service registry, the shared indexers,
+download clients and quality profiles, the Torznab proxy that scrapes
+indexer sites, notifications, and the VPN panel. It listens on 9696.
 
-## Build & Run
+## Working here
 
-```bash
-make build          # compile binary to bin/pulse
-make run            # build + run
-make dev            # hot-reload with air
-make sqlc           # regenerate SQLC code from SQL queries
-make test           # run all tests
-make docker         # build Docker image
-```
+- Work on a branch and merge through a pull request. Never commit to `main`.
+- `gh` commands target `Beacon-Stack/pulse`.
+- `make check` before pushing: lint, dead-code checks, Go tests and the
+  frontend build.
+- Comments say what the code does and why, not how it got that way;
+  history belongs in the commit message.
+- SQL lives in `internal/db/queries/sqlite/`; run `make sqlc` after
+  changing it. Don't edit `internal/db/generated/`.
+- `web/ui/src/shared/` is a copy of the `web-shared` repo. Change it
+  there, not here.
+- The Docker image builds with the Go version in the `Dockerfile`. After
+  `go get`, check the `go` line in `go.mod` didn't move past it.
 
-### Frontend
-
-```bash
-cd web/ui
-npm install
-npm run dev         # Vite dev server with proxy to :9696
-npm run build       # production build → web/static/
-```
-
-## Project Structure
+## Layout
 
 ```
-cmd/pulse/        main entry point
-pkg/sdk/                Go client SDK for ecosystem services
-internal/
-  api/                  HTTP layer (Huma v2 + Chi v5)
-    v1/                 API v1 handlers
-    middleware/          auth, security, logging, recovery
-    ws/                 WebSocket hub for event streaming
-  core/
-    registry/           service registration & discovery
-    config/             shared config key-value store
-    indexer/            centralized indexer management + catalog + tester
-    health/             health-check poller
-    tag/                tag management
-  db/
-    migrations/         goose SQL migrations
-    queries/sqlite/     SQLC query definitions
-    generated/sqlite/   auto-generated Go code (DO NOT EDIT)
-  events/               in-process event bus
-  config/               app configuration (Viper)
-web/
-  ui/                   React 19 + TypeScript + Vite + TailwindCSS frontend
-  static/               built frontend assets (embedded in binary)
-  embed.go              Go embed for serving the SPA
+cmd/pulse/            entry point and wiring
+pkg/                  packages the other apps import (see below)
+internal/api/         HTTP routes (huma + chi), middleware, WebSocket hub
+internal/core/        registry, indexer, downloadclient, qualityprofile,
+                      sharedsettings, health, gluetun (VPN), dashboard, tag
+internal/scraper/     runs indexer definitions against sites
+internal/torznab/     the Torznab feed the apps search through
+internal/sitenet/     outbound requests to indexer sites (VPN, FlareSolverr)
+internal/db/          migrations, queries, generated code
+web/ui/               React + TypeScript + Vite; built into web/static/
 ```
 
-## Tech Stack
+## `pkg/` is a public API
 
-- **Go 1.25** with Huma v2 (OpenAPI-first) + Chi v5 router
-- **SQLite** (WAL mode) via SQLC for type-safe queries
-- **Goose** for database migrations
-- **Viper** for config (YAML + env vars `PULSE_*`)
-- **WebSocket** (coder/websocket) for real-time event streaming
-- **React 19** + TypeScript + Vite + TailwindCSS v4 frontend
-- **React Query** for server state, **Sonner** for toasts
+Pilot, Prism and Haul import `pkg/sdk`, `pkg/notify`, `pkg/healthcheck`
+and `pkg/log` at a pinned commit of this module.
 
-## Key Conventions
+- A function in `pkg/` that nothing in Pulse calls is not dead: check the
+  other three repos before removing or changing it. The dead-code check
+  in CI skips `pkg/` for this reason.
+- A change the apps need only reaches them when each one bumps its Pulse
+  version in `go.mod`.
 
-- All IDs are UUIDs (string type)
-- Timestamps are RFC3339 UTC strings
-- API auth: X-Api-Key header (auto-generated on first run)
-- Same-origin browser requests trusted via Sec-Fetch-Site
-- Event bus is non-blocking, handlers run in goroutines
-- SQLC generated code lives in `internal/db/generated/sqlite/` — never edit directly
-- Config supports env var overrides: `PULSE_SERVER_PORT=8080`
-- Frontend uses inline CSS with CSS custom properties for theming (same as Luminarr)
-- Catalog entries live in `internal/core/indexer/catalog_data.go` — add new indexers there
+## Indexer catalog
 
-## Client SDK
-
-The `pkg/sdk` package lets any Go service integrate with Pulse:
-
-```go
-client, err := sdk.New(sdk.Config{
-    ConfigurarURL: "http://pulse:9696",
-    APIKey:        "your-api-key",
-    ServiceName:   "luminarr",
-    ServiceType:   "media-manager",
-    APIURL:        "http://luminarr:8282",
-    Capabilities:  []string{"supports_torrent"},
-})
-defer client.Close()
-
-// Discover download clients
-downloaders, _ := client.DiscoverByType(ctx, "download-client")
-
-// Read shared config
-codec, _ := client.GetConfig(ctx, "quality", "preferred_codec")
-
-// Get indexers assigned to this service
-indexers, _ := client.MyIndexers(ctx)
-```
-
-## API Endpoints
-
-All endpoints are under `/api/v1/`. Interactive docs at `/api/docs`.
-
-### Services
-- `POST /services/register` — register/re-register
-- `GET /services` — list all
-- `GET /services/discover?type=...&capability=...` — discover
-- `GET /services/{id}` — get one
-- `PUT /services/{id}/heartbeat` — heartbeat
-- `DELETE /services/{id}` — deregister
-
-### Config
-- `PUT /config` — set entry (upsert)
-- `GET /config` — list all entries
-- `GET /config/namespaces` — list namespaces
-- `GET /config/{namespace}` — list by namespace
-- `GET /config/{namespace}/{key}` — get one
-- `DELETE /config/{namespace}/{key}` — delete
-- `POST /config/subscribe` — subscribe service to namespace
-- `POST /config/unsubscribe` — unsubscribe
-- `GET /config/subscriptions/{service_id}` — list subscriptions
-
-### Indexers
-- `POST /indexers` — create
-- `GET /indexers` — list all
-- `GET /indexers/{id}` — get one
-- `PUT /indexers/{id}` — update
-- `DELETE /indexers/{id}` — delete
-- `POST /indexers/{id}/assign` — assign to service
-- `DELETE /indexers/{id}/assign/{service_id}` — unassign
-- `GET /indexers/{id}/assignments` — list assignments
-- `GET /services/{service_id}/indexers` — indexers for a service
-- `POST /indexers/test` — test indexer connectivity
-
-### Catalog
-- `GET /indexers/catalog?q=...&protocol=...&privacy=...&category=...` — browse catalog
-- `GET /indexers/catalog/{id}` — single catalog entry with settings schema
-
-### Tags
-- `GET /tags` — list all with usage counts
-- `POST /tags` — create
-- `PUT /tags/{id}` — rename
-- `DELETE /tags/{id}` — delete
-
-### System
-- `GET /system/status` — status & uptime
-- `GET /health` — container health check (no auth)
-- `WS /ws` — WebSocket event stream
-
-## Frontend Pages
-
-- `/` — Dashboard with stats and service overview
-- `/services` — Service registry with register/deregister
-- `/indexers` — Managed indexers with assign-to-service
-- `/indexers/add` — Add Indexer catalog browser (search, filter, grid/list, config drawer)
-- `/config` — Shared config store with namespace filtering
-- `/settings/system` — System info
-- `/settings/app` — Theme picker (6 dark + 1 light preset)
-
-## Default Port
-
-9696 (configurable via `PULSE_SERVER_PORT` or `config.yaml`)
+- Catalog entries come from the Prowlarr definitions: fetched from GitHub
+  at start and daily, with `internal/core/indexer/prowlarr_snapshot.zip`
+  as the offline copy (`make prowlarr-snapshot` refreshes it).
+- `internal/core/indexer/catalog_data.go` holds the built-in entries.
