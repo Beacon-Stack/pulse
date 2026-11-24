@@ -53,11 +53,11 @@ type Stats struct {
 // Client talks to the Docker Engine API over a Unix socket.
 // The zero value is invalid; use NewClient.
 type Client struct {
-	http       *http.Client
-	baseURL    string
-	overrides  map[string]string // logical service name → container name
-	rateCache  *netRateCache
-	cpuCache   *cpuRateCache
+	http      *http.Client
+	baseURL   string
+	overrides map[string]string // logical service name → container name
+	rateCache *netRateCache
+	cpuCache  *cpuRateCache
 }
 
 // NewClient returns a Docker Engine API client backed by the given Unix socket.
@@ -252,13 +252,13 @@ func (c *Client) fetchContainerHealth(ctx context.Context, name string) string {
 
 // statsResponse mirrors the docker /stats response shape (fields we use only).
 type statsResponse struct {
-	Name        string  `json:"name"`
-	Read        string  `json:"read"`
-	CPUStats    cpuData `json:"cpu_stats"`
-	PreCPUStats cpuData `json:"precpu_stats"`
-	MemoryStats memData `json:"memory_stats"`
+	Name        string             `json:"name"`
+	Read        string             `json:"read"`
+	CPUStats    cpuData            `json:"cpu_stats"`
+	PreCPUStats cpuData            `json:"precpu_stats"`
+	MemoryStats memData            `json:"memory_stats"`
 	Networks    map[string]netData `json:"networks"`
-	BlkioStats  blkioData `json:"blkio_stats"`
+	BlkioStats  blkioData          `json:"blkio_stats"`
 	PidsStats   struct {
 		Current uint64 `json:"current"`
 	} `json:"pids_stats"`

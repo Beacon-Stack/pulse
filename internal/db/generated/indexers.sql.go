@@ -118,15 +118,6 @@ func (q *Queries) DeleteAssignmentsByIndexer(ctx context.Context, indexerID stri
 	return err
 }
 
-const deleteAssignmentsByService = `-- name: DeleteAssignmentsByService :exec
-DELETE FROM indexer_assignments WHERE service_id = ?
-`
-
-func (q *Queries) DeleteAssignmentsByService(ctx context.Context, serviceID string) error {
-	_, err := q.db.ExecContext(ctx, deleteAssignmentsByService, serviceID)
-	return err
-}
-
 const deleteIndexer = `-- name: DeleteIndexer :exec
 DELETE FROM indexers WHERE id = ?
 `
@@ -134,22 +125,6 @@ DELETE FROM indexers WHERE id = ?
 func (q *Queries) DeleteIndexer(ctx context.Context, id string) error {
 	_, err := q.db.ExecContext(ctx, deleteIndexer, id)
 	return err
-}
-
-const getAssignmentOverrides = `-- name: GetAssignmentOverrides :one
-SELECT overrides FROM indexer_assignments WHERE indexer_id = ? AND service_id = ?
-`
-
-type GetAssignmentOverridesParams struct {
-	IndexerID string `json:"indexerId"`
-	ServiceID string `json:"serviceId"`
-}
-
-func (q *Queries) GetAssignmentOverrides(ctx context.Context, arg GetAssignmentOverridesParams) (string, error) {
-	row := q.db.QueryRowContext(ctx, getAssignmentOverrides, arg.IndexerID, arg.ServiceID)
-	var overrides string
-	err := row.Scan(&overrides)
-	return overrides, err
 }
 
 const getIndexer = `-- name: GetIndexer :one

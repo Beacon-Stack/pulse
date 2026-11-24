@@ -9,8 +9,8 @@ import (
 
 	"github.com/danielgtaylor/huma/v2"
 
-	db "github.com/beacon-stack/pulse/internal/db/generated"
 	"github.com/beacon-stack/pulse/internal/core/indexer"
+	db "github.com/beacon-stack/pulse/internal/db/generated"
 )
 
 // ── Request / Response types ─────────────────────────────────────────────────

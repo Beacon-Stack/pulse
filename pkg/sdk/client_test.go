@@ -62,7 +62,7 @@ func TestSDKRegisterAndDiscover(t *testing.T) {
 
 	// Register service A
 	clientA, err := New(Config{
-		PulseURL:     ts.URL,
+		PulseURL:          ts.URL,
 		APIKey:            testAPIKey,
 		ServiceName:       "test-downloader",
 		ServiceType:       "download-client",
@@ -84,7 +84,7 @@ func TestSDKRegisterAndDiscover(t *testing.T) {
 
 	// Register service B
 	clientB, err := New(Config{
-		PulseURL:     ts.URL,
+		PulseURL:          ts.URL,
 		APIKey:            testAPIKey,
 		ServiceName:       "test-luminarr",
 		ServiceType:       "media-manager",
@@ -136,7 +136,7 @@ func TestSDKDeregister(t *testing.T) {
 	ts := setupTestServer(t)
 
 	client, err := New(Config{
-		PulseURL:     ts.URL,
+		PulseURL:          ts.URL,
 		APIKey:            testAPIKey,
 		ServiceName:       "ephemeral",
 		ServiceType:       "automation",
@@ -172,4 +172,3 @@ func TestSDKDeregister(t *testing.T) {
 		t.Errorf("expected 0 services after deregister, got %d", len(all2))
 	}
 }
-

@@ -156,7 +156,7 @@ export function useRotateVPN() {
   });
 }
 
-export interface SiteTrouble {
+interface SiteTrouble {
   host: string;
   failures: number;
   successes: number;

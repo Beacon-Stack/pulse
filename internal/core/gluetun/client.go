@@ -106,9 +106,9 @@ func (c *Client) Status(ctx context.Context) (*Status, error) {
 	}
 
 	var (
-		wg       sync.WaitGroup
-		mu       sync.Mutex
-		status   Status
+		wg        sync.WaitGroup
+		mu        sync.Mutex
+		status    Status
 		successes int
 		failures  int
 	)

@@ -9,39 +9,6 @@ import (
 	"context"
 )
 
-const createFilterPreset = `-- name: CreateFilterPreset :one
-INSERT INTO filter_presets (id, name, filters, created_at, updated_at)
-VALUES (?, ?, ?, ?, ?)
-RETURNING id, name, filters, created_at, updated_at
-`
-
-type CreateFilterPresetParams struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	Filters   string `json:"filters"`
-	CreatedAt string `json:"createdAt"`
-	UpdatedAt string `json:"updatedAt"`
-}
-
-func (q *Queries) CreateFilterPreset(ctx context.Context, arg CreateFilterPresetParams) (FilterPreset, error) {
-	row := q.db.QueryRowContext(ctx, createFilterPreset,
-		arg.ID,
-		arg.Name,
-		arg.Filters,
-		arg.CreatedAt,
-		arg.UpdatedAt,
-	)
-	var i FilterPreset
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Filters,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
 const deleteFilterPreset = `-- name: DeleteFilterPreset :exec
 DELETE FROM filter_presets WHERE id = ?
 `
@@ -49,49 +16,6 @@ DELETE FROM filter_presets WHERE id = ?
 func (q *Queries) DeleteFilterPreset(ctx context.Context, id string) error {
 	_, err := q.db.ExecContext(ctx, deleteFilterPreset, id)
 	return err
-}
-
-const deleteFilterPresetByName = `-- name: DeleteFilterPresetByName :exec
-DELETE FROM filter_presets WHERE name = ?
-`
-
-func (q *Queries) DeleteFilterPresetByName(ctx context.Context, name string) error {
-	_, err := q.db.ExecContext(ctx, deleteFilterPresetByName, name)
-	return err
-}
-
-const getFilterPreset = `-- name: GetFilterPreset :one
-SELECT id, name, filters, created_at, updated_at FROM filter_presets WHERE id = ?
-`
-
-func (q *Queries) GetFilterPreset(ctx context.Context, id string) (FilterPreset, error) {
-	row := q.db.QueryRowContext(ctx, getFilterPreset, id)
-	var i FilterPreset
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Filters,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
-const getFilterPresetByName = `-- name: GetFilterPresetByName :one
-SELECT id, name, filters, created_at, updated_at FROM filter_presets WHERE name = ?
-`
-
-func (q *Queries) GetFilterPresetByName(ctx context.Context, name string) (FilterPreset, error) {
-	row := q.db.QueryRowContext(ctx, getFilterPresetByName, name)
-	var i FilterPreset
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Filters,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
 }
 
 const listFilterPresets = `-- name: ListFilterPresets :many
@@ -125,37 +49,6 @@ func (q *Queries) ListFilterPresets(ctx context.Context) ([]FilterPreset, error)
 		return nil, err
 	}
 	return items, nil
-}
-
-const updateFilterPreset = `-- name: UpdateFilterPreset :one
-UPDATE filter_presets SET name = ?, filters = ?, updated_at = ?
-WHERE id = ?
-RETURNING id, name, filters, created_at, updated_at
-`
-
-type UpdateFilterPresetParams struct {
-	Name      string `json:"name"`
-	Filters   string `json:"filters"`
-	UpdatedAt string `json:"updatedAt"`
-	ID        string `json:"id"`
-}
-
-func (q *Queries) UpdateFilterPreset(ctx context.Context, arg UpdateFilterPresetParams) (FilterPreset, error) {
-	row := q.db.QueryRowContext(ctx, updateFilterPreset,
-		arg.Name,
-		arg.Filters,
-		arg.UpdatedAt,
-		arg.ID,
-	)
-	var i FilterPreset
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Filters,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
 }
 
 const upsertFilterPreset = `-- name: UpsertFilterPreset :one

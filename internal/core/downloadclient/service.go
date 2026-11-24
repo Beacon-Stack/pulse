@@ -17,8 +17,8 @@ import (
 // Input is the data needed to create or update a download client.
 type Input struct {
 	Name      string `json:"name"`
-	Kind      string `json:"kind"`      // qbittorrent, deluge, transmission, sabnzbd, nzbget
-	Protocol  string `json:"protocol"`  // torrent, usenet
+	Kind      string `json:"kind"`     // qbittorrent, deluge, transmission, sabnzbd, nzbget
+	Protocol  string `json:"protocol"` // torrent, usenet
 	Enabled   bool   `json:"enabled"`
 	Priority  int    `json:"priority"`
 	Host      string `json:"host"`

@@ -34,9 +34,9 @@ func TestNewClient_Disabled(t *testing.T) {
 func TestContainerNameFor(t *testing.T) {
 	c := &Client{overrides: map[string]string{"Haul": "haul-prod"}}
 	cases := []struct{ in, want string }{
-		{"Haul", "haul-prod"},   // override wins
-		{"Pilot", "pilot"},      // lowercase by default
-		{"PRISM", "prism"},      // lowercase by default
+		{"Haul", "haul-prod"}, // override wins
+		{"Pilot", "pilot"},    // lowercase by default
+		{"PRISM", "prism"},    // lowercase by default
 	}
 	for _, tc := range cases {
 		if got := c.containerNameFor(tc.in); got != tc.want {
@@ -209,13 +209,13 @@ func TestContainerStats_EndToEnd(t *testing.T) {
 		"name": "/haul",
 		"read": "2024-01-01T00:00:00Z",
 		"cpu_stats": map[string]any{
-			"cpu_usage":         map[string]any{"total_usage": 200, "percpu_usage": []int{1, 2, 3, 4}},
-			"system_cpu_usage":  2000,
-			"online_cpus":       4,
+			"cpu_usage":        map[string]any{"total_usage": 200, "percpu_usage": []int{1, 2, 3, 4}},
+			"system_cpu_usage": 2000,
+			"online_cpus":      4,
 		},
 		"precpu_stats": map[string]any{
-			"cpu_usage":         map[string]any{"total_usage": 100},
-			"system_cpu_usage":  1000,
+			"cpu_usage":        map[string]any{"total_usage": 100},
+			"system_cpu_usage": 1000,
 		},
 		"memory_stats": map[string]any{
 			"usage": 1_000_000,

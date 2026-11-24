@@ -7,10 +7,10 @@
 //	client, err := sdk.New(sdk.Config{
 //	    PulseURL: "http://pulse:9696",
 //	    APIKey:         "your-api-key",
-//	    ServiceName:    "luminarr",
+//	    ServiceName:    "prism",
 //	    ServiceType:    "media-manager",
-//	    APIURL:         "http://luminarr:8282",
-//	    HealthURL:      "http://luminarr:8282/health",
+//	    APIURL:         "http://prism:8282",
+//	    HealthURL:      "http://prism:8282/health",
 //	    Version:        "0.1.0",
 //	    Capabilities:   []string{"supports_torrent", "supports_usenet"},
 //	})
@@ -43,7 +43,7 @@ type Config struct {
 	// APIKey is the Pulse API key for authentication.
 	APIKey string
 
-	// ServiceName is the name this service registers under (e.g. "luminarr").
+	// ServiceName is the name this service registers under (e.g. "prism").
 	ServiceName string
 
 	// ServiceType categorizes the service (e.g. "media-manager", "download-client").
@@ -277,8 +277,8 @@ func (c *Client) MyIndexers(ctx context.Context) ([]Indexer, error) {
 type DownloadClient struct {
 	ID        string `json:"id"`
 	Name      string `json:"name"`
-	Kind      string `json:"kind"`      // qbittorrent, deluge, transmission, sabnzbd, nzbget
-	Protocol  string `json:"protocol"`  // torrent, usenet
+	Kind      string `json:"kind"`     // qbittorrent, deluge, transmission, sabnzbd, nzbget
+	Protocol  string `json:"protocol"` // torrent, usenet
 	Enabled   bool   `json:"enabled"`
 	Priority  int    `json:"priority"`
 	Host      string `json:"host"`

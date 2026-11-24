@@ -23,24 +23,6 @@ func (q *Queries) DeleteConfigEntry(ctx context.Context, arg DeleteConfigEntryPa
 	return err
 }
 
-const deleteConfigNamespace = `-- name: DeleteConfigNamespace :exec
-DELETE FROM config_entries WHERE namespace = ?
-`
-
-func (q *Queries) DeleteConfigNamespace(ctx context.Context, namespace string) error {
-	_, err := q.db.ExecContext(ctx, deleteConfigNamespace, namespace)
-	return err
-}
-
-const deleteSubscriptionsByService = `-- name: DeleteSubscriptionsByService :exec
-DELETE FROM config_subscriptions WHERE service_id = ?
-`
-
-func (q *Queries) DeleteSubscriptionsByService(ctx context.Context, serviceID string) error {
-	_, err := q.db.ExecContext(ctx, deleteSubscriptionsByService, serviceID)
-	return err
-}
-
 const getConfigEntry = `-- name: GetConfigEntry :one
 SELECT id, namespace, "key", value, updated_at FROM config_entries WHERE namespace = ? AND key = ?
 `
@@ -61,168 +43,6 @@ func (q *Queries) GetConfigEntry(ctx context.Context, arg GetConfigEntryParams) 
 		&i.UpdatedAt,
 	)
 	return i, err
-}
-
-const listAllConfig = `-- name: ListAllConfig :many
-SELECT id, namespace, "key", value, updated_at FROM config_entries ORDER BY namespace ASC, key ASC
-`
-
-func (q *Queries) ListAllConfig(ctx context.Context) ([]ConfigEntry, error) {
-	rows, err := q.db.QueryContext(ctx, listAllConfig)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []ConfigEntry
-	for rows.Next() {
-		var i ConfigEntry
-		if err := rows.Scan(
-			&i.ID,
-			&i.Namespace,
-			&i.Key,
-			&i.Value,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const listConfigByNamespace = `-- name: ListConfigByNamespace :many
-SELECT id, namespace, "key", value, updated_at FROM config_entries WHERE namespace = ? ORDER BY key ASC
-`
-
-func (q *Queries) ListConfigByNamespace(ctx context.Context, namespace string) ([]ConfigEntry, error) {
-	rows, err := q.db.QueryContext(ctx, listConfigByNamespace, namespace)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []ConfigEntry
-	for rows.Next() {
-		var i ConfigEntry
-		if err := rows.Scan(
-			&i.ID,
-			&i.Namespace,
-			&i.Key,
-			&i.Value,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const listConfigNamespaces = `-- name: ListConfigNamespaces :many
-SELECT DISTINCT namespace FROM config_entries ORDER BY namespace ASC
-`
-
-func (q *Queries) ListConfigNamespaces(ctx context.Context) ([]string, error) {
-	rows, err := q.db.QueryContext(ctx, listConfigNamespaces)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []string
-	for rows.Next() {
-		var namespace string
-		if err := rows.Scan(&namespace); err != nil {
-			return nil, err
-		}
-		items = append(items, namespace)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const listSubscribersByNamespace = `-- name: ListSubscribersByNamespace :many
-SELECT s.id, s.name, s.type, s.api_url, s.api_key, s.health_url, s.version, s.status, s.last_seen, s.registered, s.metadata FROM services s
-JOIN config_subscriptions cs ON s.id = cs.service_id
-WHERE cs.namespace = ?
-ORDER BY s.name ASC
-`
-
-func (q *Queries) ListSubscribersByNamespace(ctx context.Context, namespace string) ([]Service, error) {
-	rows, err := q.db.QueryContext(ctx, listSubscribersByNamespace, namespace)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Service
-	for rows.Next() {
-		var i Service
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Type,
-			&i.ApiUrl,
-			&i.ApiKey,
-			&i.HealthUrl,
-			&i.Version,
-			&i.Status,
-			&i.LastSeen,
-			&i.Registered,
-			&i.Metadata,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const listSubscriptionsByService = `-- name: ListSubscriptionsByService :many
-SELECT namespace FROM config_subscriptions WHERE service_id = ?
-`
-
-func (q *Queries) ListSubscriptionsByService(ctx context.Context, serviceID string) ([]string, error) {
-	rows, err := q.db.QueryContext(ctx, listSubscriptionsByService, serviceID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []string
-	for rows.Next() {
-		var namespace string
-		if err := rows.Scan(&namespace); err != nil {
-			return nil, err
-		}
-		items = append(items, namespace)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
 }
 
 const setConfigEntry = `-- name: SetConfigEntry :one
@@ -262,7 +82,6 @@ func (q *Queries) SetConfigEntry(ctx context.Context, arg SetConfigEntryParams) 
 }
 
 const subscribe = `-- name: Subscribe :exec
-
 INSERT INTO config_subscriptions (id, service_id, namespace)
 VALUES (?, ?, ?)
 ON CONFLICT DO NOTHING

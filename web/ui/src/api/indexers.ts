@@ -72,22 +72,6 @@ export function useDeleteIndexer() {
   });
 }
 
-export function useAssignIndexer() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: ({ indexerId, serviceId, overrides }: { indexerId: string; serviceId: string; overrides?: string }) =>
-      apiFetch<IndexerAssignment>(`/indexers/${indexerId}/assign`, {
-        method: "POST",
-        body: JSON.stringify({ service_id: serviceId, overrides }),
-      }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["indexers"] });
-      toast.success("Indexer assigned");
-    },
-    onError: (err) => toast.error((err as Error).message),
-  });
-}
-
 export function useUnassignIndexer() {
   const qc = useQueryClient();
   return useMutation({

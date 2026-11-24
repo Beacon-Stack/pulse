@@ -10,7 +10,6 @@ import (
 )
 
 const addCapability = `-- name: AddCapability :exec
-
 INSERT INTO service_capabilities (id, service_id, capability)
 VALUES (?, ?, ?)
 ON CONFLICT DO NOTHING
@@ -26,17 +25,6 @@ type AddCapabilityParams struct {
 func (q *Queries) AddCapability(ctx context.Context, arg AddCapabilityParams) error {
 	_, err := q.db.ExecContext(ctx, addCapability, arg.ID, arg.ServiceID, arg.Capability)
 	return err
-}
-
-const countServicesByType = `-- name: CountServicesByType :one
-SELECT COUNT(*) FROM services WHERE type = ?
-`
-
-func (q *Queries) CountServicesByType(ctx context.Context, type_ string) (int64, error) {
-	row := q.db.QueryRowContext(ctx, countServicesByType, type_)
-	var count int64
-	err := row.Scan(&count)
-	return count, err
 }
 
 const createService = `-- name: CreateService :one
@@ -176,45 +164,6 @@ func (q *Queries) ListCapabilities(ctx context.Context, serviceID string) ([]str
 			return nil, err
 		}
 		items = append(items, capability)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const listOnlineServices = `-- name: ListOnlineServices :many
-SELECT id, name, type, api_url, api_key, health_url, version, status, last_seen, registered, metadata FROM services WHERE status = 'online' ORDER BY type ASC, name ASC
-`
-
-func (q *Queries) ListOnlineServices(ctx context.Context) ([]Service, error) {
-	rows, err := q.db.QueryContext(ctx, listOnlineServices)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Service
-	for rows.Next() {
-		var i Service
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Type,
-			&i.ApiUrl,
-			&i.ApiKey,
-			&i.HealthUrl,
-			&i.Version,
-			&i.Status,
-			&i.LastSeen,
-			&i.Registered,
-			&i.Metadata,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
 	}
 	if err := rows.Close(); err != nil {
 		return nil, err

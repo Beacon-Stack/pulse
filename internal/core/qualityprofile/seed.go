@@ -65,9 +65,9 @@ func (s *Service) SeedDefaults(ctx context.Context, cfg *cfgstore.Store) error {
 func defaultProfiles() []Input {
 	return []Input{
 		{
-			Name:           "SD",
-			CutoffJSON:     qualityJSON("SD DVD", "sd", "dvd", "xvid", "none"),
-			QualitiesJSON:  qualitiesJSON([]qualityEntry{
+			Name:       "SD",
+			CutoffJSON: qualityJSON("SD DVD", "sd", "dvd", "xvid", "none"),
+			QualitiesJSON: qualitiesJSON([]qualityEntry{
 				{"SD HDTV", "sd", "hdtv", "x264", "none"},
 				{"SD DVD", "sd", "dvd", "xvid", "none"},
 			}),

@@ -1,4 +1,4 @@
-.PHONY: build run dev sqlc test clean docker prowlarr-snapshot
+.PHONY: build run dev sqlc test lint deadcode deadcode/go web check clean docker docker-run tidy prowlarr-snapshot
 
 # Build the binary
 build:
@@ -18,7 +18,27 @@ sqlc:
 
 # Run tests
 test:
-	go test ./... -v -count=1
+	go test ./... -count=1
+
+# Lint
+lint:
+	golangci-lint run
+
+# Fail on unreachable Go code or unused frontend files, exports and packages.
+# pkg/ is skipped: the other Beacon apps import it, so a function Pulse
+# itself never calls is not dead.
+deadcode: deadcode/go
+	cd web/ui && npm run deadcode
+
+deadcode/go:
+	@out="$$(go run golang.org/x/tools/cmd/deadcode@v0.53.0 -test ./... | grep -v -e node_modules -e '^pkg/')"; echo "$$out"; test -z "$$out"
+
+# Build the frontend into web/static
+web:
+	cd web/ui && npm run build
+
+# Everything CI checks
+check: lint deadcode test web
 
 # Clean build artifacts
 clean:

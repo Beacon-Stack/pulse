@@ -164,30 +164,41 @@ client.Subscribe(ctx, "media", func(ns, key, value string) {
                      └─────────┘
 ```
 
-Pilot and Prism both register with Pulse and pull their indexers, quality profiles, and shared settings from it. Haul doesn't register but can optionally read shared config (for rename format, etc.) through the SDK.
+Pilot and Prism both register with Pulse and pull their indexers, quality profiles, and shared settings from it. Haul registers too, so Pulse can show its health and send notifications on its behalf.
 
 ## Privacy
 
-Pulse makes outbound connections only to the indexers you configure (to test connectivity) and to the services that register with it. No telemetry, no analytics, no crash reporting, no update checks. API keys and indexer credentials are stored in your local database only.
+Pulse collects nothing: no telemetry, no analytics, no crash reporting. It connects to:
+
+- **the indexer sites you add**, to search and test them, through your VPN container and FlareSolverr if you set those up;
+- **GitHub**, at start and once a day, to fetch the Prowlarr indexer definitions the catalog is built from, and when you press Check for updates;
+- **your download clients and the apps registered with it**, to check they're up and send them their settings;
+- **your notification channels** (Discord, Slack, Telegram, ntfy, Pushover, Gotify, email or another app's URL), if you set them up.
+
+Your browser also loads the interface fonts from Google Fonts. API keys and indexer credentials are stored in your local database only.
 
 ## Project structure
 
 ```
 cmd/pulse/                Entry point
-pkg/sdk/                  Go client SDK for ecosystem services
+pkg/                      Packages the other apps import: sdk, notify, healthcheck, log
 internal/
   api/                    HTTP router, middleware, v1 handlers, WebSocket hub
   core/
     registry/             Service registration & discovery
-    sharedsettings/       Shared config key-value store
-    qualityprofile/       Quality profile CRUD + sync
-    indexer/              Indexer management, catalog, tester, autoassign
-    downloadclient/       Download client config CRUD
+    sharedsettings/       Settings shared with the apps
+    qualityprofile/       Quality profiles and their sync to the apps
+    indexer/              Indexer management, catalog, tester, auto-assign
+    downloadclient/       Download client configs
     health/               Health-check poller
+    gluetun/              VPN status and controls
+    dashboard/            Dashboard data
     tag/                  Tag management
   db/                     Migrations and generated query code (sqlc)
   events/                 In-process event bus
-  scraper/                Torznab proxy engine
+  scraper/                Runs indexer definitions against sites
+  torznab/                The Torznab feed the apps search through
+  sitenet/                Outbound requests to indexer sites
   config/                 App configuration (Viper)
 web/
   embed.go                Go embed for serving the SPA
@@ -201,8 +212,9 @@ web/
 make build         # compile binary to bin/pulse
 make run           # build + run
 make dev           # hot reload with air
-make test          # go test ./... -v
-make sqlc          # regenerate SQLC code from queries
+make test          # go test ./...
+make check         # lint, dead-code checks, tests, frontend build
+make sqlc          # regenerate database code after changing SQL
 ```
 
 ## Contributing

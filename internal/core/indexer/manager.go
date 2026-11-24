@@ -124,11 +124,6 @@ func (m *Manager) List(ctx context.Context) ([]db.Indexer, error) {
 	return m.q.ListIndexers(ctx)
 }
 
-// ListEnabled returns only enabled indexers.
-func (m *Manager) ListEnabled(ctx context.Context) ([]db.Indexer, error) {
-	return m.q.ListEnabledIndexers(ctx)
-}
-
 // Update modifies an existing indexer.
 func (m *Manager) Update(ctx context.Context, id string, input Input) (*db.Indexer, error) {
 	now := time.Now().UTC().Format(time.RFC3339)

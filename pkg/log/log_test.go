@@ -95,8 +95,8 @@ type fakePlugin struct {
 	h      slog.Handler
 }
 
-func (p *fakePlugin) Name() string             { return "fake" }
-func (p *fakePlugin) Handler() slog.Handler    { return p.h }
+func (p *fakePlugin) Name() string          { return "fake" }
+func (p *fakePlugin) Handler() slog.Handler { return p.h }
 func (p *fakePlugin) Close(_ context.Context) error {
 	p.closed = true
 	return nil

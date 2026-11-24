@@ -9,17 +9,17 @@ type CatalogEntry struct {
 	Name        string   `json:"name"`
 	Description string   `json:"description"`
 	Language    string   `json:"language"`
-	Protocol    string   `json:"protocol"`    // torrent, usenet
-	Privacy     string   `json:"privacy"`     // public, semi-private, private
-	Categories  []string `json:"categories"`  // Movies, TV, Audio, Books, XXX, Other
+	Protocol    string   `json:"protocol"`   // torrent, usenet
+	Privacy     string   `json:"privacy"`    // public, semi-private, private
+	Categories  []string `json:"categories"` // Movies, TV, Audio, Books, XXX, Other
 	URLs        []string `json:"urls"`
-	Settings    []Field  `json:"settings"`    // config fields required to add this indexer
+	Settings    []Field  `json:"settings"` // config fields required to add this indexer
 }
 
 // Field describes a single user-configurable setting for an indexer.
 type Field struct {
 	Name        string        `json:"name"`
-	Type        string        `json:"type"`        // text, password, checkbox, select, info
+	Type        string        `json:"type"` // text, password, checkbox, select, info
 	Label       string        `json:"label"`
 	HelpText    string        `json:"help_text,omitempty"`
 	Required    bool          `json:"required"`

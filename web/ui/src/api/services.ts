@@ -18,17 +18,6 @@ export function useService(id: string) {
   });
 }
 
-export function useDiscoverServices(type?: string, capability?: string) {
-  const params = new URLSearchParams();
-  if (type) params.set("type", type);
-  if (capability) params.set("capability", capability);
-  const qs = params.toString();
-  return useQuery({
-    queryKey: ["services", "discover", type, capability],
-    queryFn: () => apiFetch<Service[]>(`/services/discover${qs ? `?${qs}` : ""}`),
-  });
-}
-
 export function useRegisterService() {
   const qc = useQueryClient();
   return useMutation({
@@ -55,12 +44,5 @@ export function useDeregisterService() {
       toast.success("Service deregistered");
     },
     onError: (err) => toast.error((err as Error).message),
-  });
-}
-
-export function useHeartbeatService() {
-  return useMutation({
-    mutationFn: (id: string) =>
-      apiFetch<void>(`/services/${id}/heartbeat`, { method: "PUT" }),
   });
 }

@@ -213,9 +213,13 @@ func RegisterDownloadClientRoutes(api huma.API, svc *downloadclient.Service) {
 		Path:        "/api/v1/download-clients/test",
 		Summary:     "Test download client connectivity",
 		Tags:        []string{"Download Clients"},
-	}, func(ctx context.Context, input *dlClientTestInput) (*struct{ Body downloadclient.DLClientTestResult }, error) {
+	}, func(ctx context.Context, input *dlClientTestInput) (*struct {
+		Body downloadclient.DLClientTestResult
+	}, error) {
 		result := svc.Test(ctx, input.Body.Kind, input.Body.Host, input.Body.Port, input.Body.UseSSL)
-		return &struct{ Body downloadclient.DLClientTestResult }{Body: result}, nil
+		return &struct {
+			Body downloadclient.DLClientTestResult
+		}{Body: result}, nil
 	})
 }
 

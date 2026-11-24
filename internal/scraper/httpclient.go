@@ -12,11 +12,11 @@ import (
 
 // RateLimitedClient is an HTTP client with per-host rate limiting.
 type RateLimitedClient struct {
-	client    *http.Client
-	delay     time.Duration
-	mu        sync.Mutex
-	lastReq   time.Time
-	cfUA      map[string]string // domain → FlareSolverr user-agent
+	client  *http.Client
+	delay   time.Duration
+	mu      sync.Mutex
+	lastReq time.Time
+	cfUA    map[string]string // domain → FlareSolverr user-agent
 }
 
 // NewRateLimitedClient creates an HTTP client with rate limiting.
