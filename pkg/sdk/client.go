@@ -275,16 +275,22 @@ func (c *Client) MyIndexers(ctx context.Context) ([]Indexer, error) {
 
 // DownloadClient represents a centrally managed download client.
 type DownloadClient struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	Kind      string `json:"kind"`     // qbittorrent, deluge, transmission, sabnzbd, nzbget
-	Protocol  string `json:"protocol"` // torrent, usenet
-	Enabled   bool   `json:"enabled"`
-	Priority  int    `json:"priority"`
-	Host      string `json:"host"`
-	Port      int    `json:"port"`
-	UseSSL    bool   `json:"use_ssl"`
-	Username  string `json:"username"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Kind     string `json:"kind"`     // qbittorrent, deluge, transmission, sabnzbd, nzbget
+	Protocol string `json:"protocol"` // torrent, usenet
+	Enabled  bool   `json:"enabled"`
+	Priority int    `json:"priority"`
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	UseSSL   bool   `json:"use_ssl"`
+	Username string `json:"username"`
+	// Password and APIKey are what the client needs to let the app in.
+	// Pulse sends them only to callers using its API key. APIKey is set
+	// for download clients that are themselves registered with Pulse
+	// (Haul): it is the key they registered.
+	Password  string `json:"password,omitempty"`
+	APIKey    string `json:"api_key,omitempty"`
 	Category  string `json:"category"`
 	Directory string `json:"directory"`
 	Settings  string `json:"settings"`

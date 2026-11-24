@@ -1,8 +1,13 @@
 package api
 
 import (
+	"context"
 	"log/slog"
+	"net"
 	"net/http"
+	"net/url"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/beacon-stack/pulse/pkg/auth"
@@ -170,7 +175,7 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	}
 
 	if cfg.DownloadClientService != nil {
-		v1.RegisterDownloadClientRoutes(humaAPI, cfg.DownloadClientService)
+		v1.RegisterDownloadClientRoutes(humaAPI, cfg.DownloadClientService, serviceKeyLookup(cfg.RegistryService))
 	}
 
 	if cfg.QualityProfileService != nil {
@@ -206,4 +211,36 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	r.Handle("/*", web.ServeStatic())
 
 	return r
+}
+
+// serviceKeyLookup finds the API key of the registered service listening
+// at host:port, by its registered API address.
+func serviceKeyLookup(reg *registry.Service) v1.ServiceKeyFunc {
+	if reg == nil {
+		return nil
+	}
+	return func(ctx context.Context, host string, port int) string {
+		services, err := reg.List(ctx)
+		if err != nil {
+			return ""
+		}
+		want := net.JoinHostPort(strings.ToLower(host), strconv.Itoa(port))
+		for _, svc := range services {
+			u, err := url.Parse(svc.ApiUrl)
+			if err != nil || u.Host == "" {
+				continue
+			}
+			p := u.Port()
+			if p == "" {
+				p = "80"
+				if u.Scheme == "https" {
+					p = "443"
+				}
+			}
+			if net.JoinHostPort(strings.ToLower(u.Hostname()), p) == want {
+				return svc.ApiKey
+			}
+		}
+		return ""
+	}
 }
