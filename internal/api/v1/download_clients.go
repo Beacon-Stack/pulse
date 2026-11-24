@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/beacon-stack/pulse/pkg/auth"
+
 	"github.com/danielgtaylor/huma/v2"
 
 	"github.com/beacon-stack/pulse/internal/core/downloadclient"
@@ -11,16 +13,20 @@ import (
 )
 
 type dlClientBody struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	Kind      string `json:"kind"`
-	Protocol  string `json:"protocol"`
-	Enabled   bool   `json:"enabled"`
-	Priority  int    `json:"priority"`
-	Host      string `json:"host"`
-	Port      int    `json:"port"`
-	UseSSL    bool   `json:"use_ssl"`
-	Username  string `json:"username"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Kind     string `json:"kind"`
+	Protocol string `json:"protocol"`
+	Enabled  bool   `json:"enabled"`
+	Priority int    `json:"priority"`
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	UseSSL   bool   `json:"use_ssl"`
+	Username string `json:"username"`
+	// Password and APIKey are only filled in for callers using Pulse's API
+	// key (the apps), never for a browser.
+	Password  string `json:"password,omitempty"`
+	APIKey    string `json:"api_key,omitempty"`
 	Category  string `json:"category"`
 	Directory string `json:"directory"`
 	Settings  string `json:"settings"`
@@ -78,8 +84,16 @@ type dlClientTestInput struct {
 	}
 }
 
-// RegisterDownloadClientRoutes registers download client management endpoints.
-func RegisterDownloadClientRoutes(api huma.API, svc *downloadclient.Service) {
+// ServiceKeyFunc returns the API key a registered service listens with at
+// host:port, or "" when no registered service is there. It lets Pulse
+// hand the apps the key for a download client that registered itself
+// (Haul), so they can still reach it when it requires a login from
+// everyone.
+type ServiceKeyFunc func(ctx context.Context, host string, port int) string
+
+// RegisterDownloadClientRoutes registers download client management
+// endpoints. keyFor may be nil.
+func RegisterDownloadClientRoutes(api huma.API, svc *downloadclient.Service, keyFor ServiceKeyFunc) {
 	// POST /api/v1/download-clients — create
 	huma.Register(api, huma.Operation{
 		OperationID:   "create-download-client",
@@ -131,9 +145,18 @@ func RegisterDownloadClientRoutes(api huma.API, svc *downloadclient.Service) {
 		if err != nil {
 			return nil, huma.NewError(http.StatusInternalServerError, "failed to list download clients", err)
 		}
+		// The apps (which call with Pulse's API key) also get what each
+		// client needs to let them in.
+		withSecrets := auth.ViaAPIKey(ctx)
 		items := make([]dlClientBody, len(rows))
 		for i := range rows {
 			items[i] = rowToBody(&rows[i])
+			if withSecrets {
+				items[i].Password = rows[i].Password
+				if keyFor != nil {
+					items[i].APIKey = keyFor(ctx, rows[i].Host, int(rows[i].Port))
+				}
+			}
 		}
 		return &struct{ Body []dlClientBody }{Body: items}, nil
 	})

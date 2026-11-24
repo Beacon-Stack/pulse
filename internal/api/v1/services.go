@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/beacon-stack/pulse/pkg/auth"
+
 	"github.com/danielgtaylor/huma/v2"
 
 	"github.com/beacon-stack/pulse/internal/core/registry"
@@ -54,12 +56,15 @@ type discoverInput struct {
 	Capability string `query:"capability"`
 }
 
-func toServiceBody(s registry.ServiceInfo) serviceBody {
+// toServiceBody builds the API answer for a service. Its API key is
+// included only for callers using Pulse's own key (the apps, which need
+// each other's keys); a browser never gets it.
+func toServiceBody(ctx context.Context, s registry.ServiceInfo) serviceBody {
 	caps := s.Capabilities
 	if caps == nil {
 		caps = []string{}
 	}
-	return serviceBody{
+	body := serviceBody{
 		ID:           s.ID,
 		Name:         s.Name,
 		Type:         s.Type,
@@ -71,8 +76,11 @@ func toServiceBody(s registry.ServiceInfo) serviceBody {
 		Registered:   s.Registered,
 		Capabilities: caps,
 		Metadata:     s.Metadata,
-		APIKey:       s.ApiKey,
 	}
+	if auth.ViaAPIKey(ctx) {
+		body.APIKey = s.ApiKey
+	}
+	return body
 }
 
 // RegisterServiceRoutes registers service registry and discovery endpoints.
@@ -99,7 +107,7 @@ func RegisterServiceRoutes(api huma.API, svc *registry.Service) {
 		if err != nil {
 			return nil, huma.NewError(http.StatusInternalServerError, "registration failed", err)
 		}
-		return &struct{ Body serviceBody }{Body: toServiceBody(*info)}, nil
+		return &struct{ Body serviceBody }{Body: toServiceBody(ctx, *info)}, nil
 	})
 
 	// GET /api/v1/services
@@ -116,7 +124,7 @@ func RegisterServiceRoutes(api huma.API, svc *registry.Service) {
 		}
 		items := make([]serviceBody, len(list))
 		for i, s := range list {
-			items[i] = toServiceBody(s)
+			items[i] = toServiceBody(ctx, s)
 		}
 		return &struct{ Body []serviceBody }{Body: items}, nil
 	})
@@ -145,7 +153,7 @@ func RegisterServiceRoutes(api huma.API, svc *registry.Service) {
 		}
 		items := make([]serviceBody, len(list))
 		for i, s := range list {
-			items[i] = toServiceBody(s)
+			items[i] = toServiceBody(ctx, s)
 		}
 		return &struct{ Body []serviceBody }{Body: items}, nil
 	})
@@ -162,7 +170,7 @@ func RegisterServiceRoutes(api huma.API, svc *registry.Service) {
 		if err != nil {
 			return nil, huma.NewError(http.StatusNotFound, "service not found", err)
 		}
-		return &struct{ Body serviceBody }{Body: toServiceBody(*info)}, nil
+		return &struct{ Body serviceBody }{Body: toServiceBody(ctx, *info)}, nil
 	})
 
 	// PUT /api/v1/services/{id}/heartbeat

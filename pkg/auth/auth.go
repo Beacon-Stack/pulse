@@ -429,6 +429,16 @@ func (a *Auth) ConfirmPassword(ctx context.Context, password string) error {
 	return nil
 }
 
+// ViaAPIKey reports whether the request behind ctx was made with the
+// app's API key, as scripts and the other apps do, rather than from a
+// browser let in by address or by a login. Handlers use it to keep
+// secrets out of answers to browsers. ctx must come from a request that
+// passed Middleware.
+func ViaAPIKey(ctx context.Context) bool {
+	c, _ := ctx.Value(callerKey{}).(caller)
+	return c.method == MethodAPIKey
+}
+
 // CallerAddress is the address the app saw the request come from, and
 // whether it counts as local. The settings page shows it, because behind
 // some container setups and proxies it is not the address the owner
