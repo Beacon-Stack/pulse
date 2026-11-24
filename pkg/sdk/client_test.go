@@ -86,9 +86,9 @@ func TestSDKRegisterAndDiscover(t *testing.T) {
 	clientB, err := New(Config{
 		PulseURL:          ts.URL,
 		APIKey:            testAPIKey,
-		ServiceName:       "test-luminarr",
+		ServiceName:       "test-prism",
 		ServiceType:       "media-manager",
-		APIURL:            "http://luminarr:8282",
+		APIURL:            "http://prism:8282",
 		Version:           "0.1.0",
 		Capabilities:      []string{"supports_torrent", "supports_usenet"},
 		HeartbeatInterval: time.Hour,

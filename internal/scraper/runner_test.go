@@ -11,7 +11,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-// ── normalizeCardigannQuirks ────────────────────────────────────────────────
+// normalizeCardigannQuirks
 
 // Real-world regression: Prowlarr-Indexers v11/1337x.yml has an extra
 // closing paren on its TV-search path. Without normalization, Go's
@@ -78,7 +78,7 @@ func TestNormalizeCardigannQuirks_ResultParsesCleanly(t *testing.T) {
 	}
 }
 
-// ── Boolean coercion in NewRunner ───────────────────────────────────────────
+// Boolean coercion in NewRunner
 
 // Headline regression — the Nyaa.si "<no value>" titles. The upstream
 // YAML's `sonarr_compatibility` setting defaults to bool false, but
@@ -168,7 +168,7 @@ func TestNewRunner_BoolFalseRoutesToFalseBranch(t *testing.T) {
 	}
 }
 
-// ── path.Inputs query-string building ───────────────────────────────────────
+// path.Inputs query-string building
 
 // Headline regression — Nyaa.si search ignored the q parameter because
 // Pulse never built path.Inputs into the URL. Result: every search
@@ -237,7 +237,7 @@ func TestBuildQueryString_PathInputsOverrideBlockInputs(t *testing.T) {
 	}
 }
 
-// ── Runner.Search end-to-end ─────────────────────────────────────────────────
+// Runner.Search end-to-end
 
 // End-to-end test: composes the cdecd4b fixes (bool coercion,
 // missingkey=zero, iterative pass-2, filter-arg template eval, and
@@ -365,7 +365,7 @@ func TestRunnerSearch_EndToEnd_ComposesAllFixes(t *testing.T) {
 	}
 }
 
-// ── Filter-arg template evaluation ──────────────────────────────────────────
+// Filter-arg template evaluation
 
 // Cardigann YAML routinely embeds Go templates inside re_replace
 // replacement strings. Without evaluating the template against the row
@@ -433,7 +433,7 @@ func TestApplyFilters_NilContextSkipsTemplateEval(t *testing.T) {
 	}
 }
 
-// ── missingkey=zero on EvalTemplate ─────────────────────────────────────────
+// missingkey=zero on EvalTemplate
 
 // Default Go text/template renders missing map keys as the literal
 // "<no value>". Cardigann YAML chains fields where intermediate ones
@@ -453,7 +453,7 @@ func TestEvalTemplate_MissingKeyRendersEmpty(t *testing.T) {
 	}
 }
 
-// ── Iterative pass 2 in extractRow ──────────────────────────────────────────
+// Iterative pass 2 in extractRow
 
 // Pass 2 must reach a fixed point regardless of map iteration order.
 // Build a three-hop chain feeding into `title` (a SearchResult-bearing
@@ -536,7 +536,7 @@ search.fields: {}
 	}
 }
 
-// ── buildResult: magnet field key tolerance ──────────────────────────────────
+// buildResult: magnet field key tolerance
 //
 // Real-world regression: Cardigann YAMLs use either `magneturi` or
 // `magnet` as the field name for the magnet selector. Prowlarr's

@@ -26,7 +26,7 @@ type quality struct {
 	HDR        string `json:"hdr"`
 }
 
-// ── qualityJSON ──────────────────────────────────────────────────────────────
+// qualityJSON
 
 // qualityJSON's output must round-trip cleanly through json.Unmarshal
 // into the shape Prism/Pilot expect. A regression in the field-name
@@ -70,7 +70,7 @@ func TestQualityJSON_EscapesQuotesInInput(t *testing.T) {
 	}
 }
 
-// ── qualitiesJSON ────────────────────────────────────────────────────────────
+// qualitiesJSON
 
 // qualitiesJSON produces a JSON array of the same shape, with as many
 // elements as the input list. A bug in the comma-joining loop would
@@ -105,7 +105,7 @@ func TestQualitiesJSON_EmptyList(t *testing.T) {
 	}
 }
 
-// ── defaultProfiles ──────────────────────────────────────────────────────────
+// defaultProfiles
 
 // Every default profile's cutoff must appear in its qualities list.
 // Forgetting to add a quality matching the cutoff means the cutoff

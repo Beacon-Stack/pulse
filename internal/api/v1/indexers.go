@@ -13,7 +13,7 @@ import (
 	db "github.com/beacon-stack/pulse/internal/db/generated"
 )
 
-// ── Request / Response types ─────────────────────────────────────────────────
+// Request / Response types
 
 type indexerBody struct {
 	ID              string `json:"id"`
@@ -342,7 +342,7 @@ func RegisterIndexerRoutes(api huma.API, mgr *indexer.Manager, proxyBaseURL ...s
 			body := toIndexerBody(r)
 			// Rewrite URL to point at Pulse's Torznab proxy for scraped indexers.
 			// If the URL isn't already a Torznab/Newznab API endpoint, replace it
-			// with the proxy URL so Luminarr queries through Pulse.
+			// with the proxy URL so the app searches through Pulse.
 			if baseURL != "" && !isNativeTorznabURL(r.Url) {
 				body.URL = fmt.Sprintf("%s/api/v1/torznab/%s", baseURL, r.ID)
 			}

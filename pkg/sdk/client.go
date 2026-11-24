@@ -206,7 +206,7 @@ func (c *Client) Deregister(ctx context.Context) error {
 	return c.doRequest(ctx, "DELETE", fmt.Sprintf("/api/v1/services/%s", c.serviceID), nil, nil)
 }
 
-// ── Discovery ────────────────────────────────────────────────────────────────
+// Discovery
 
 // Service represents a registered service returned by discovery queries.
 type Service struct {
@@ -249,7 +249,7 @@ func (c *Client) DiscoverAll(ctx context.Context) ([]Service, error) {
 	return out, err
 }
 
-// ── Indexers ─────────────────────────────────────────────────────────────────
+// Indexers
 
 // Indexer represents an indexer assigned to this service.
 type Indexer struct {
@@ -271,7 +271,7 @@ func (c *Client) MyIndexers(ctx context.Context) ([]Indexer, error) {
 	return out, err
 }
 
-// ── Download Clients ─────────────────────────────────────────────────────────
+// Download Clients
 
 // DownloadClient represents a centrally managed download client.
 type DownloadClient struct {
@@ -297,7 +297,7 @@ func (c *Client) MyDownloadClients(ctx context.Context) ([]DownloadClient, error
 	return out, err
 }
 
-// ── Quality Profiles ─────────────────────────────────────────────────────────
+// Quality Profiles
 
 // QualityProfile represents a centrally managed quality profile pushed from Pulse.
 // The JSON blob fields (CutoffJSON, QualitiesJSON, UpgradeUntilJSON) are opaque
@@ -323,7 +323,7 @@ func (c *Client) MyQualityProfiles(ctx context.Context) ([]QualityProfile, error
 	return out, err
 }
 
-// ── Shared Media Handling Settings ───────────────────────────────────────────
+// Shared Media Handling Settings
 
 // SharedSettings is the filesystem/handling settings that apply uniformly
 // across all media-manager services. Services overlay these onto their local
@@ -345,7 +345,7 @@ func (c *Client) MySharedSettings(ctx context.Context) (*SharedSettings, error) 
 	return &out, nil
 }
 
-// ── Internal ─────────────────────────────────────────────────────────────────
+// Internal
 
 func (c *Client) register(ctx context.Context) (*Service, error) {
 	body := map[string]any{
@@ -476,7 +476,7 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body any, r
 	return nil
 }
 
-// ── Notifications ────────────────────────────────────────────────────────────
+// Notifications
 
 // NotifyHub returns Pulse as a notify.Hub, for an app's notify.Outbox:
 // events handed to it are broadcast on Pulse's channels.

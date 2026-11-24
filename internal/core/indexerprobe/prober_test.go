@@ -21,7 +21,7 @@ import (
 	"github.com/beacon-stack/pulse/internal/scraper"
 )
 
-// ── fakes ────────────────────────────────────────────────────────────────────
+// fakes
 
 type fakeSearch struct {
 	mu       sync.Mutex
@@ -146,7 +146,7 @@ func newHarness(t *testing.T) *harness {
 	return h
 }
 
-// ── tests ────────────────────────────────────────────────────────────────────
+// tests
 
 func TestEligible(t *testing.T) {
 	h := newHarness(t)

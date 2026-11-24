@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-// ── Capabilities document (returned for ?t=caps) ────────────────────────────
+// Capabilities document (returned for ?t=caps)
 
 // Caps is the XML capabilities document.
 type Caps struct {
@@ -51,7 +51,7 @@ type CapsCategory struct {
 	Subcats []CapsCategory `xml:"subcat,omitempty"`
 }
 
-// ── Search results feed (returned for ?t=search etc.) ───────────────────────
+// Search results feed (returned for ?t=search etc.)
 
 // Feed is the Torznab RSS search results feed.
 type Feed struct {
@@ -150,7 +150,7 @@ func writeElement(e *xml.Encoder, name, value string) {
 	_ = e.EncodeToken(xml.EndElement{Name: xml.Name{Local: name}})
 }
 
-// ── Builders ────────────────────────────────────────────────────────────────
+// Builders
 
 // NewFeed creates a new search results feed.
 func NewFeed(title string, items []Item) Feed {

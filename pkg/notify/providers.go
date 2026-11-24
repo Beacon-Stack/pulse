@@ -119,7 +119,7 @@ func decode[T any](mk func(T) Sender) func(json.RawMessage) (Sender, error) {
 	}
 }
 
-// ── Shared formatting ────────────────────────────────────────────────────────
+// Shared formatting
 
 func heading(e Event) string { return e.App + ": " + e.Title }
 
@@ -199,7 +199,7 @@ func do(c *http.Client, req *http.Request) error {
 	return nil
 }
 
-// ── Discord ──────────────────────────────────────────────────────────────────
+// Discord
 
 type discordConfig struct {
 	WebhookURL string `json:"webhook_url"`
@@ -251,7 +251,7 @@ func (c discordConfig) Send(ctx context.Context, e Event) error {
 	return postJSON(ctx, internetClient, c.WebhookURL, body, nil)
 }
 
-// ── Slack ────────────────────────────────────────────────────────────────────
+// Slack
 
 type slackConfig struct {
 	WebhookURL string `json:"webhook_url"`
@@ -282,7 +282,7 @@ func plainBodyNoURL(e Event) string {
 	return plainBody(e)
 }
 
-// ── Telegram ─────────────────────────────────────────────────────────────────
+// Telegram
 
 type telegramConfig struct {
 	BotToken string `json:"bot_token"`
@@ -309,7 +309,7 @@ func (c telegramConfig) Send(ctx context.Context, e Event) error {
 	}, nil)
 }
 
-// ── ntfy ─────────────────────────────────────────────────────────────────────
+// ntfy
 
 type ntfyConfig struct {
 	URL   string `json:"url"`
@@ -365,7 +365,7 @@ func (c ntfyConfig) Send(ctx context.Context, e Event) error {
 	return do(homeClient, req)
 }
 
-// ── Pushover ─────────────────────────────────────────────────────────────────
+// Pushover
 
 type pushoverConfig struct {
 	UserKey  string `json:"user_key"`
@@ -396,7 +396,7 @@ func (c pushoverConfig) Send(ctx context.Context, e Event) error {
 	return postJSON(ctx, internetClient, pushoverAPI, body, nil)
 }
 
-// ── Gotify ───────────────────────────────────────────────────────────────────
+// Gotify
 
 type gotifyConfig struct {
 	URL   string `json:"url"`
@@ -423,7 +423,7 @@ func (c gotifyConfig) Send(ctx context.Context, e Event) error {
 	}, map[string]string{"X-Gotify-Key": c.Token})
 }
 
-// ── Email ────────────────────────────────────────────────────────────────────
+// Email
 
 type emailConfig struct {
 	Host     string   `json:"host"`
@@ -522,7 +522,7 @@ func emailMessage(c emailConfig, e Event) []byte {
 	return []byte(b.String())
 }
 
-// ── Webhook ("Other app") ────────────────────────────────────────────────────
+// Webhook ("Other app")
 
 type webhookConfig struct {
 	URL    string `json:"url"`
@@ -553,7 +553,7 @@ func Sign(secret string, body []byte) string {
 	return hex.EncodeToString(m.Sum(nil))
 }
 
-// ── Small helpers ────────────────────────────────────────────────────────────
+// Small helpers
 
 func orDefault(s, d string) string {
 	if strings.TrimSpace(s) == "" {

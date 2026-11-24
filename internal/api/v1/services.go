@@ -9,7 +9,7 @@ import (
 	"github.com/beacon-stack/pulse/internal/core/registry"
 )
 
-// ── Request / Response types ─────────────────────────────────────────────────
+// Request / Response types
 
 type serviceBody struct {
 	ID           string   `json:"id"`

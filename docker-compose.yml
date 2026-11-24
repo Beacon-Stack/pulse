@@ -1,4 +1,3 @@
-# ============================================================================
 # Pulse — control plane for the Beacon apps
 # https://beaconstack.io/pulse
 #
@@ -11,7 +10,6 @@
 # in one place. Point each app at this Pulse with its *_PULSE_URL and
 # *_PULSE_API_KEY settings (see each app's compose file). Examples that
 # connect the whole stack: https://beaconstack.io
-# ============================================================================
 
 services:
   pulse:

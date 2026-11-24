@@ -134,10 +134,9 @@ func (m *Manager) RecordSearchOutcome(ctx context.Context, indexerID string, sea
 // refresh), using the same resolver the torznab proxy uses at search time
 // so the audit can never disagree with what a search would hit.
 //
-// Without this, an indexer whose upstream definition was removed (the
-// 2026-08-16 TorrentGalaxyClone incident — TorrentGalaxy shut down and
-// Prowlarr deleted the definition) stays configured and assigned forever,
-// and the first place it fails is every user search.
+// Without this, an indexer whose upstream definition was removed (a site
+// shuts down and Prowlarr deletes its definition) stays configured and
+// assigned, and the first place it fails is every search.
 //
 // A transition into or out of definition_missing changes what
 // ListIndexersForService returns, so assigned services are push-notified

@@ -40,7 +40,7 @@ func TestLoad_ReadsDatabasePath(t *testing.T) {
 	}
 }
 
-// ── EnsureAPIKey ────────────────────────────────────────────────────────────
+// EnsureAPIKey
 
 // stubStore is a minimal APIKeyStore for exercising EnsureAPIKey without
 // standing up a real database.

@@ -1,4 +1,4 @@
-// ── Theme system ──────────────────────────────────────────────────────────────
+// Theme system
 // Themes are stored in localStorage and applied by setting CSS custom properties
 // on document.documentElement. The default values live in index.css; themes
 // override them at runtime without any server round-trip.
@@ -33,7 +33,7 @@ export interface ThemePreset {
 }
 
 export const THEME_PRESETS: ThemePreset[] = [
-  // ── Dark themes ──────────────────────────────────────────────────────────
+  // Dark themes
   {
     id: "pulse",
     label: "Pulse",
@@ -360,7 +360,7 @@ export const THEME_PRESETS: ThemePreset[] = [
     },
   },
 
-  // ── Light themes ─────────────────────────────────────────────────────────
+  // Light themes
   {
     id: "catppuccin-latte",
     label: "Catppuccin Latte",

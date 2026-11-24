@@ -3,6 +3,13 @@
 // and return structured search results.
 package scraper
 
+import (
+	"bytes"
+	"fmt"
+
+	"gopkg.in/yaml.v3"
+)
+
 // Definition is the full parsed representation of a Prowlarr Cardigann YAML file.
 type Definition struct {
 	ID           string         `yaml:"id"`
@@ -142,4 +149,57 @@ type SearchResult struct {
 	Description          string
 	IMDBID               string
 	Poster               string
+}
+
+// ParseDefinition parses raw YAML bytes into a Definition.
+//
+// Applies a small set of upstream-typo workarounds before YAML parse —
+// see normalizeCardigannQuirks. These exist because the Prowlarr-Indexers
+// repo occasionally ships YAML with subtle template-syntax typos that
+// Prowlarr's C# Cardigann implementation tolerates but Go's text/template
+// rejects. We patch them at load time rather than per-call so the rest
+// of the runner sees clean templates.
+func ParseDefinition(raw []byte) (*Definition, error) {
+	raw = normalizeCardigannQuirks(raw)
+	var def Definition
+	if err := yaml.Unmarshal(raw, &def); err != nil {
+		return nil, fmt.Errorf("parsing definition YAML: %w", err)
+	}
+	return &def, nil
+}
+
+// normalizeCardigannQuirks repairs known upstream Cardigann YAML typos
+// that Go's text/template can't tolerate. Each entry should be:
+//   - documented with the indexer where it was first observed
+//   - linked to the upstream YAML so we can drop the workaround once
+//     Prowlarr-Indexers fixes it
+//
+// Replacements happen on the raw YAML bytes BEFORE yaml.Unmarshal so all
+// downstream consumers (template parser, runner, tests) see the clean
+// version. They are intentionally narrow string substitutions — broader
+// regex normalization would risk corrupting valid templates that just
+// happen to look adjacent to a known typo.
+func normalizeCardigannQuirks(raw []byte) []byte {
+	type quirk struct {
+		from, to string
+		// note is for code archaeology — link the upstream definition
+		// where this typo lives so a future maintainer can verify it's
+		// still needed before deleting the rule.
+		note string
+	}
+	quirks := []quirk{
+		{
+			// 1337x v11 search path #2 (TV) has (eq … .False)) with one
+			// extra closing paren. Movies/Music/Other paths in the same
+			// file are correct.
+			// https://github.com/Prowlarr/Indexers/blob/master/definitions/v11/1337x.yml
+			from: ".False)) }}",
+			to:   ".False) }}",
+			note: "1337x.yml v11: TV-search path extra-paren typo",
+		},
+	}
+	for _, q := range quirks {
+		raw = bytes.ReplaceAll(raw, []byte(q.from), []byte(q.to))
+	}
+	return raw
 }
